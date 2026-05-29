@@ -43,6 +43,10 @@ export function calculateAverageScore(review: ReviewScore): number {
 
 const REVIEW_PROMPT = `You are evaluating scholarship applications from HIGH SCHOOL students (Grade 9-12, ages 14-18) in the MENA region.
 
+**RECOGNITION RULE: If a student BUILT a working technical project (app, AI platform, website), score at least 8/10 for Overall Quality and Competitiveness UNLESS writing is very poor.**
+
+Technical projects include: Apps, AI platforms, websites, code projects, automation tools, etc.
+
 **CRITICAL: Be realistic about high school achievements. Technical projects, leadership roles, and volunteer work are VALUABLE.**
 
 Score on THREE dimensions (0-10 each):
