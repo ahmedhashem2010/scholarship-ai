@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, Check, GraduationCap, User, Globe, Briefcase } from "lucide-react";
 import { ConversionEvents } from "@/lib/analytics";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 
 const steps = [
   { title: "About You", icon: User },
@@ -178,18 +178,36 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] bg-gradient-to-b from-primary-50 to-white">
-      <div className="page-container py-12 max-w-2xl mx-auto">
-        <div className="text-center mb-10">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground mb-4">
-            <GraduationCap className="h-6 w-6" />
+    <div className="min-h-[calc(100vh-3.5rem)] bg-gradient-to-b from-primary-50 to-white overflow-x-hidden">
+      <div className="page-container py-8 sm:py-12 max-w-xl mx-auto px-4 sm:px-6">
+        <div className="text-center mb-8 sm:mb-10">
+          <div className="mx-auto flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground mb-3 sm:mb-4">
+            <GraduationCap className="h-5 w-5 sm:h-6 sm:w-6" />
           </div>
-          <h1 className="text-h2">Set Up Your Profile</h1>
-          <p className="mt-2 text-muted-foreground">Help us find the perfect scholarships for you</p>
+          <h1 className="text-xl sm:text-h2">Set Up Your Profile</h1>
+          <p className="mt-1 sm:mt-2 text-sm sm:text-base text-muted-foreground">Help us find the perfect scholarships for you</p>
         </div>
 
-        {/* Step Indicator */}
-        <div className="mb-10">
+        {/* Step Indicator — Mobile */}
+        <div className="md:hidden text-center mb-6">
+          <p className="text-sm text-muted-foreground">
+            Step {step + 1} of {steps.length}
+          </p>
+          <h2 className="text-xl font-semibold mt-1">
+            {steps[step]?.title ?? ""}
+          </h2>
+          <div className="w-full bg-muted rounded-full h-2 mt-4">
+            <div
+              className="bg-primary h-2 rounded-full transition-all duration-500"
+              style={{
+                width: `${((step + 1) / steps.length) * 100}%`,
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Step Indicator — Desktop */}
+        <div className="hidden md:block mb-10">
           <div className="flex items-center justify-between">
             {steps.map((s, i) => (
               <div key={s.title} className="flex items-center">
@@ -218,12 +236,12 @@ export default function OnboardingPage() {
         </div>
 
         <Card>
-          <CardHeader>
-            <CardTitle className="text-base">{steps[step]?.title ?? ""}</CardTitle>
-          </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 sm:p-6">
+            <div className="hidden sm:block">
+              <h2 className="text-base font-semibold mb-4">{steps[step]?.title ?? ""}</h2>
+            </div>
             {step === 0 && (
-              <div className="space-y-4 animate-fade-in">
+              <div className="space-y-3 sm:space-y-4 animate-fade-in">
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-1.5">Full Name</label>
                   <input
