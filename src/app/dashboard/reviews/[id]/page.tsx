@@ -12,9 +12,7 @@ import dynamic from "next/dynamic"
 const ReviewDisplay = dynamic(() => import("@/components/ReviewDisplay").then(m => ({ default: m.ReviewDisplay })), {
   loading: () => <div className="h-64 animate-pulse rounded-2xl bg-muted" />,
 })
-const PDFViewer = dynamic(() => import("@/components/scholarship/pdf-viewer").then(m => ({ default: m.PDFViewer })), {
-  loading: () => <div className="h-96 animate-pulse rounded-2xl bg-muted" />,
-})
+// PDF viewer disabled for competition submission
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -151,11 +149,9 @@ export default function DocumentReviewPage() {
                 <Clock className="h-4 w-4" />
                 <span>Version {documentData?.version || 1}</span>
               </div>
-              <PDFViewer
-                documentUrl={`/api/documents/${documentId}/file`}
-                fileType={documentData?.fileType}
-                isLoading={isLoading}
-              />
+              <div className="flex h-96 items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 p-4">
+                <p className="text-sm text-gray-500">PDF viewer temporarily disabled</p>
+              </div>
             </div>
           </div>
         </div>
