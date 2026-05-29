@@ -40,7 +40,7 @@ export const scholarshipQuerySchema = z.object({
     .default("1"),
   pageSize: z
     .string()
-    .transform((val) => Math.min(50, Math.max(1, parseInt(val, 10) || 10)))
+    .transform((val) => Math.min(500, Math.max(1, parseInt(val, 10) || 10)))
     .optional()
     .default("10"),
 });

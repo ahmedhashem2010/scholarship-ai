@@ -12,7 +12,7 @@ export default function ScholarshipsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/scholarships")
+    fetch("/api/scholarships?pageSize=250")
       .then((r) => r.json())
       .then((json) => {
         if (json.success) {
