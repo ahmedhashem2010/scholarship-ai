@@ -33,45 +33,41 @@ export function calculateAverageScore(review: ReviewScore): number {
   return avg;
 }
 
-const REVIEW_PROMPT = `CRITICAL INSTRUCTIONS: You MUST follow this scoring system exactly.
+const REVIEW_PROMPT = `Rate this high school student's CV on 3 scales (0-10 each).
 
-REFERENCE BENCHMARK (9-10/10):
-- Yale/Harvard/MIT fellowship acceptance
-- Research at university labs with numerical results
-- LED 100+ person events or initiatives
-- International awards or competitions
-- Multiple significant achievements combined
+SCORING RULES:
+- 9-10 = Built real project (app, research, device) OR won major competition OR international fellowship
+- 7-8 = Has good achievements (projects + leadership OR multiple awards)
+- 5-6 = Some achievements but basic
+- 0-4 = Generic or no achievements
 
-RULE 1: If the CV mentions ANY of these → MINIMUM 8/10:
-✓ "Yale" or "Harvard" or international fellowship
-✓ "Research" + "university lab" + "results"
-✓ "Led" + "100+" people or "organized" + event
-✓ "Published" or "submitted research"
-✓ Specific numbers/measurements in achievements
+Document Type: {documentType}
 
-RULE 2: If the CV has 3+ strong achievements → MINIMUM 7/10
+Document:
+{documentText}
 
-RULE 3: Only score below 7/10 if the CV is generic or lacks detail
+NOW RATE IT.
 
-SCORING (0-10):
-9-10 = Has international fellowship OR research + multiple achievements
-7-8 = Has 2-3 strong achievements (projects, leadership, awards)
-5-6 = Has some achievements but lacks quantification
-0-4 = Generic or minimal achievements
-
-Score these 3 dimensions:
-1. Overall Quality (0-10)
-2. ATS Compatibility (0-10) 
-3. Competitiveness (0-10)
-
-Return ONLY this JSON format:
+Return ONLY this JSON format with NO other text:
 {
-  "overallQuality": {"score": <0-10>, "strengthsSummary": "<1 sentence>", "weaknessesSummary": "<1 sentence or 'None'>"},
-  "atsCompatibility": {"score": <0-10>, "missingKeywords": [], "improvements": []},
-  "competitiveness": {"score": <0-10>, "uniqueStrengths": "<1 sentence>", "differentiation": "<1 sentence or 'Already competitive'>"},
-  "topImprovements": ["<1>", "<2>", "<3>"],
-  "quickWins": ["<1>", "<2>"],
-  "overallAssessment": "<2 sentences, encouraging>"
+  "overallQuality": {
+    "score": NUMBER_0_TO_10,
+    "strengthsSummary": "one sentence about strengths",
+    "weaknessesSummary": "one sentence about weaknesses"
+  },
+  "atsCompatibility": {
+    "score": NUMBER_0_TO_10,
+    "missingKeywords": ["keyword1", "keyword2"],
+    "improvements": ["improvement1"]
+  },
+  "competitiveness": {
+    "score": NUMBER_0_TO_10,
+    "uniqueStrengths": "one sentence",
+    "differentiation": "one sentence"
+  },
+  "topImprovements": ["improvement1", "improvement2", "improvement3"],
+  "quickWins": ["win1", "win2"],
+  "overallAssessment": "two sentence summary"
 }`;
 
 async function callAI(prompt: string): Promise<string> {
