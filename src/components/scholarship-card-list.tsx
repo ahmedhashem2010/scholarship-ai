@@ -33,7 +33,7 @@ interface ScholarshipCardData {
   country: string;
   university: string | null;
   degree: string;
-  deadline: Date | null;
+  deadline: string | null;
   competitionLevel: string;
   description: string | null;
   benefits: string | null;
@@ -127,14 +127,14 @@ export function ScholarshipCardList({ scholarships }: { scholarships: Scholarshi
         result.sort((a, b) => {
           if (!a.deadline) return 1;
           if (!b.deadline) return -1;
-          return a.deadline.getTime() - b.deadline.getTime();
+          return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
         });
         break;
       case "deadline_desc":
         result.sort((a, b) => {
           if (!a.deadline) return -1;
           if (!b.deadline) return 1;
-          return b.deadline.getTime() - a.deadline.getTime();
+          return new Date(b.deadline).getTime() - new Date(a.deadline).getTime();
         });
         break;
       case "name_asc":
