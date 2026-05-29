@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = 'force-dynamic';
+
 import { useState } from "react";
 import { CreditCard, CheckCircle2, Sparkles, Star, Zap, Shield, Smartphone, Landmark, Banknote } from "lucide-react";
 import { useRouter } from "next/navigation";

@@ -2,12 +2,13 @@
 
 export const dynamic = 'force-dynamic';
 
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Mail, ArrowRight } from "lucide-react";
 
-export default function VerifyPage() {
+function VerifyPageContent() {
   const searchParams = useSearchParams();
   const email = searchParams.get("email") || "your email";
 
@@ -37,5 +38,13 @@ export default function VerifyPage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+export default function VerifyPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <VerifyPageContent />
+    </Suspense>
   );
 }

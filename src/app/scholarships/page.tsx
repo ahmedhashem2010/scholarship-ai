@@ -1,3 +1,7 @@
+'use client';
+
+export const dynamic = 'force-dynamic';
+
 import { prisma } from "@/lib/prisma";
 import { Search } from "lucide-react";
 import { ScholarshipCardList } from "@/components/scholarship-card-list";

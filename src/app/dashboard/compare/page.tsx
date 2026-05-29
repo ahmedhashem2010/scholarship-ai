@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useEffect, useState, useCallback } from "react";
+import { Suspense, useEffect, useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -98,7 +98,7 @@ function getCompetitionColor(level: string): "red" | "yellow" | "green" {
   return "green";
 }
 
-export default function ComparePage() {
+function ComparePageContent() {
   const searchParams = useSearchParams();
   const ids = searchParams.get("ids")?.split(",").filter(Boolean) ?? [];
 
@@ -893,5 +893,13 @@ export default function ComparePage() {
         </Link>
       </div>
     </div>
+  );
+}
+
+export default function ComparePage() {
+  return (
+    <Suspense fallback={<div className="page-container py-16 text-center text-muted-foreground">Loading...</div>}>
+      <ComparePageContent />
+    </Suspense>
   );
 }
