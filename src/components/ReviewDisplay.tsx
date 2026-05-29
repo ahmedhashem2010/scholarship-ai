@@ -1,129 +1,89 @@
 "use client"
 
-import { Lightbulb, Zap, MessageSquare, Award, FileSearch, TrendingUp } from "lucide-react"
+import { Lightbulb, Zap, MessageSquare } from "lucide-react"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { calculateAverageScore, type ReviewScore } from "@/lib/ai-review"
 
-interface ReviewDisplayProps {
-  review: {
-    overallQuality: {
-      score: number
-      strengthsSummary: string
-      weaknesseSummary: string
-    }
-    atsCompatibility: {
-      score: number
-      missingKeywords: string[]
-      improvements: string[]
-    }
-    competitiveness: {
-      score: number
-      uniqueStrengths: string
-      differentiation: string
-    }
-    topImprovements: string[]
-    quickWins: string[]
-    overallAssessment: string
-  }
-}
+export function ReviewDisplay({ review }: { review: ReviewScore }) {
+  const mainScore = calculateAverageScore(review)
 
-function ScoreCard({
-  icon: Icon,
-  label,
-  score,
-  children,
-}: {
-  icon: React.ElementType
-  label: string
-  score: number
-  children: React.ReactNode
-}) {
-  const color =
-    score >= 8 ? "text-green-600 dark:text-green-400" :
-    score >= 6 ? "text-yellow-600 dark:text-yellow-400" :
-    "text-red-600 dark:text-red-400"
-
-  const bg =
-    score >= 8 ? "from-green-500/10 to-green-600/5 border-green-500/20" :
-    score >= 6 ? "from-yellow-500/10 to-yellow-600/5 border-yellow-500/20" :
-    "from-red-500/10 to-red-600/5 border-red-500/20"
-
-  return (
-    <div className={`rounded-xl border bg-gradient-to-br ${bg} p-5`}>
-      <div className="mb-3 flex items-center gap-2">
-        <Icon className={`h-5 w-5 ${color}`} />
-        <h3 className="font-semibold text-foreground">{label}</h3>
-      </div>
-      <div className="mb-3 flex items-baseline gap-1">
-        <span className={`text-4xl font-bold ${color}`}>{score}</span>
-        <span className="text-sm text-muted-foreground">/ 10</span>
-      </div>
-      {children}
-    </div>
-  )
-}
-
-export function ReviewDisplay({ review }: ReviewDisplayProps) {
   return (
     <div className="space-y-6">
-      {/* THREE SCORE CARDS */}
-      <div className="grid gap-4 sm:grid-cols-3">
-        <ScoreCard icon={Award} label="Overall Quality" score={review.overallQuality.score}>
-          <div className="space-y-2 text-sm">
-            <div>
-              <span className="font-medium text-green-600 dark:text-green-400">Strengths:</span>
-              <p className="text-muted-foreground">{review.overallQuality.strengthsSummary}</p>
+      {/* Main Score - Average of all 3 */}
+      <Card className="border-2 border-blue-500 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950">
+        <CardHeader>
+          <CardTitle className="text-center">
+            <div className="text-5xl font-bold text-blue-600 dark:text-blue-400">
+              {mainScore}
             </div>
-            <div>
-              <span className="font-medium text-red-600 dark:text-red-400">Weaknesses:</span>
-              <p className="text-muted-foreground">{review.overallQuality.weaknesseSummary}</p>
+            <div className="mt-2 text-lg text-gray-600 dark:text-gray-400">
+              Overall Score (Average)
             </div>
-          </div>
-        </ScoreCard>
+          </CardTitle>
+        </CardHeader>
+      </Card>
 
-        <ScoreCard icon={FileSearch} label="ATS Compatibility" score={review.atsCompatibility.score}>
-          <div className="space-y-2 text-sm">
-            {review.atsCompatibility.missingKeywords.length > 0 && (
-              <div>
-                <span className="font-medium text-foreground">Missing Keywords:</span>
-                <div className="mt-1 flex flex-wrap gap-1">
-                  {review.atsCompatibility.missingKeywords.map((kw, i) => (
-                    <span
-                      key={i}
-                      className="rounded-full bg-orange-500/10 px-2 py-0.5 text-xs text-orange-600 dark:text-orange-400"
-                    >
-                      {kw}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-            {review.atsCompatibility.improvements.length > 0 && (
-              <div>
-                <span className="font-medium text-foreground">Improvements:</span>
-                <ul className="mt-1 list-inside list-disc space-y-0.5 text-muted-foreground">
-                  {review.atsCompatibility.improvements.map((imp, i) => (
-                    <li key={i}>{imp}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        </ScoreCard>
+      {/* Three Detailed Scores */}
+      <div className="grid grid-cols-3 gap-4">
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-sm">
+              💡 Overall Quality
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-blue-600">
+              {review.overallQuality.score}
+              <span className="text-lg text-gray-500">/10</span>
+            </div>
+            <p className="mt-2 text-xs font-semibold text-green-600 dark:text-green-400">
+              Strengths: {review.overallQuality.strengthsSummary}
+            </p>
+            <p className="mt-1 text-xs text-red-600 dark:text-red-400">
+              Weaknesses: {review.overallQuality.weaknessesSummary}
+            </p>
+          </CardContent>
+        </Card>
 
-        <ScoreCard icon={TrendingUp} label="Competitiveness" score={review.competitiveness.score}>
-          <div className="space-y-2 text-sm">
-            <div>
-              <span className="font-medium text-green-600 dark:text-green-400">Unique Strengths:</span>
-              <p className="text-muted-foreground">{review.competitiveness.uniqueStrengths}</p>
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-sm">
+              🔍 ATS Compatibility
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-green-600">
+              {review.atsCompatibility.score}
+              <span className="text-lg text-gray-500">/10</span>
             </div>
-            <div>
-              <span className="font-medium text-blue-600 dark:text-blue-400">Differentiation:</span>
-              <p className="text-muted-foreground">{review.competitiveness.differentiation}</p>
+            <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+              <span className="font-semibold">Missing Keywords:</span>
+              {review.atsCompatibility.missingKeywords.length > 0
+                ? ` ${review.atsCompatibility.missingKeywords.join(", ")}`
+                : " None!"}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-sm">
+              🚀 Competitiveness
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-purple-600">
+              {review.competitiveness.score}
+              <span className="text-lg text-gray-500">/10</span>
             </div>
-          </div>
-        </ScoreCard>
+            <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+              {review.competitiveness.uniqueStrengths}
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* TOP 5 IMPROVEMENTS */}
+      {/* TOP IMPROVEMENTS */}
       <div className="rounded-xl border border-indigo-500/20 bg-indigo-500/5 p-5 dark:border-indigo-400/20 dark:bg-indigo-400/5">
         <div className="mb-4 flex items-center gap-2">
           <Lightbulb className="h-5 w-5 text-indigo-500 dark:text-indigo-400" />

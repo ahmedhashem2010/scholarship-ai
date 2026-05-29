@@ -15,7 +15,7 @@ export interface ReviewScore {
   overallQuality: {
     score: number;
     strengthsSummary: string;
-    weaknesseSummary: string;
+    weaknessesSummary: string;
   };
   atsCompatibility: {
     score: number;
@@ -32,53 +32,58 @@ export interface ReviewScore {
   overallAssessment: string;
 }
 
-const REVIEW_PROMPT = `You are an expert scholarship reviewer and ATS (Applicant Tracking System) specialist. Analyze this document for scholarship applications in MENA region.
+export function calculateAverageScore(review: ReviewScore): number {
+  const avg = Math.round(
+    (review.overallQuality.score +
+     review.atsCompatibility.score +
+     review.competitiveness.score) / 3
+  );
+  return avg;
+}
+
+const REVIEW_PROMPT = `You are evaluating scholarship applications from HIGH SCHOOL students (Grade 9-12, ages 14-18) in the MENA region.
+
+**IMPORTANT: Grade on high school standards, not university standards.**
 
 Score on THREE dimensions (0-10 each):
 
-1. **OVERALL QUALITY (0-10):**
-   - 9-10: Exceptional. Clear goals, compelling story, strong evidence of achievement
-   - 7-8: Strong. Good articulation, relevant experience, clear fit for scholarship
-   - 5-6: Average. Basic information present, some weak areas, needs polish
-   - 3-4: Below average. Unclear messaging, lacking specifics, weak evidence
-   - 0-2: Poor. Incoherent, irrelevant, or incomplete
+1. **OVERALL QUALITY (0-10):** For a high school applicant
+   - 9-10: Exceptional. Clear goals, compelling story, significant project/achievement
+   - 7-8: Strong. Good articulation, relevant experience, demonstrates initiative
+   - 5-6: Average. Basic information, some good points, needs more specificity
+   - 3-4: Below average. Unclear, lacks detail, weak evidence
+   - 0-2: Poor. Incoherent or incomplete
 
-2. **ATS COMPATIBILITY (0-10):** How likely this passes automated screening systems
-   - Check: Keywords match scholarship focus areas (education, STEM, social impact)
-   - Check: Quantifiable achievements (percentages, numbers, rankings)
-   - Check: Clear section headers and organization
-   - Check: Professional language, no spelling errors
-   - 9-10: Optimized. All keywords present, excellent structure, passes all filters
-   - 7-8: Good. Most keywords, clear sections, minor improvements needed
-   - 5-6: Adequate. Basic structure, some keywords missing, formatting issues
-   - 0-4: Poor. Disorganized, missing keywords, grammar issues
+2. **ATS COMPATIBILITY (0-10):** For high school applications
+   - Check: Scholarship keywords (leadership, innovation, STEM, social impact, community)
+   - Check: Quantified results where possible (students helped, projects built, teams led)
+   - Check: Clear dates, organization names, specific outcomes
+   - 9-10: Optimized. All keywords, quantified, well-organized
+   - 7-8: Good. Most keywords present, good structure
+   - 5-6: Adequate. Basic structure, some improvements needed
+   - 0-4: Poor. Disorganized, vague, missing details
 
-3. **COMPETITIVENESS (0-10):** How competitive vs typical MENA scholarship applicants
-   - 9-10: Exceptional. Top 1% of applicants. Unique story + strong achievements
-   - 7-8: Competitive. Top 10%. Good achievements, clear value proposition
-   - 5-6: Average. Typical applicant profile, needs differentiation
-   - 3-4: Below average. Lacks standout achievements or clarity
-   - 0-2: Weak. Similar to many others, no clear competitive advantage
+3. **COMPETITIVENESS (0-10):** High school applicants in MENA
+   - 9-10: Top applicant. Technical project (app/AI/coding) OR exceptional leadership + impact
+   - 7-8: Competitive. Good achievements, clear value proposition, stands out
+   - 5-6: Average. Typical high school profile, needs differentiation
+   - 3-4: Below average. Lacks standout projects or leadership
+   - 0-2: Weak. Generic profile
 
-DOCUMENT TYPE: {documentType}
-
-DOCUMENT TEXT:
-{documentText}
-
-Respond ONLY as JSON (no markdown, no explanations):
+Respond ONLY as valid JSON (no markdown, no explanations):
 {
   "overallQuality": {
-    "score": <0-10>,
+    "score": <number 0-10>,
     "strengthsSummary": "<1-2 key strengths>",
-    "weaknesseSummary": "<1-2 key weaknesses>"
+    "weaknessesSummary": "<1-2 key weaknesses>"
   },
   "atsCompatibility": {
-    "score": <0-10>,
+    "score": <number 0-10>,
     "missingKeywords": ["keyword1", "keyword2"],
     "improvements": ["improvement1", "improvement2"]
   },
   "competitiveness": {
-    "score": <0-10>,
+    "score": <number 0-10>,
     "uniqueStrengths": "<What makes this applicant stand out>",
     "differentiation": "<How to compete better>"
   },
@@ -156,7 +161,7 @@ const FALLBACK: ReviewScore = {
   overallQuality: {
     score: 5,
     strengthsSummary: "Shows relevant experience and interest in the field",
-    weaknesseSummary: "Needs more specific evidence and quantifiable achievements",
+    weaknessesSummary: "Needs more specific evidence and quantifiable achievements",
   },
   atsCompatibility: {
     score: 5,
