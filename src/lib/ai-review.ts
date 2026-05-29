@@ -1,15 +1,7 @@
 const FREEMODEL_ENDPOINT = "https://api.freemodel.dev/v1/chat/completions";
 const FREEMODEL_KEY = process.env.FREEMODEL_API_KEY;
 
-const REVIEW_MODELS = [
-  "gpt-4o-mini",
-  "claude-sonnet-4-20250514",
-  "claude-haiku-3-5-20241022",
-  "gpt-4o",
-  "deepseek-chat",
-  "gemini-2.0-flash",
-  "claude-3-5-haiku-20241022",
-];
+const REVIEW_MODELS = ['claude-sonnet-4-20250514']; // Only Claude for reviews
 
 export interface ReviewScore {
   overallQuality: {
