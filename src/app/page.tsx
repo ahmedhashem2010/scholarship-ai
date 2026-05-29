@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import Link from 'next/link';
 import { ArrowRight, Check, Brain, Target, TrendingUp } from 'lucide-react';
 import { ThemeToggle } from '@/components/scholarship/theme-toggle';

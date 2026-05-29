@@ -1,5 +1,7 @@
 "use client"
 
+export const dynamic = 'force-dynamic'
+
 import { useState, useEffect, memo, useRef } from "react"
 import { Header } from "@/components/scholarship/header"
 import { useLanguage } from "@/contexts/LanguageContext"
