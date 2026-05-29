@@ -1,11 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Disable all static export - use serverless only
   experimental: {
     ppr: false,
   },
-  // Don't try to optimize for static - just run as serverless
   staticPageGenerationTimeout: 0,
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      config.externals.push({ canvas: "commonjs canvas" });
+    }
+    return config;
+  },
 };
 
 export default nextConfig

@@ -21,17 +21,28 @@ export async function extractTextFromFile(
 }
 
 async function extractFromPDF(buffer: Buffer): Promise<string> {
-  const { PDFParse } = await import("pdf-parse");
-  const parser = new PDFParse({ data: buffer });
+  const pdfjs = await import("pdfjs-dist");
+  const data = new Uint8Array(buffer);
+  const loadingTask = pdfjs.getDocument({ data });
+  const doc = await loadingTask.promise;
   try {
-    const result = await parser.getText();
-    const text = result.text?.trim() || "";
+    const pages: string[] = [];
+    for (let i = 1; i <= doc.numPages; i++) {
+      const page = await doc.getPage(i);
+      const textContent = await page.getTextContent();
+      const pageText = textContent.items
+        .filter((item) => "str" in item)
+        .map((item) => (item as { str: string }).str)
+        .join(" ");
+      pages.push(pageText);
+    }
+    const text = pages.join("\n").trim();
     if (!text) {
       throw new Error("No text could be extracted from the PDF. The file may be scanned/image-based.");
     }
     return text;
   } finally {
-    await parser.destroy();
+    doc.destroy();
   }
 }
 
