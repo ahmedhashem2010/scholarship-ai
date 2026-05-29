@@ -1,7 +1,0 @@
-{
-  "buildCommand": "next build",
-  "outputDirectory": ".next",
-  "env": {
-    "VERCEL_ENV": "production"
-  }
-}
