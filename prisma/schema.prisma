@@ -1,0 +1,172 @@
+// PostgreSQL variant — copy to schema.prisma before deploying to production.
+// Run: Copy-Item prisma/schema.postgres.prisma prisma/schema.prisma
+// Then: npx prisma generate && npx prisma migrate deploy
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String       @id
+  email         String?
+  name          String?
+  reviewCredits Int          @default(0)
+  profile       UserProfile?
+  documents     Document[]
+  reviews       Review[]
+  payments      Payment[]
+  applications  Application[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
+model UserProfile {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  displayName       String
+  dateOfBirth       DateTime
+  country           String
+  educationLevel    String
+  major             String?
+  targetDegree      String
+  englishLevel      String
+  englishScore      Int?
+  gpa               Float?
+  hasWorkExperience Boolean  @default(false)
+  workYears         Int?
+  hasResearch       Boolean  @default(false)
+  budget            String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Scholarship {
+  id                  String           @id @default(cuid())
+  nameEn              String           @unique
+  nameAr              String
+  country             String
+  university          String?
+  degree              String
+  deadline            DateTime?
+  flagUrl             String?
+  description         String?
+  benefits            String?
+  requirements        String?
+  sourceUrl           String?
+  source              String?
+
+  // Eligibility criteria — stored as JSON arrays in PostgreSQL
+  eligibleCountries   String[]
+  eligibleEducation   String[]
+  fieldOfStudy        String[]
+  minimumAge          Int?
+  maximumAge          Int?
+  minimumGPA          Float?
+  englishRequirement  String?
+  requiresResearch    Boolean          @default(false)
+  requiresWorkExp     Boolean          @default(false)
+  applicationFee      Float?
+  competitionLevel    String           @default("medium")
+  requiredDocuments   String[]
+
+  applications        Application[]
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+}
+
+model Application {
+  id            String   @id @default(cuid())
+  userId        String
+  scholarshipId String
+  status        String   @default("NOT_STARTED")
+  progress      Int      @default(0)
+  startedAt     DateTime @default(now())
+  submittedAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user        User                  @relation(fields: [userId], references: [id])
+  scholarship Scholarship           @relation(fields: [scholarshipId], references: [id])
+  documents   ApplicationDocument[]
+
+  @@index([userId])
+  @@index([scholarshipId])
+  @@unique([userId, scholarshipId])
+}
+
+model Payment {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  amount    Int
+  credits   Int
+  status    String   @default("pending")
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Document {
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id])
+  fileName         String
+  fileUrl          String
+  fileType         String
+  fileSize         Int
+  documentType     String   @default("OTHER")
+  version          Int      @default(1)
+  parentDocumentId String?
+  parentDocument   Document?  @relation("DocumentVersions", fields: [parentDocumentId], references: [id])
+  childVersions    Document[] @relation("DocumentVersions")
+  improvementScore Float?
+  uploadedAt       DateTime @default(now())
+  reviews          Review[]
+  appDocuments     ApplicationDocument[]
+
+  @@index([userId])
+}
+
+model ApplicationDocument {
+  id                 String   @id @default(cuid())
+  applicationId      String
+  documentType       String
+  status             String   @default("NOT_STARTED")
+  aiScore            Int?
+  uploadedDocumentId String?
+  feedback           String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  application      Application @relation(fields: [applicationId], references: [id])
+  uploadedDocument Document?   @relation(fields: [uploadedDocumentId], references: [id])
+
+  @@index([applicationId])
+}
+
+model Review {
+  id             String   @id @default(cuid())
+  documentId     String
+  document       Document @relation(fields: [documentId], references: [id])
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  score          Int
+  strengths      String
+  weaknesses     String
+  suggestions    String
+  grammarIssues  String
+  overallFeedback String
+  modelUsed      String   @default("gemini-2.0-flash")
+  createdAt      DateTime @default(now())
+
+  @@index([documentId])
+  @@index([userId])
+}
