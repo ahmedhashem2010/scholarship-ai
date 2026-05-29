@@ -44,18 +44,32 @@ export async function POST(
       orderBy: { createdAt: "desc" },
     });
     if (existingReview) {
+      const rawScores = JSON.parse(existingReview.strengths);
+      const isOldFormat = Array.isArray(rawScores) && rawScores.length > 0 && typeof rawScores[0] === "string";
       return NextResponse.json({
         success: true,
-        data: {
+        data: isOldFormat ? {
           id: existingReview.id,
           documentId: existingReview.documentId,
           userId: existingReview.userId,
-          score: existingReview.score,
-          strengths: JSON.parse(existingReview.strengths),
-          weaknesses: JSON.parse(existingReview.weaknesses),
-          suggestions: JSON.parse(existingReview.suggestions),
-          grammarIssues: JSON.parse(existingReview.grammarIssues),
-          overallFeedback: existingReview.overallFeedback,
+          overallQuality: { score: existingReview.score, strengthsSummary: "", weaknesseSummary: "" },
+          atsCompatibility: { score: existingReview.score, missingKeywords: [], improvements: [] },
+          competitiveness: { score: existingReview.score, uniqueStrengths: "", differentiation: "" },
+          topImprovements: JSON.parse(existingReview.suggestions),
+          quickWins: JSON.parse(existingReview.grammarIssues),
+          overallAssessment: existingReview.overallFeedback,
+          modelUsed: existingReview.modelUsed,
+          createdAt: existingReview.createdAt,
+        } : {
+          id: existingReview.id,
+          documentId: existingReview.documentId,
+          userId: existingReview.userId,
+          overallQuality: rawScores.overallQuality,
+          atsCompatibility: rawScores.atsCompatibility,
+          competitiveness: rawScores.competitiveness,
+          topImprovements: JSON.parse(existingReview.suggestions),
+          quickWins: JSON.parse(existingReview.grammarIssues),
+          overallAssessment: existingReview.overallFeedback,
           modelUsed: existingReview.modelUsed,
           createdAt: existingReview.createdAt,
         },
@@ -98,27 +112,34 @@ export async function POST(
     }
 
     const coaching = await reviewDocument(text, document.documentType);
-    if (!coaching || typeof coaching.score !== "number") {
+    if (!coaching || typeof coaching.overallQuality?.score !== "number") {
       return NextResponse.json({ success: false, error: "AI review returned an invalid response" }, { status: 502 });
     }
 
-    const improvementScore = prevScore !== null ? coaching.score - prevScore : null;
+    const mainScore = coaching.overallQuality.score;
+    const improvementScore = prevScore !== null ? mainScore - prevScore : null;
 
     await prisma.user.update({
       where: { id: user.id },
       data: { reviewCredits: { decrement: 1 } },
     });
 
+    const scoresData = {
+      overallQuality: coaching.overallQuality,
+      atsCompatibility: coaching.atsCompatibility,
+      competitiveness: coaching.competitiveness,
+    };
+
     const review = await prisma.review.create({
       data: {
         documentId: document.id,
         userId: user.id,
-        score: coaching.score,
-        strengths: JSON.stringify(coaching.strongPoints ?? []),
-        weaknesses: JSON.stringify(coaching.weakSentences ?? []),
-        suggestions: JSON.stringify(coaching.improvements ?? []),
+        score: mainScore,
+        strengths: JSON.stringify(scoresData),
+        weaknesses: JSON.stringify([]),
+        suggestions: JSON.stringify(coaching.topImprovements ?? []),
         grammarIssues: JSON.stringify(coaching.quickWins ?? []),
-        overallFeedback: coaching.assessment ?? "Review completed.",
+        overallFeedback: coaching.overallAssessment ?? "Review completed.",
       },
     });
 
@@ -133,13 +154,12 @@ export async function POST(
       id: review.id,
       documentId: review.documentId,
       userId: review.userId,
-      score: review.score,
-      reasoning: coaching.reasoning ?? "",
-      strongPoints: JSON.parse(review.strengths),
-      weakSentences: JSON.parse(review.weaknesses),
-      improvements: JSON.parse(review.suggestions),
+      overallQuality: coaching.overallQuality,
+      atsCompatibility: coaching.atsCompatibility,
+      competitiveness: coaching.competitiveness,
+      topImprovements: JSON.parse(review.suggestions),
       quickWins: JSON.parse(review.grammarIssues),
-      assessment: review.overallFeedback,
+      overallAssessment: review.overallFeedback,
       modelUsed: review.modelUsed,
       createdAt: review.createdAt,
     };
@@ -192,27 +212,36 @@ export async function GET(
 
     const versionChain = await getVersionChain(id);
 
-    const rawWeaknesses = review ? JSON.parse(review.weaknesses) : []
-    const weakSentences = Array.isArray(rawWeaknesses) && rawWeaknesses.length > 0 && typeof rawWeaknesses[0] === "object"
-      ? rawWeaknesses
-      : (rawWeaknesses as string[]).map((w: string) => ({ quote: w, issue: "Consider revising this section" }))
+    const rawScores = review ? JSON.parse(review.strengths) : null;
+    const isOldFormat = Array.isArray(rawScores) && rawScores.length > 0 && typeof rawScores[0] === "string";
 
     return NextResponse.json({
       success: true,
-      data: review ? {
+      data: review ? (isOldFormat ? {
         id: review.id,
         documentId: review.documentId,
         userId: review.userId,
-        score: review.score,
-        reasoning: "",
-        strongPoints: JSON.parse(review.strengths),
-        weakSentences,
-        improvements: JSON.parse(review.suggestions),
+        overallQuality: { score: review.score, strengthsSummary: "", weaknesseSummary: "" },
+        atsCompatibility: { score: review.score, missingKeywords: [], improvements: [] },
+        competitiveness: { score: review.score, uniqueStrengths: "", differentiation: "" },
+        topImprovements: JSON.parse(review.suggestions),
         quickWins: JSON.parse(review.grammarIssues),
-        assessment: review.overallFeedback,
+        overallAssessment: review.overallFeedback,
         modelUsed: review.modelUsed,
         createdAt: review.createdAt,
-      } : null,
+      } : {
+        id: review.id,
+        documentId: review.documentId,
+        userId: review.userId,
+        overallQuality: rawScores.overallQuality,
+        atsCompatibility: rawScores.atsCompatibility,
+        competitiveness: rawScores.competitiveness,
+        topImprovements: JSON.parse(review.suggestions),
+        quickWins: JSON.parse(review.grammarIssues),
+        overallAssessment: review.overallFeedback,
+        modelUsed: review.modelUsed,
+        createdAt: review.createdAt,
+      }) : null,
       document: {
         id: document.id,
         fileName: document.fileName,

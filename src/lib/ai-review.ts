@@ -1,5 +1,3 @@
-import { parseReviewResponse, type ParsedReview } from "./parse-review";
-
 const FREEMODEL_ENDPOINT = "https://api.freemodel.dev/v1/chat/completions";
 const FREEMODEL_KEY = process.env.FREEMODEL_API_KEY;
 
@@ -13,42 +11,88 @@ const REVIEW_MODELS = [
   "claude-3-5-haiku-20241022",
 ];
 
-const REVIEW_PROMPT = `You are an expert scholarship application coach. Review this document and provide CONCISE, ACTIONABLE feedback.
+export interface ReviewScore {
+  overallQuality: {
+    score: number;
+    strengthsSummary: string;
+    weaknesseSummary: string;
+  };
+  atsCompatibility: {
+    score: number;
+    missingKeywords: string[];
+    improvements: string[];
+  };
+  competitiveness: {
+    score: number;
+    uniqueStrengths: string;
+    differentiation: string;
+  };
+  topImprovements: string[];
+  quickWins: string[];
+  overallAssessment: string;
+}
+
+const REVIEW_PROMPT = `You are an expert scholarship reviewer and ATS (Applicant Tracking System) specialist. Analyze this document for scholarship applications in MENA region.
+
+Score on THREE dimensions (0-10 each):
+
+1. **OVERALL QUALITY (0-10):**
+   - 9-10: Exceptional. Clear goals, compelling story, strong evidence of achievement
+   - 7-8: Strong. Good articulation, relevant experience, clear fit for scholarship
+   - 5-6: Average. Basic information present, some weak areas, needs polish
+   - 3-4: Below average. Unclear messaging, lacking specifics, weak evidence
+   - 0-2: Poor. Incoherent, irrelevant, or incomplete
+
+2. **ATS COMPATIBILITY (0-10):** How likely this passes automated screening systems
+   - Check: Keywords match scholarship focus areas (education, STEM, social impact)
+   - Check: Quantifiable achievements (percentages, numbers, rankings)
+   - Check: Clear section headers and organization
+   - Check: Professional language, no spelling errors
+   - 9-10: Optimized. All keywords present, excellent structure, passes all filters
+   - 7-8: Good. Most keywords, clear sections, minor improvements needed
+   - 5-6: Adequate. Basic structure, some keywords missing, formatting issues
+   - 0-4: Poor. Disorganized, missing keywords, grammar issues
+
+3. **COMPETITIVENESS (0-10):** How competitive vs typical MENA scholarship applicants
+   - 9-10: Exceptional. Top 1% of applicants. Unique story + strong achievements
+   - 7-8: Competitive. Top 10%. Good achievements, clear value proposition
+   - 5-6: Average. Typical applicant profile, needs differentiation
+   - 3-4: Below average. Lacks standout achievements or clarity
+   - 0-2: Weak. Similar to many others, no clear competitive advantage
 
 DOCUMENT TYPE: {documentType}
 
 DOCUMENT TEXT:
 {documentText}
 
-PROVIDE FEEDBACK IN THIS EXACT FORMAT (be concise):
-
-SCORE: [1-10]
-REASONING: [1 sentence why this score]
-
-STRONG POINTS:
-- [Point 1 - one sentence]
-- [Point 2 - one sentence]
-- [Point 3 - one sentence max, only if applicable]
-
-WEAK SENTENCES:
-- "[Quote problematic sentence]" → Issue: [What's wrong]
-- "[Quote problematic sentence]" → Issue: [What's wrong]
-- "[Quote problematic sentence]" → Issue: [What's wrong]
-
-TOP 5 IMPROVEMENTS:
-1. [Specific improvement with brief reason]
-2. [Specific improvement with brief reason]
-3. [Specific improvement with brief reason]
-4. [Specific improvement with brief reason]
-5. [Specific improvement with brief reason]
-
-QUICK WINS (Easy fixes):
-- [Grammar/clarity issue]
-- [Formatting issue]
-- [Tone issue]
-
-OVERALL ASSESSMENT:
-[2-3 sentences on what works well and main priority to fix]`;
+Respond ONLY as JSON (no markdown, no explanations):
+{
+  "overallQuality": {
+    "score": <0-10>,
+    "strengthsSummary": "<1-2 key strengths>",
+    "weaknesseSummary": "<1-2 key weaknesses>"
+  },
+  "atsCompatibility": {
+    "score": <0-10>,
+    "missingKeywords": ["keyword1", "keyword2"],
+    "improvements": ["improvement1", "improvement2"]
+  },
+  "competitiveness": {
+    "score": <0-10>,
+    "uniqueStrengths": "<What makes this applicant stand out>",
+    "differentiation": "<How to compete better>"
+  },
+  "topImprovements": [
+    "<Specific improvement 1>",
+    "<Specific improvement 2>",
+    "<Specific improvement 3>"
+  ],
+  "quickWins": [
+    "<Easy fix with high impact 1>",
+    "<Easy fix with high impact 2>"
+  ],
+  "overallAssessment": "<2-3 sentence summary with concrete advice>"
+}`;
 
 async function callAI(prompt: string): Promise<string> {
   if (FREEMODEL_KEY) {
@@ -60,7 +104,7 @@ async function callAI(prompt: string): Promise<string> {
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
-        max_tokens: 1000,
+        max_tokens: 2000,
         temperature: 0.4,
         messages: [{ role: "user", content: prompt }],
       }),
@@ -83,7 +127,7 @@ async function callAI(prompt: string): Promise<string> {
       },
       body: JSON.stringify({
         model,
-        max_tokens: 1000,
+        max_tokens: 2000,
         temperature: 0.4,
         messages: [{ role: "user", content: prompt }],
       }),
@@ -108,18 +152,23 @@ async function callAI(prompt: string): Promise<string> {
   throw new Error(`All review models failed. Last error: ${lastError}`);
 }
 
-const FALLBACK: ParsedReview = {
-  score: 5,
-  reasoning: "The document has room for improvement in several key areas.",
-  strongPoints: [
-    "Shows relevant experience in the field",
-    "Demonstrates interest in the subject matter",
-  ],
-  weakSentences: [
-    { quote: "I am very passionate about this", issue: "Generic statement lacks specific evidence" },
-    { quote: "I have experience in many areas", issue: "Too vague, needs quantifiable results" },
-  ],
-  improvements: [
+const FALLBACK: ReviewScore = {
+  overallQuality: {
+    score: 5,
+    strengthsSummary: "Shows relevant experience and interest in the field",
+    weaknesseSummary: "Needs more specific evidence and quantifiable achievements",
+  },
+  atsCompatibility: {
+    score: 5,
+    missingKeywords: ["scholarship focus areas", "quantifiable results"],
+    improvements: ["Add section headers", "Include relevant keywords"],
+  },
+  competitiveness: {
+    score: 5,
+    uniqueStrengths: "Demonstrates basic qualifications",
+    differentiation: "Add unique achievements and a compelling personal story to stand out",
+  },
+  topImprovements: [
     "Add specific quantifiable achievements with numbers and outcomes",
     "Strengthen the opening paragraph to grab attention",
     "Tailor content specifically to this scholarship's criteria",
@@ -130,13 +179,13 @@ const FALLBACK: ParsedReview = {
     "Review comma usage in longer sentences",
     "Replace passive voice with active constructions",
   ],
-  assessment: "The document covers relevant experience but needs more specific, quantifiable achievements and better tailoring to the scholarship criteria. The main priority is adding concrete metrics and outcomes.",
+  overallAssessment: "The document covers relevant experience but needs more specific, quantifiable achievements and better tailoring to the scholarship criteria. The main priority is adding concrete metrics and outcomes.",
 };
 
 export async function reviewDocument(
   text: string,
   documentType: string
-): Promise<ParsedReview> {
+): Promise<ReviewScore> {
   const typeLabel = documentType.replace(/_/g, " ").toLowerCase();
 
   const prompt = REVIEW_PROMPT
@@ -146,17 +195,22 @@ export async function reviewDocument(
   const responseText = await callAI(prompt);
 
   try {
-    const parsed = parseReviewResponse(responseText);
-    if (parsed.score < 1 || parsed.score > 10) {
-      throw new Error("Score out of range");
+    const cleaned = responseText
+      .replace(/```json\s*/gi, "")
+      .replace(/```\s*/g, "")
+      .trim();
+    const parsed: ReviewScore = JSON.parse(cleaned);
+    if (typeof parsed.overallQuality?.score !== "number" || parsed.overallQuality.score < 1 || parsed.overallQuality.score > 10) {
+      throw new Error("Invalid score");
     }
     return parsed;
   } catch {
     const preview = responseText.length > 200 ? responseText.slice(0, 200) + "..." : responseText;
     console.error("AI review parsing failed. Raw response:", preview);
+    const score = Math.max(1, Math.min(10, parseInt(responseText.match(/\d+/)?.[0] || "5")));
     return {
       ...FALLBACK,
-      score: Math.max(1, Math.min(10, parseInt(responseText.match(/\d+/)?.[0] || "5"))),
+      overallQuality: { ...FALLBACK.overallQuality, score },
     };
   }
 }

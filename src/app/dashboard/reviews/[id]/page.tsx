@@ -44,7 +44,7 @@ export default function DocumentReviewPage() {
       if (result.success && result.data) {
         setReviewData(result.data)
 
-        if (result.data.score > 8) {
+        if (result.data.overallQuality?.score > 8) {
           setTimeout(() => setShowConfetti(true), 500)
         }
       }
@@ -129,7 +129,7 @@ export default function DocumentReviewPage() {
             ) : (
               <>
                 <ReviewDisplay review={reviewData} />
-                <ImprovementChecklist improvements={reviewData.improvements} />
+                <ImprovementChecklist improvements={reviewData.topImprovements} />
                 <div className="rounded-lg bg-primary/5 p-4 text-center">
                   <p className="mb-3 font-semibold text-foreground">Ready to improve?</p>
                   <Button onClick={handleUploadNewVersion}>
