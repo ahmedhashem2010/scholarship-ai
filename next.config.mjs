@@ -12,6 +12,7 @@ const nextConfig = {
       bodySizeLimit: '10mb',
     },
     serverComponentsExternalPackages: ['pdf-parse'],
+    isrMemoryCacheSize: 50 * 1024 * 1024,
   },
   webpack: (config, { isServer }) => {
     config.resolve.alias = {
