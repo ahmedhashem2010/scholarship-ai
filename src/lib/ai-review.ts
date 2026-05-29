@@ -33,44 +33,29 @@ export function calculateAverageScore(review: ReviewScore): number {
   return avg;
 }
 
-const REVIEW_PROMPT = `Rate this high school student's CV on 3 scales (0-10 each).
+const REVIEW_PROMPT = `You are rating a high school student's CV (grades 9-12) for a scholarship.
 
-SCORING RULES:
-- 9-10 = Built real project (app, research, device) OR won major competition OR international fellowship
-- 7-8 = Has good achievements (projects + leadership OR multiple awards)
-- 5-6 = Some achievements but basic
-- 0-4 = Generic or no achievements
+SCORE on 3 scales (0-10):
+- 9-10: Built project OR research OR international fellowship
+- 7-8: Good achievements + leadership
+- 5-6: Some achievements but basic
+- 0-4: Generic
 
-ATS KEYWORDS FOR HIGH SCHOOL:
-✓ Leadership ✓ Innovation ✓ STEM ✓ Research ✓ Project ✓ Awards ✓ Community ✓ International ✓ Entrepreneurship ✓ Impact ✓ Founded ✓ Organized ✓ Led
+ATS Keywords to check: Leadership, Innovation, STEM, Research, Project, Awards, Community, International, Entrepreneurship, Impact, Founded, Organized, Led
 
 Document Type: {documentType}
 
 Document:
 {documentText}
 
-NOW RATE IT.
-
-Return ONLY this JSON format with NO other text:
+Return ONLY JSON (no other text):
 {
-  "overallQuality": {
-    "score": NUMBER_0_TO_10,
-    "strengthsSummary": "one sentence about strengths",
-    "weaknessesSummary": "one sentence about weaknesses"
-  },
-  "atsCompatibility": {
-    "score": NUMBER_0_TO_10,
-    "missingKeywords": ["keyword1", "keyword2"],
-    "improvements": ["improvement1"]
-  },
-  "competitiveness": {
-    "score": NUMBER_0_TO_10,
-    "uniqueStrengths": "one sentence",
-    "differentiation": "one sentence"
-  },
-  "topImprovements": ["improvement1", "improvement2", "improvement3"],
-  "quickWins": ["win1", "win2"],
-  "overallAssessment": "two sentence summary"
+  "overallQuality": {"score": 0, "strengthsSummary": "text", "weaknessesSummary": "text"},
+  "atsCompatibility": {"score": 0, "missingKeywords": [], "improvements": []},
+  "competitiveness": {"score": 0, "uniqueStrengths": "text", "differentiation": "text"},
+  "topImprovements": ["text1", "text2", "text3"],
+  "quickWins": ["text1", "text2"],
+  "overallAssessment": "text"
 }`;
 
 async function callAI(prompt: string): Promise<string> {
