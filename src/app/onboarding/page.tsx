@@ -178,7 +178,7 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] bg-gradient-to-b from-primary-50 to-white overflow-x-hidden">
+    <div className="min-h-[calc(100vh-3.5rem)] bg-gradient-to-b from-primary-50 to-white dark:from-gray-900 dark:to-gray-950 overflow-x-hidden">
       <div className="page-container py-8 sm:py-12 max-w-xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-8 sm:mb-10">
           <div className="mx-auto flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground mb-3 sm:mb-4">
