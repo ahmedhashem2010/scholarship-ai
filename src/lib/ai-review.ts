@@ -41,6 +41,9 @@ SCORING RULES:
 - 5-6 = Some achievements but basic
 - 0-4 = Generic or no achievements
 
+ATS KEYWORDS FOR HIGH SCHOOL:
+✓ Leadership ✓ Innovation ✓ STEM ✓ Research ✓ Project ✓ Awards ✓ Community ✓ International ✓ Entrepreneurship ✓ Impact ✓ Founded ✓ Organized ✓ Led
+
 Document Type: {documentType}
 
 Document:
