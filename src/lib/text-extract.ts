@@ -21,7 +21,13 @@ export async function extractTextFromFile(
 }
 
 async function extractFromPDF(buffer: Buffer): Promise<string> {
-  const pdfjs = await import("pdfjs-dist");
+  const { createRequire } = await import("node:module");
+  const pdfjs = await import("pdfjs-dist/legacy/build/pdf.js");
+  const runtimeRequire = createRequire(process.cwd() + "/.next/noop.js");
+  const workerPath = runtimeRequire.resolve(
+    "pdfjs-dist/legacy/build/pdf.worker.js"
+  );
+  pdfjs.GlobalWorkerOptions.workerSrc = workerPath;
   const data = new Uint8Array(buffer);
   const loadingTask = pdfjs.getDocument({ data });
   const doc = await loadingTask.promise;
