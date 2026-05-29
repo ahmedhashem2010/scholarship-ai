@@ -66,11 +66,11 @@ const faqs = [
     items: [
       {
         q: "How do I upload documents?",
-        a: "Go to the Documents page and click 'Upload Document'. Select a file from your computer (PDF or DOCX, max 10MB). Choose the document type (Personal Statement, CV, etc.) and click upload. You can also upload from the Application Journey page.",
+        a: "Go to the Documents page and click 'Upload Document'. Select a file from your computer (PDF, DOCX, or TXT, max 10MB). Choose the document type (Personal Statement, CV, etc.) and click upload. You can also upload from the Application Journey page.",
       },
       {
         q: "What file formats are supported?",
-        a: "We support PDF (.pdf) and Word documents (.docx). PDF is preferred as it preserves formatting. Maximum file size is 10MB. Scanned PDFs (image-based) may not work with our AI text extraction.",
+        a: "We support PDF (.pdf), Word documents (.docx), and plain text (.txt). PDF is preferred as it preserves formatting. Maximum file size is 10MB. Scanned PDFs (image-based) may not work with our AI text extraction.",
       },
       {
         q: "How do I contact support?",

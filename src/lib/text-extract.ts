@@ -17,7 +17,11 @@ export async function extractTextFromFile(
     return extractFromDOCX(buffer);
   }
 
-  throw new Error(`Unsupported file type: ${fileType}. Only PDF and DOCX are supported.`);
+  if (fileType === "text/plain") {
+    return buffer.toString("utf-8").trim();
+  }
+
+  throw new Error(`Unsupported file type: ${fileType}. Only PDF, DOCX, and TXT are supported.`);
 }
 
 async function extractFromPDF(buffer: Buffer): Promise<string> {

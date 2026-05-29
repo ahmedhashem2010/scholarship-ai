@@ -43,9 +43,10 @@ export function UploadDropzone({
     const allowed = [
       "application/pdf",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "text/plain",
     ];
     if (!allowed.includes(f.type)) {
-      setError("Only PDF and DOCX files are allowed");
+      setError("Only PDF, DOCX, and TXT files are allowed");
       return;
     }
     if (f.size > 10 * 1024 * 1024) {
@@ -108,7 +109,7 @@ export function UploadDropzone({
         <input
           ref={inputRef}
           type="file"
-          accept=".pdf,.docx"
+          accept=".pdf,.docx,.txt"
           onChange={handleFileSelect}
           className="hidden"
         />
@@ -128,7 +129,7 @@ export function UploadDropzone({
         ) : (
           <>
             <p className="font-medium text-foreground">Drop your file here</p>
-            <p className="mt-1 text-sm text-muted-foreground">or click to browse (PDF, DOCX &middot; max 10MB)</p>
+            <p className="mt-1 text-sm text-muted-foreground">or click to browse (PDF, DOCX, TXT &middot; max 10MB)</p>
           </>
         )}
       </div>

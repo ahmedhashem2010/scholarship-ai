@@ -67,9 +67,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: "File exceeds 10MB limit" }, { status: 400 });
     }
 
-    const allowedTypes = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
+    const allowedTypes = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/plain"];
     if (!allowedTypes.includes(file.type)) {
-      return NextResponse.json({ success: false, error: "Only PDF and DOCX files are allowed" }, { status: 400 });
+      return NextResponse.json({ success: false, error: "Only PDF, DOCX, and TXT files are allowed" }, { status: 400 });
     }
 
     await ensureUserRecord(user.id, user.email ?? undefined);
