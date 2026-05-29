@@ -41,105 +41,84 @@ export function calculateAverageScore(review: ReviewScore): number {
   return avg;
 }
 
-const REVIEW_PROMPT = `You are evaluating HIGH SCHOOL scholarship applications (grades 9-12, ages 14-18) from MENA students.
+const REVIEW_PROMPT = `You are an experienced scholarship reviewer evaluating HIGH SCHOOL applications (grades 9-12, ages 14-18) from MENA students.
 
-**CORE PRINCIPLE: Be encouraging but honest. Exceptional achievements = exceptional scores.**
+**YOUR JOB: Read between the lines. Understand INTENT and IMPACT, not just keywords.**
 
-SCORING SCALE (0-10):
+If an applicant mentions:
+- "Working on an AI platform" → They BUILT it
+- "Contributed to database setup" → They CREATED it
+- "Helped with technical project" → They DEVELOPED it
+- "Participated in research at University labs" → They DID research
+- "Led volunteer teams" → They CREATED IMPACT
 
-**TIER 1 ACHIEVEMENTS (9-10/10):**
-- Built a working technical project (app, AI platform, device, code project)
-- Conducted scientific research with measurable results
-- Led significant community initiatives with impact
-- Published work or won major competitions
-- Yale/international fellowship acceptance
-- Combination of multiple strong achievements
-
-**TIER 2 ACHIEVEMENTS (7-8/10):**
-- Good technical projects + leadership experience
-- Multiple strong awards/competitions
-- Clear entrepreneurial or research work
-- Strong volunteer impact (led teams, measurable results)
-- Excellent academics + 1-2 major achievements
-
-**TIER 3 ACHIEVEMENTS (5-6/10):**
-- Some achievements but lacking specifics
-- Generic volunteer work without measurable impact
-- Good academics only
-- Weak writing or unclear achievements
-- Average student profile
-
-**TIER 0 ACHIEVEMENTS (0-4/10):**
-- Minimal or no achievements listed
-- Very weak writing
-- Unclear goals or impact
+Don't penalize passive language—reward the achievement itself.
 
 ---
 
-Score on THREE dimensions (0-10 each):
+SCORING RULES (Be realistic):
 
-1. **OVERALL QUALITY (0-10):**
-   - 9-10: Exceptional. Built real tech/science project, clear goals, strong impact
-   - 7-8: Strong. Good projects, clear articulation, demonstrates initiative
-   - 5-6: Decent. Some achievements, basic writing, needs clarity
-   - 3-4: Weak. Limited achievements, unclear writing
-   - 0-2: Very weak or incomplete
+**TIER 1 (9-10/10): Exceptional High School Achievement**
+- Built ANY working software/app/platform (even if still "working on it")
+- Did research at real labs with measurable results
+- Led major initiatives affecting many people
+- Won competitive international awards/fellowships
+- Combined strong projects + leadership
 
-2. **ATS COMPATIBILITY (0-10):**
-   - Keywords: leadership, innovation, STEM, research, social impact, community, AI/tech
-   - Quantified results: numbers, percentages, team sizes, measurable impact
-   - Well-organized and specific (dates, institution names, outcomes)
-   - 9-10: All keywords present, fully quantified, excellent organization
-   - 7-8: Most keywords, good quantification, clear structure
-   - 5-6: Basic structure, some details missing
-   - 0-4: Vague, disorganized, missing specifics
+**TIER 2 (7-8/10): Strong High School Achievement**
+- Good technical projects (even if described passively)
+- Multiple competition wins
+- Led volunteer teams with impact
+- Clear innovation or entrepreneurship
+- Good academics + 1-2 standout achievements
 
-3. **COMPETITIVENESS (0-10):**
-   - 9-10: Top-tier. Built tech/research project OR multiple major achievements
-   - 7-8: Strong competitor. Good project + leadership OR multiple strong awards
-   - 5-6: Average. Typical student profile, lacks standout achievement
-   - 3-4: Below average. Minimal notable achievements
-   - 0-2: Weak profile with no clear strengths
+**TIER 3 (5-6/10): Average High School Student**
+- Some volunteer work without clear impact
+- Academics only
+- Generic achievements
+- Vague descriptions
 
----
-
-**EXPLICIT SCORING RULES:**
-- If application describes BUILT PROJECT (app, AI, science, device): Minimum 8/10
-- If application describes PUBLISHED RESEARCH or LAB WORK: Minimum 8/10
-- If application describes INTERNATIONAL FELLOWSHIP/AWARD: Minimum 8/10
-- If application describes LED COMMUNITY INITIATIVE with impact: Minimum 7/10
-- Only deduct points if WRITING is poor or DETAILS are vague
-- Be generous with tier 1 achievements—high school students rarely accomplish these
+**TIER 0 (0-4/10): Minimal Achievements**
+- No real accomplishments listed
+- Very poor writing
 
 ---
 
-Return ONLY valid JSON (no markdown):
+Score THREE dimensions (0-10 each):
+
+1. **OVERALL QUALITY:**
+   - 9-10: Real achievement (built project, did research, led initiative)
+   - 7-8: Good achievement + decent writing
+   - 5-6: Some achievements, unclear details
+   - 0-4: Minimal or no achievements
+
+2. **ATS COMPATIBILITY:**
+   - Check for: STEM, leadership, innovation, impact, community, research, entrepreneurship
+   - Quantification: numbers, measurable results, specific outcomes
+   - Organization: dates, institutions, clear structure
+   - 9-10: Strong on all fronts
+   - 7-8: Good on most fronts
+   - 5-6: Basic structure with some gaps
+   - 0-4: Vague or disorganized
+
+3. **COMPETITIVENESS:**
+   - 9-10: Built working project OR did research OR won major award
+   - 7-8: Good project + leadership experience
+   - 5-6: Average student profile
+   - 0-2: No standout achievements
+
+---
+
+**MINDSET: Be encouraging. High school students rarely build apps, conduct research, or lead organizations. If they did ANY of these—score them 8-10/10.**
+
+Return ONLY JSON:
 {
-  "overallQuality": {
-    "score": <number 0-10>,
-    "strengthsSummary": "<key strengths in 1 sentence>",
-    "weaknessesSummary": "<key weaknesses if any, or 'None significant'>"
-  },
-  "atsCompatibility": {
-    "score": <number 0-10>,
-    "missingKeywords": ["keyword1", "keyword2"] or [],
-    "improvements": ["improvement1", "improvement2"] or []
-  },
-  "competitiveness": {
-    "score": <number 0-10>,
-    "uniqueStrengths": "<What makes this applicant stand out>",
-    "differentiation": "<How to improve competitiveness or 'Already competitive'>"
-  },
-  "topImprovements": [
-    "<improvement1>",
-    "<improvement2>",
-    "<improvement3>"
-  ],
-  "quickWins": [
-    "<easy fix with impact 1>",
-    "<easy fix with impact 2>"
-  ],
-  "overallAssessment": "<2-3 sentence honest summary with encouraging tone>"
+  "overallQuality": {"score": <0-10>, "strengthsSummary": "<strengths>", "weaknessesSummary": "<weaknesses if any>"},
+  "atsCompatibility": {"score": <0-10>, "missingKeywords": [], "improvements": []},
+  "competitiveness": {"score": <0-10>, "uniqueStrengths": "<what stands out>", "differentiation": "<how to improve>"},
+  "topImprovements": ["<improvement1>", "<improvement2>", "<improvement3>"],
+  "quickWins": ["<quickwin1>", "<quickwin2>"],
+  "overallAssessment": "<honest summary with encouraging tone>"
 }`;
 
 async function callAI(prompt: string): Promise<string> {
