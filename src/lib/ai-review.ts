@@ -41,65 +41,45 @@ export function calculateAverageScore(review: ReviewScore): number {
   return avg;
 }
 
-const REVIEW_PROMPT = `You are a scholarship reviewer evaluating HIGH SCHOOL applications (grades 9-12, ages 14-18) from MENA students.
+const REVIEW_PROMPT = `CRITICAL INSTRUCTIONS: You MUST follow this scoring system exactly.
 
-**REFERENCE STANDARD FOR 9-10/10:**
-This is what excellent looks like for a high school student:
-- Yale University Fellowship acceptance (international recognition)
-- Built a functional biomedical research project (Dopawave) with measurable scientific results
-- Conducted research at certified university labs (Horus University, Mansoura University)
-- Published/submitted research to competitive forums (UGRF)
-- Multiple math olympiad participations and national awards
-- Led major community initiatives (organized NASA hackathon with 100+ participants, secured sponsorships from major brands)
-- Extensive volunteer leadership (led 1500+ volunteers, won awards, created measurable impact)
-- Graphic design/content creation work with quantified results (42+ projects, 76+ episodes, 28% engagement increase)
-- Business experience with P&L management and measurable outcomes (15% cost reduction, 97% forecasting accuracy, 89% efficiency gains)
-- Strong personal statement explaining mission and impact
+REFERENCE BENCHMARK (9-10/10):
+- Yale/Harvard/MIT fellowship acceptance
+- Research at university labs with numerical results
+- LED 100+ person events or initiatives
+- International awards or competitions
+- Multiple significant achievements combined
 
-**YOUR JOB: Rate all other applications by comparing to this standard.**
+RULE 1: If the CV mentions ANY of these → MINIMUM 8/10:
+✓ "Yale" or "Harvard" or international fellowship
+✓ "Research" + "university lab" + "results"
+✓ "Led" + "100+" people or "organized" + event
+✓ "Published" or "submitted research"
+✓ Specific numbers/measurements in achievements
 
-SCORING GUIDE:
+RULE 2: If the CV has 3+ strong achievements → MINIMUM 7/10
 
-**9-10/10 (Tier 1 - Exceptional):**
-Match this standard or close to it:
-- International fellowship/major award + strong project OR
-- Research project at university labs + multiple achievements OR
-- Led major initiatives (100+ people) + competition wins + clear quantified impact
+RULE 3: Only score below 7/10 if the CV is generic or lacks detail
 
-**7-8/10 (Tier 2 - Strong):**
-Has 2-3 of these:
-- Good technical/research project
-- Led community initiatives with measurable impact
-- Multiple competition wins
-- Work experience with quantified results
-- Clear leadership across multiple areas
+SCORING (0-10):
+9-10 = Has international fellowship OR research + multiple achievements
+7-8 = Has 2-3 strong achievements (projects, leadership, awards)
+5-6 = Has some achievements but lacks quantification
+0-4 = Generic or minimal achievements
 
-**5-6/10 (Tier 3 - Average):**
-Has some achievements but lacks depth:
-- Generic volunteer work without numbers
-- One award or project
-- Good academics only
-- Some experience but unclear impact
+Score these 3 dimensions:
+1. Overall Quality (0-10)
+2. ATS Compatibility (0-10) 
+3. Competitiveness (0-10)
 
-**0-4/10 (Tier 0 - Minimal):**
-No significant achievements or very unclear
-
----
-
-Score THREE dimensions (0-10 each):
-
-1. **OVERALL QUALITY:** How does this compare to the reference standard?
-2. **ATS COMPATIBILITY:** Keywords (leadership, innovation, research, impact, STEM), quantification, organization
-3. **COMPETITIVENESS:** Would this applicant stand out in a group of similar students?
-
-Return ONLY JSON:
+Return ONLY this JSON format:
 {
-  "overallQuality": {"score": <0-10>, "strengthsSummary": "<strengths>", "weaknessesSummary": "<weaknesses if any>"},
+  "overallQuality": {"score": <0-10>, "strengthsSummary": "<1 sentence>", "weaknessesSummary": "<1 sentence or 'None'>"},
   "atsCompatibility": {"score": <0-10>, "missingKeywords": [], "improvements": []},
-  "competitiveness": {"score": <0-10>, "uniqueStrengths": "<what stands out>", "differentiation": "<how to improve>"},
-  "topImprovements": ["<improvement1>", "<improvement2>", "<improvement3>"],
-  "quickWins": ["<quickwin1>", "<quickwin2>"],
-  "overallAssessment": "<honest summary with encouraging tone>"
+  "competitiveness": {"score": <0-10>, "uniqueStrengths": "<1 sentence>", "differentiation": "<1 sentence or 'Already competitive'>"},
+  "topImprovements": ["<1>", "<2>", "<3>"],
+  "quickWins": ["<1>", "<2>"],
+  "overallAssessment": "<2 sentences, encouraging>"
 }`;
 
 async function callAI(prompt: string): Promise<string> {
