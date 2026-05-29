@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
 declare global {
@@ -9,14 +9,13 @@ declare global {
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 
-export function Analytics() {
+function AnalyticsInner() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   useEffect(() => {
     if (!GA_ID || typeof window === "undefined") return;
 
-    // Lazy-load gtag script on first mount
     if (!document.querySelector(`script[src*="googletagmanager"]`)) {
       const script = document.createElement("script");
       script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`;
@@ -29,7 +28,6 @@ export function Analytics() {
     }
   }, []);
 
-  // Track page views on route change
   useEffect(() => {
     if (!GA_ID || typeof window === "undefined") return;
     const gtag = (...args: unknown[]) => (window.dataLayer ?? []).push(args);
@@ -39,4 +37,12 @@ export function Analytics() {
   }, [pathname, searchParams]);
 
   return null;
+}
+
+export function Analytics() {
+  return (
+    <Suspense fallback={null}>
+      <AnalyticsInner />
+    </Suspense>
+  );
 }
