@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
+import { calculateAverageScore } from "@/lib/ai-review";
 import {
   FileText,
   Upload,
@@ -72,7 +73,7 @@ function formatDate(dateStr: string): string {
 
 export default function DocumentsPage() {
   const [documents, setDocuments] = useState<Document[]>([]);
-  const [reviews, setReviews] = useState<Record<string, { id: string; score: number }>>({});
+  const [reviews, setReviews] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
   const [showUpload, setShowUpload] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -87,13 +88,13 @@ export default function DocumentsPage() {
       if (json.success) {
         setDocuments(json.data);
 
-        const reviewMap: Record<string, { id: string; score: number }> = {};
+        const reviewMap: Record<string, any> = {};
         for (const doc of json.data as Document[]) {
           try {
             const reviewRes = await fetch(`/api/documents/${doc.id}/review`);
             const reviewJson = await reviewRes.json();
             if (reviewJson.success && reviewJson.data) {
-              reviewMap[doc.id] = { id: reviewJson.data.id, score: reviewJson.data.score };
+              reviewMap[doc.id] = reviewJson.data;
             }
           } catch {
             // individual check failed, skip
@@ -136,7 +137,7 @@ export default function DocumentsPage() {
       const res = await fetch(`/api/documents/${docId}/review`, { method: "POST" });
       const json = await res.json();
       if (json.success && json.data) {
-        setReviews((prev) => ({ ...prev, [docId]: { id: json.data.id, score: json.data.score } }));
+        setReviews((prev) => ({ ...prev, [docId]: json.data }));
         addToast("success", `Review complete! Score: ${json.data.score}/10`);
         router.push(`/dashboard/reviews/${docId}`);
       } else if (json.needsCredits) {
@@ -245,7 +246,7 @@ export default function DocumentsPage() {
         <div className="space-y-3">
           {documents.map((doc) => {
             const review = reviews[doc.id];
-            const scoreValue = review?.score ?? 0;
+            const scoreValue = review ? calculateAverageScore(review) : 0;
             const scoreColor = scoreValue >= 8 ? "success" : scoreValue >= 6 ? "warning" : "danger";
 
             return (

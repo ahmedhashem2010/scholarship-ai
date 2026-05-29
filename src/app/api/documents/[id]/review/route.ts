@@ -3,7 +3,7 @@ export const runtime = "nodejs";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createApiClient } from "@/lib/supabase/api-auth";
-import { reviewDocument } from "@/lib/ai-review";
+import { reviewDocument, calculateAverageScore, type ReviewScore } from "@/lib/ai-review";
 import { extractTextFromFile } from "@/lib/text-extract";
 import { getVersionChain } from "@/lib/document-versions";
 
@@ -52,6 +52,7 @@ export async function POST(
           id: existingReview.id,
           documentId: existingReview.documentId,
           userId: existingReview.userId,
+          score: existingReview.score,
           overallQuality: { score: existingReview.score, strengthsSummary: "", weaknessesSummary: "" },
           atsCompatibility: { score: existingReview.score, missingKeywords: [], improvements: [] },
           competitiveness: { score: existingReview.score, uniqueStrengths: "", differentiation: "" },
@@ -64,6 +65,7 @@ export async function POST(
           id: existingReview.id,
           documentId: existingReview.documentId,
           userId: existingReview.userId,
+          score: calculateAverageScore(rawScores as ReviewScore),
           overallQuality: rawScores.overallQuality,
           atsCompatibility: rawScores.atsCompatibility,
           competitiveness: rawScores.competitiveness,
@@ -154,6 +156,7 @@ export async function POST(
       id: review.id,
       documentId: review.documentId,
       userId: review.userId,
+      score: calculateAverageScore(coaching),
       overallQuality: coaching.overallQuality,
       atsCompatibility: coaching.atsCompatibility,
       competitiveness: coaching.competitiveness,
@@ -221,6 +224,7 @@ export async function GET(
         id: review.id,
         documentId: review.documentId,
         userId: review.userId,
+        score: review.score,
         overallQuality: { score: review.score, strengthsSummary: "", weaknessesSummary: "" },
         atsCompatibility: { score: review.score, missingKeywords: [], improvements: [] },
         competitiveness: { score: review.score, uniqueStrengths: "", differentiation: "" },
@@ -233,6 +237,7 @@ export async function GET(
         id: review.id,
         documentId: review.documentId,
         userId: review.userId,
+        score: calculateAverageScore(rawScores as ReviewScore),
         overallQuality: rawScores.overallQuality,
         atsCompatibility: rawScores.atsCompatibility,
         competitiveness: rawScores.competitiveness,

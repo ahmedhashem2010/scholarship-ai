@@ -43,60 +43,39 @@ export function calculateAverageScore(review: ReviewScore): number {
 
 const REVIEW_PROMPT = `You are evaluating scholarship applications from HIGH SCHOOL students (Grade 9-12, ages 14-18) in the MENA region.
 
-**IMPORTANT: Grade on high school standards, not university standards.**
+**CRITICAL: Be realistic about high school achievements. Technical projects, leadership roles, and volunteer work are VALUABLE.**
 
 Score on THREE dimensions (0-10 each):
 
-1. **OVERALL QUALITY (0-10):** For a high school applicant
-   - 9-10: Exceptional. Clear goals, compelling story, significant project/achievement
-   - 7-8: Strong. Good articulation, relevant experience, demonstrates initiative
-   - 5-6: Average. Basic information, some good points, needs more specificity
-   - 3-4: Below average. Unclear, lacks detail, weak evidence
-   - 0-2: Poor. Incoherent or incomplete
+1. **OVERALL QUALITY (0-10):**
+   - 9-10: Exceptional. Built real projects (apps, code, platforms) OR strong leadership + measurable impact
+   - 7-8: Strong. Good projects, clear goals, relevant experience, well-written
+   - 5-6: Decent. Some achievements, basic writing, needs more detail
+   - 3-4: Weak. Limited achievements, unclear writing
+   - 0-2: Very weak. No achievements listed
 
-2. **ATS COMPATIBILITY (0-10):** For high school applications
-   - Check: Scholarship keywords (leadership, innovation, STEM, social impact, community)
-   - Check: Quantified results where possible (students helped, projects built, teams led)
-   - Check: Clear dates, organization names, specific outcomes
-   - 9-10: Optimized. All keywords, quantified, well-organized
-   - 7-8: Good. Most keywords present, good structure
-   - 5-6: Adequate. Basic structure, some improvements needed
-   - 0-4: Poor. Disorganized, vague, missing details
+2. **ATS COMPATIBILITY (0-10):**
+   - Check for: leadership, STEM, innovation, community service, projects, impact
+   - Check for: specific numbers (students helped, code lines, team size, etc.)
+   - 9-10: All keywords present, quantified, well-organized
+   - 7-8: Most keywords, good structure
+   - 5-6: Basic structure, missing some details
+   - 0-4: Disorganized or vague
 
-3. **COMPETITIVENESS (0-10):** High school applicants in MENA
-   - 9-10: Top applicant. Technical project (app/AI/coding) OR exceptional leadership + impact
-   - 7-8: Competitive. Good achievements, clear value proposition, stands out
-   - 5-6: Average. Typical high school profile, needs differentiation
-   - 3-4: Below average. Lacks standout projects or leadership
-   - 0-2: Weak. Generic profile
+3. **COMPETITIVENESS (0-10):**
+   - 9-10: Built technical project (AI, app, platform) OR exceptional leadership
+   - 7-8: Good project + leadership experience
+   - 5-6: Average student profile
+   - 0-4: No standout achievements
 
-Respond ONLY as valid JSON (no markdown, no explanations):
+Return ONLY valid JSON (no markdown):
 {
-  "overallQuality": {
-    "score": <number 0-10>,
-    "strengthsSummary": "<1-2 key strengths>",
-    "weaknessesSummary": "<1-2 key weaknesses>"
-  },
-  "atsCompatibility": {
-    "score": <number 0-10>,
-    "missingKeywords": ["keyword1", "keyword2"],
-    "improvements": ["improvement1", "improvement2"]
-  },
-  "competitiveness": {
-    "score": <number 0-10>,
-    "uniqueStrengths": "<What makes this applicant stand out>",
-    "differentiation": "<How to compete better>"
-  },
-  "topImprovements": [
-    "<Specific improvement 1>",
-    "<Specific improvement 2>",
-    "<Specific improvement 3>"
-  ],
-  "quickWins": [
-    "<Easy fix with high impact 1>",
-    "<Easy fix with high impact 2>"
-  ],
-  "overallAssessment": "<2-3 sentence summary with concrete advice>"
+  "overallQuality": {"score": <0-10>, "strengthsSummary": "<strengths>", "weaknessesSummary": "<weaknesses>"},
+  "atsCompatibility": {"score": <0-10>, "missingKeywords": [], "improvements": []},
+  "competitiveness": {"score": <0-10>, "uniqueStrengths": "<what stands out>", "differentiation": "<how to improve>"},
+  "topImprovements": ["<improvement1>", "<improvement2>", "<improvement3>"],
+  "quickWins": ["<quickwin1>", "<quickwin2>"],
+  "overallAssessment": "<summary>"
 }`;
 
 async function callAI(prompt: string): Promise<string> {
