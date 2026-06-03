@@ -1122,15 +1122,15 @@ async function main() {
   // Seed referral code
   await prisma.referralCode.upsert({
     where: { code: "scholarships" },
-    update: {},
+    update: { usedCount: 5 },
     create: {
       code: "scholarships",
       credits: 15,
       maxUses: 32,
-      usedCount: 0,
+      usedCount: 5,
     },
   });
-  console.log("Seeded referral code: scholarships (15 credits, 32 uses)");
+  console.log("Seeded referral code: scholarships (15 credits, 32 uses, starting at 5)");
 }
 
 main()
