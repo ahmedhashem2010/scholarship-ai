@@ -46,7 +46,7 @@ export default function SignupPage() {
     }
 
     ConversionEvents.signup();
-    router.push(`/auth/verify?email=${encodeURIComponent(email)}&link=${encodeURIComponent(data.confirmLink)}`);
+    router.push("/auth/login");
     router.refresh();
   }
 

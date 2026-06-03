@@ -17,19 +17,14 @@ export async function POST(req: NextRequest) {
     { auth: { autoRefreshToken: false, persistSession: false } }
   );
 
-  const origin = new URL(req.url).origin;
-
-  // Create user + generate confirmation link
-  const { data, error } = await supabase.auth.admin.generateLink({
-    type: "signup",
+  // Create user with auto-confirm — no email needed
+  const { error } = await supabase.auth.admin.createUser({
     email,
     password,
-    options: {
-      redirectTo: `${origin}/auth/login`,
-      data: {
-        name: name || null,
-        ...(referralCode ? { referral_code: referralCode } : {}),
-      },
+    email_confirm: true,
+    user_metadata: {
+      name: name || null,
+      ...(referralCode ? { referral_code: referralCode } : {}),
     },
   });
 
@@ -37,12 +32,5 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
-  const confirmLink = data.properties?.action_link;
-  if (!confirmLink) {
-    return NextResponse.json({ error: "Failed to generate confirmation link" }, { status: 500 });
-  }
-
-  return NextResponse.json({
-    confirmLink,
-  });
+  return NextResponse.json({ success: true });
 }
