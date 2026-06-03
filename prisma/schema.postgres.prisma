@@ -114,6 +114,16 @@ model Payment {
   @@index([userId])
 }
 
+model ReferralCode {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  credits   Int
+  maxUses   Int
+  usedCount Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Document {
   id               String   @id @default(cuid())
   userId           String

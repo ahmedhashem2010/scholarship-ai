@@ -6,6 +6,7 @@ import { useState, useEffect, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, Check, GraduationCap, User, Globe, Briefcase } from "lucide-react";
 import { ConversionEvents } from "@/lib/analytics";
+import { useProfile } from "@/lib/profile-context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -64,6 +65,7 @@ const budgetOptions = [
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const { refresh: refreshProfile } = useProfile();
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -157,6 +159,7 @@ export default function OnboardingPage() {
       const json = await res.json();
       if (json.success) {
         ConversionEvents.onboardingComplete();
+        await refreshProfile();
         router.push("/dashboard");
         router.refresh();
       } else {

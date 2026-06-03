@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { sendEmail } from "@/lib/email";
-import { welcomeHtml } from "@/lib/email-templates";
+import { confirmSignupHtml } from "@/lib/email-templates";
 
 export async function POST(req: NextRequest) {
-  const { email, password, name } = await req.json();
+  const { email, password, name, referralCode } = await req.json();
 
   if (!email || !password) {
     return NextResponse.json({ error: "Email and password required" }, { status: 400 });
@@ -19,40 +19,51 @@ export async function POST(req: NextRequest) {
     { auth: { autoRefreshToken: false, persistSession: false } }
   );
 
-  // Create user
-  const { data, error } = await supabase.auth.admin.createUser({
+  const origin = new URL(req.url).origin;
+
+  // Create user + generate confirmation link in one call
+  const { data, error } = await supabase.auth.admin.generateLink({
+    type: "signup",
     email,
     password,
-    email_confirm: true,
-    user_metadata: { name },
+    options: {
+      redirectTo: `${origin}/auth/login`,
+      data: {
+        name: name || null,
+        ...(referralCode ? { referral_code: referralCode } : {}),
+      },
+    },
   });
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
-  // Send welcome email
+  const confirmUrl = data.properties?.action_link;
+  if (!confirmUrl) {
+    return NextResponse.json({ error: "Failed to generate confirmation link" }, { status: 500 });
+  }
+
+  // Send confirmation email
   let emailSent = false;
   let emailError = "";
 
   try {
-    const loginUrl = `${new URL(req.url).origin}/auth/login`;
     await sendEmail({
       to: email,
-      subject: "Welcome to Scholarship Hub — your account is ready",
-      html: welcomeHtml(name || "there", loginUrl),
+      subject: "Verify your email — Scholarship Hub",
+      html: confirmSignupHtml(name || "there", confirmUrl),
     });
     emailSent = true;
   } catch (err: any) {
-    emailError = err?.message || "Failed to send welcome email";
+    emailError = err?.message || "Failed to send confirmation email";
   }
 
   return NextResponse.json({
-    user: data.user,
     emailSent,
     emailError: emailError || undefined,
     message: emailSent
-      ? "Account created! Check your email for next steps."
-      : "Account created but welcome email could not be sent.",
+      ? "Confirmation email sent! Check your inbox."
+      : "Account created but confirmation email could not be sent. Please try again or contact support.",
   });
 }

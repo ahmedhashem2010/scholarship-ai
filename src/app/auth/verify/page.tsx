@@ -20,14 +20,19 @@ function VerifyPageContent() {
         </div>
         <h1 className="text-h2 mb-2">Check your email</h1>
         <p className="text-muted-foreground mb-8">
-          We sent a welcome email to <strong className="text-foreground">{email}</strong>
+          We sent a confirmation email to <strong className="text-foreground">{email}</strong>
         </p>
 
         <Card>
-          <CardContent className="pt-6 pb-6">
-            <p className="text-sm text-muted-foreground mb-4">
-              Your account is ready. Sign in with your email and password to start exploring scholarships.
+          <CardContent className="pt-6 pb-6 space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Click the link in the email to confirm your account, then sign in to start exploring scholarships.
             </p>
+            <div className="bg-muted/50 rounded-lg p-3">
+              <p className="text-xs text-muted-foreground">
+                <strong>Didn't receive it?</strong> Check your spam folder, or try signing up again with the correct email.
+              </p>
+            </div>
             <Link
               href="/auth/login"
               className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary-700 transition-colors"

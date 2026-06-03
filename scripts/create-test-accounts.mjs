@@ -31,7 +31,8 @@ async function createSupabaseUser(acct) {
   });
   const data = await res.json();
   if (!res.ok) {
-    if (data.msg?.includes("already exists") || data.message?.includes("already exists")) {
+    const isDuplicate = data.msg?.includes("already exists") || data.message?.includes("already exists") || data.error_code === "email_exists";
+    if (isDuplicate) {
       console.log(`  ↳ Already exists in Auth, fetching ID...`);
       const listRes = await fetch(`${SUPABASE_URL}/auth/v1/admin/users?filter%5Bemail%5D=${encodeURIComponent(acct.email)}`, { headers: HEADERS });
       const listData = await listRes.json();

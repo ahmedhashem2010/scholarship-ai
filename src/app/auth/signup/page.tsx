@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { GraduationCap, Mail, Lock, Eye, EyeOff, User } from "lucide-react";
+import { GraduationCap, Mail, Lock, Eye, EyeOff, User, Gift } from "lucide-react";
 import { ConversionEvents } from "@/lib/analytics";
 
 export default function SignupPage() {
@@ -15,6 +15,7 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [referralCode, setReferralCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -33,7 +34,7 @@ export default function SignupPage() {
     const res = await fetch("/api/auth/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password, name }),
+      body: JSON.stringify({ email, password, name, referralCode: referralCode.trim() || undefined }),
     });
 
     const data = await res.json();
@@ -134,6 +135,23 @@ export default function SignupPage() {
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="referralCode" className="block text-sm font-medium text-foreground mb-1.5">
+                  Referral Code <span className="text-muted-foreground font-normal">(optional)</span>
+                </label>
+                <div className="relative">
+                  <Gift className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <input
+                    id="referralCode"
+                    type="text"
+                    value={referralCode}
+                    onChange={(e) => setReferralCode(e.target.value)}
+                    className="w-full rounded-lg border border-input bg-background pl-9 pr-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
+                    placeholder="Enter a code"
+                  />
                 </div>
               </div>
 

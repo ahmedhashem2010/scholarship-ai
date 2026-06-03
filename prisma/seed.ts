@@ -1118,6 +1118,19 @@ async function main() {
 
   const count = await prisma.scholarship.count();
   console.log(`Done. Total scholarships: ${count}`);
+
+  // Seed referral code
+  await prisma.referralCode.upsert({
+    where: { code: "scholarships" },
+    update: {},
+    create: {
+      code: "scholarships",
+      credits: 15,
+      maxUses: 32,
+      usedCount: 0,
+    },
+  });
+  console.log("Seeded referral code: scholarships (15 credits, 32 uses)");
 }
 
 main()
