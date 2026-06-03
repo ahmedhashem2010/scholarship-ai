@@ -20,7 +20,7 @@ function VerifyPageContent() {
         </div>
         <h1 className="text-h2 mb-2">Check your email</h1>
         <p className="text-muted-foreground mb-8">
-          We sent a confirmation email to <strong className="text-foreground">{email}</strong>
+          A confirmation email was sent to <strong className="text-foreground">{email}</strong>
         </p>
 
         <Card>

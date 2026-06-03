@@ -45,14 +45,6 @@ export default function SignupPage() {
       return;
     }
 
-    if (!data.emailSent) {
-      // Account created but email failed — show warning
-      setError(data.emailError || "Account created but welcome email could not be sent. Please try again or contact support.");
-      setLoading(false);
-      // Don't redirect, let them retry or try another email
-      return;
-    }
-
     ConversionEvents.signup();
     router.push(`/auth/verify?email=${encodeURIComponent(email)}`);
     router.refresh();
