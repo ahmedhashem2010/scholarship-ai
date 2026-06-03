@@ -30,7 +30,7 @@ function VerifyPageContent() {
             </p>
             <div className="bg-muted/50 rounded-lg p-3">
               <p className="text-xs text-muted-foreground">
-                <strong>Didn't receive it?</strong> Check your spam folder, or try signing up again with the correct email.
+                <strong>{"Didn't receive it?"}</strong> Check your spam folder, or try signing up again with the correct email.
               </p>
             </div>
             <Link
