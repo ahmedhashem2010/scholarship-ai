@@ -62,7 +62,13 @@ async function callAI(prompt: string): Promise<string> {
   // Try FREEMODEL first (if key is configured)
   if (FREEMODEL_KEY) {
     try {
-      const response = await fetch(FREEMODEL_ENDPOINT, {
+      const url = FREEMODEL_ENDPOINT;
+      const keySuffix = FREEMODEL_KEY.slice(-8);
+      console.log(`[FREEMODEL] POST ${url}`);
+      console.log(`[FREEMODEL] Authorization: Bearer ...${keySuffix}`);
+      console.log(`[FREEMODEL] model: gpt-4o-mini, max_tokens: 2000`);
+
+      const response = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -77,16 +83,18 @@ async function callAI(prompt: string): Promise<string> {
       });
 
       const ct = response.headers.get("content-type") || "";
+      const body = await response.text().catch(() => "");
+      console.log(`[FREEMODEL] status: ${response.status}, redirected: ${response.redirected}, content-type: ${ct}`);
+      console.log(`[FREEMODEL] response body (500 chars): ${body.slice(0, 500)}`);
+
       if (response.ok && ct.includes("application/json")) {
-        const data = await response.json();
+        const data = JSON.parse(body);
         return data.choices?.[0]?.message?.content ?? "";
       }
-      if (!ct.includes("application/json")) {
-        const text = await response.text().catch(() => "");
-        console.error(`FREEMODEL returned non-JSON (${response.status}, ${ct}): ${text.slice(0, 200)}`);
-      }
+
+      console.error(`[FREEMODEL] FAILED — non-JSON or error response`);
     } catch (e) {
-      console.error("FREEMODEL fetch error:", e);
+      console.error(`[FREEMODEL] fetch error:`, e);
     }
   }
 
@@ -94,11 +102,18 @@ async function callAI(prompt: string): Promise<string> {
 
   for (const model of REVIEW_MODELS) {
     try {
-      const response = await fetch("https://agentrouter.org/v1/chat/completions", {
+      const url = "https://agentrouter.org/v1/chat/completions";
+      const key = process.env.AGENTROUTER_API_KEY;
+      const keySuffix = key ? key.slice(-8) : "NOT SET";
+      console.log(`[AgentRouter] POST ${url}`);
+      console.log(`[AgentRouter] Authorization: Bearer ...${keySuffix}`);
+      console.log(`[AgentRouter] model: ${model}, max_tokens: 2000`);
+
+      const response = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.AGENTROUTER_API_KEY}`,
+          Authorization: `Bearer ${key}`,
         },
         body: JSON.stringify({
           model,
@@ -109,14 +124,15 @@ async function callAI(prompt: string): Promise<string> {
       });
 
       const ct = response.headers.get("content-type") || "";
-      if (response.ok && ct.includes("application/json")) {
-        const data = await response.json();
-        return data.choices?.[0]?.message?.content ?? "";
-      }
-
       const body = await response.text().catch(() => "");
       const msg = body.toLowerCase();
-      console.error(`AgentRouter model "${model}" returned (${response.status}, ${ct}): ${body.slice(0, 200)}`);
+      console.log(`[AgentRouter] status: ${response.status}, redirected: ${response.redirected}, content-type: ${ct}`);
+      console.log(`[AgentRouter] response body (500 chars): ${body.slice(0, 500)}`);
+
+      if (response.ok && ct.includes("application/json")) {
+        const data = JSON.parse(body);
+        return data.choices?.[0]?.message?.content ?? "";
+      }
 
       if (response.status === 429 || msg.includes("quota") || msg.includes("rate limit") || msg.includes("insufficient")) {
         throw new Error("AI review service is temporarily unavailable due to high demand. Please try again in a few minutes.");
@@ -124,12 +140,12 @@ async function callAI(prompt: string): Promise<string> {
       if (response.status === 403 && model === REVIEW_MODELS[REVIEW_MODELS.length - 1]) {
         throw new Error(`AgentRouter authentication failed (HTTP ${response.status}). Please verify your API key at https://agentrouter.org/console/token and ensure it has credits. Response: ${body.slice(0, 150)}`);
       }
-      lastError = `Model "${model}" failed (${response.status})`;
+      lastError = `Model "${model}" failed (${response.status}, ${ct})`;
     } catch (e) {
       if (e instanceof Error && (e.message.includes("quota") || e.message.includes("rate limit") || e.message.includes("insufficient") || e.message.includes("authentication failed"))) {
         throw e;
       }
-      console.error(`AgentRouter model "${model}" error:`, e);
+      console.error(`[AgentRouter] model "${model}" error:`, e);
       lastError = `Model "${model}" threw: ${e instanceof Error ? e.message : String(e)}`;
     }
   }
