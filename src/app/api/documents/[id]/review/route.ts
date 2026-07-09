@@ -7,8 +7,6 @@ import type { ReviewScore } from "@/lib/ai-review";
 import { extractTextFromFile } from "@/lib/text-extract";
 import { getVersionChain } from "@/lib/document-versions";
 
-export const runtime = "nodejs";
-
 function safeJsonParse(raw: string): unknown {
   try { return JSON.parse(raw); } catch { return null; }
 }

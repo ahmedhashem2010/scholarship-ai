@@ -94,7 +94,12 @@ export async function downloadFileAsBuffer(fileUrl: string): Promise<Buffer> {
   const path = fileUrl.split(`/${BUCKET}/`)[1];
   if (!path) throw new Error("Could not extract file path from URL");
 
-  const supabase = createAdminClient();
+  let supabase;
+  if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    supabase = createAdminClient();
+  } else {
+    supabase = createServerClient();
+  }
 
   const { data, error } = await supabase.storage.from(BUCKET).download(path);
   if (error) throw new Error(`Download failed: ${error.message}`);
