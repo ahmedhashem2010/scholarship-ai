@@ -90,7 +90,7 @@ export async function ensureUserRecord(userId: string, email: string | undefined
   const { prisma } = await import("@/lib/prisma");
   await prisma.user.upsert({
     where: { id: userId },
-    update: { email },
+    update: {},
     create: { id: userId, email },
   });
 }

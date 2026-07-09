@@ -13,7 +13,7 @@ datasource db {
 
 model User {
   id            String       @id
-  email         String?
+  email         String?  @unique
   name          String?
   reviewCredits Int          @default(0)
   profile       UserProfile?
