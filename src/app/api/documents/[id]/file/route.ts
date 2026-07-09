@@ -5,10 +5,10 @@ import { createClient } from "@supabase/supabase-js";
 
 export async function GET(
   request: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await context.params;
+    const { id } = params;
     if (!id) {
       return NextResponse.json({ error: "Document ID is required" }, { status: 400 });
     }

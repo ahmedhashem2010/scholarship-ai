@@ -5,10 +5,10 @@ import { deleteFile } from "@/lib/supabase/storage";
 
 export async function GET(
   request: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await context.params;
+    const { id } = params;
     if (!id) {
       return NextResponse.json({ success: false, error: "Document ID is required" }, { status: 400 });
     }
@@ -51,10 +51,10 @@ export async function GET(
 
 export async function DELETE(
   request: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await context.params;
+    const { id } = params;
     if (!id) {
       return NextResponse.json({ success: false, error: "Document ID is required" }, { status: 400 });
     }

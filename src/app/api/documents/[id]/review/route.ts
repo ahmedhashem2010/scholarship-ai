@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createApiClient } from "@/lib/supabase/api-auth";
-import { reviewDocument, calculateAverageScore, type ReviewScore } from "@/lib/ai-review";
+import { reviewDocument, calculateAverageScore } from "@/lib/ai-review";
+import type { ReviewScore } from "@/lib/ai-review";
 import { extractTextFromFile } from "@/lib/text-extract";
 import { getVersionChain } from "@/lib/document-versions";
 
@@ -19,10 +20,10 @@ function safeArray(raw: string): string[] {
 
 export async function POST(
   request: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await context.params;
+    const { id } = params;
     if (!id) {
       return NextResponse.json({ success: false, error: "Document ID is required" }, { status: 400 });
     }
@@ -175,10 +176,10 @@ export async function POST(
 
 export async function GET(
   request: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await context.params;
+    const { id } = params;
     if (!id) {
       return NextResponse.json({ success: false, error: "Document ID is required" }, { status: 400 });
     }
