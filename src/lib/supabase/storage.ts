@@ -13,6 +13,21 @@ function createAdminClient() {
   );
 }
 
+async function ensureBucket() {
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return;
+  const supabase = createAdminClient();
+  const { data: buckets } = await supabase.storage.listBuckets();
+  if (buckets?.some((b) => b.name === BUCKET)) return;
+  await supabase.storage.createBucket(BUCKET, {
+    public: true,
+    allowedMimeTypes: [
+      "application/pdf",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "text/plain",
+    ],
+  });
+}
+
 export async function uploadFile(
   userId: string,
   file: File
@@ -28,6 +43,8 @@ export async function uploadFile(
   } else {
     supabase = createServerClient();
   }
+
+  await ensureBucket();
 
   const { error } = await supabase.storage
     .from(BUCKET)
