@@ -59,58 +59,79 @@ Return ONLY JSON (no other text):
 }`;
 
 async function callAI(prompt: string): Promise<string> {
+  // Try FREEMODEL first (if key is configured)
   if (FREEMODEL_KEY) {
-    const response = await fetch(FREEMODEL_ENDPOINT, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${FREEMODEL_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        max_tokens: 2000,
-        temperature: 0.4,
-        messages: [{ role: "user", content: prompt }],
-      }),
-    });
+    try {
+      const response = await fetch(FREEMODEL_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${FREEMODEL_KEY}`,
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          max_tokens: 2000,
+          temperature: 0.4,
+          messages: [{ role: "user", content: prompt }],
+        }),
+      });
 
-    if (response.ok) {
-      const data = await response.json();
-      return data.choices?.[0]?.message?.content ?? "";
+      const ct = response.headers.get("content-type") || "";
+      if (response.ok && ct.includes("application/json")) {
+        const data = await response.json();
+        return data.choices?.[0]?.message?.content ?? "";
+      }
+      if (!ct.includes("application/json")) {
+        const text = await response.text().catch(() => "");
+        console.error(`FREEMODEL returned non-JSON (${response.status}, ${ct}): ${text.slice(0, 200)}`);
+      }
+    } catch (e) {
+      console.error("FREEMODEL fetch error:", e);
     }
   }
 
   let lastError: string | null = null;
 
   for (const model of REVIEW_MODELS) {
-    const response = await fetch("https://agentrouter.org/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.AGENTROUTER_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model,
-        max_tokens: 2000,
-        temperature: 0.4,
-        messages: [{ role: "user", content: prompt }],
-      }),
-    });
+    try {
+      const response = await fetch("https://agentrouter.org/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.AGENTROUTER_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model,
+          max_tokens: 2000,
+          temperature: 0.4,
+          messages: [{ role: "user", content: prompt }],
+        }),
+      });
 
-    if (response.ok) {
-      const data = await response.json();
-      return data.choices?.[0]?.message?.content ?? "";
-    }
+      const ct = response.headers.get("content-type") || "";
+      if (response.ok && ct.includes("application/json")) {
+        const data = await response.json();
+        return data.choices?.[0]?.message?.content ?? "";
+      }
 
-    const body = await response.text().catch(() => "");
-    const msg = body.toLowerCase();
-    if (response.status === 429 || msg.includes("quota") || msg.includes("rate limit") || msg.includes("insufficient")) {
-      throw new Error("AI review service is temporarily unavailable due to high demand. Please try again in a few minutes.");
+      const body = await response.text().catch(() => "");
+      const msg = body.toLowerCase();
+      console.error(`AgentRouter model "${model}" returned (${response.status}, ${ct}): ${body.slice(0, 200)}`);
+
+      if (response.status === 429 || msg.includes("quota") || msg.includes("rate limit") || msg.includes("insufficient")) {
+        throw new Error("AI review service is temporarily unavailable due to high demand. Please try again in a few minutes.");
+      }
+      if (response.status === 403 && model === REVIEW_MODELS[REVIEW_MODELS.length - 1]) {
+        throw new Error(`AgentRouter authentication failed (HTTP ${response.status}). Please verify your API key at https://agentrouter.org/console/token and ensure it has credits. Response: ${body.slice(0, 150)}`);
+      }
+      lastError = `Model "${model}" failed (${response.status})`;
+    } catch (e) {
+      if (e instanceof Error && (e.message.includes("quota") || e.message.includes("rate limit") || e.message.includes("insufficient") || e.message.includes("authentication failed"))) {
+        throw e;
+      }
+      console.error(`AgentRouter model "${model}" error:`, e);
+      lastError = `Model "${model}" threw: ${e instanceof Error ? e.message : String(e)}`;
     }
-    if (response.status === 403 && model === REVIEW_MODELS[REVIEW_MODELS.length - 1]) {
-      throw new Error(`AgentRouter authentication failed (HTTP ${response.status}). Please verify your API key at https://agentrouter.org/console/token and ensure it has credits. Response: ${body.slice(0, 150)}`);
-    }
-    lastError = `Model "${model}" failed (${response.status})`;
   }
 
   throw new Error(`All review models failed. Last error: ${lastError}`);
@@ -156,7 +177,13 @@ export async function reviewDocument(
     .replace("{documentType}", typeLabel)
     .replace("{documentText}", text.slice(0, 15000));
 
-  const responseText = await callAI(prompt);
+  let responseText: string;
+  try {
+    responseText = await callAI(prompt);
+  } catch (e) {
+    console.error("callAI threw:", e);
+    return { ...FALLBACK };
+  }
 
   try {
     const cleaned = responseText
