@@ -1,5 +1,5 @@
-const FREEMODEL_ENDPOINT = "https://api.freemodel.dev/v1/chat/completions";
-const FREEMODEL_KEY = "fe_oa_6cc1a9337db51115cc4f18c7a0c1ba17cfcb1d5e4b8dd30d";
+const BAZAARLINK_ENDPOINT = "https://bazaarlink.ai/api/v1/chat/completions";
+const BAZAARLINK_KEY = "sk-bl-ieccC872qJVtQfjpAlD6kRC2izlTpkWfmctWmTIWngeb1Qp3";
 
 const REVIEW_MODELS = ['claude-sonnet-4-20250514']; // Only Claude for reviews
 
@@ -59,43 +59,41 @@ Return ONLY JSON (no other text):
 }`;
 
 async function callAI(prompt: string): Promise<string> {
-  // Try FREEMODEL first (if key is configured)
-  if (FREEMODEL_KEY) {
-    try {
-      const url = FREEMODEL_ENDPOINT;
-      const keySuffix = FREEMODEL_KEY.slice(-8);
-      console.log(`[FREEMODEL] POST ${url}`);
-      console.log(`[FREEMODEL] Authorization: Bearer ...${keySuffix}`);
-      console.log(`[FREEMODEL] model: gpt-4o-mini, max_tokens: 2000`);
+  // Try BazaarLink first (free OpenAI-compatible gateway)
+  try {
+    const url = BAZAARLINK_ENDPOINT;
+    const keySuffix = BAZAARLINK_KEY.slice(-8);
+    console.log(`[BazaarLink] POST ${url}`);
+    console.log(`[BazaarLink] Authorization: Bearer ...${keySuffix}`);
+    console.log(`[BazaarLink] model: auto:free, max_tokens: 2000`);
 
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${FREEMODEL_KEY}`,
-        },
-        body: JSON.stringify({
-          model: "gpt-4o-mini",
-          max_tokens: 2000,
-          temperature: 0.4,
-          messages: [{ role: "user", content: prompt }],
-        }),
-      });
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${BAZAARLINK_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "auto:free",
+        max_tokens: 2000,
+        temperature: 0.4,
+        messages: [{ role: "user", content: prompt }],
+      }),
+    });
 
-      const ct = response.headers.get("content-type") || "";
-      const body = await response.text().catch(() => "");
-      console.log(`[FREEMODEL] status: ${response.status}, redirected: ${response.redirected}, content-type: ${ct}`);
-      console.log(`[FREEMODEL] response body (500 chars): ${body.slice(0, 500)}`);
+    const ct = response.headers.get("content-type") || "";
+    const body = await response.text().catch(() => "");
+    console.log(`[BazaarLink] status: ${response.status}, redirected: ${response.redirected}, content-type: ${ct}`);
+    console.log(`[BazaarLink] response body (500 chars): ${body.slice(0, 500)}`);
 
-      if (response.ok && ct.includes("application/json")) {
-        const data = JSON.parse(body);
-        return data.choices?.[0]?.message?.content ?? "";
-      }
-
-      console.error(`[FREEMODEL] FAILED — non-JSON or error response`);
-    } catch (e) {
-      console.error(`[FREEMODEL] fetch error:`, e);
+    if (response.ok && ct.includes("application/json")) {
+      const data = JSON.parse(body);
+      return data.choices?.[0]?.message?.content ?? "";
     }
+
+    console.error(`[BazaarLink] FAILED — non-JSON or error response`);
+  } catch (e) {
+    console.error(`[BazaarLink] fetch error:`, e);
   }
 
   let lastError: string | null = null;
