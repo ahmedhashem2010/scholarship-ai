@@ -1,5 +1,5 @@
 const FREEMODEL_ENDPOINT = "https://api.freemodel.dev/v1/chat/completions";
-const FREEMODEL_KEY = process.env.FREEMODEL_API_KEY;
+const FREEMODEL_KEY = "fe_oa_6cc1a9337db51115cc4f18c7a0c1ba17cfcb1d5e4b8dd30d";
 
 const REVIEW_MODELS = ['claude-sonnet-4-20250514']; // Only Claude for reviews
 
