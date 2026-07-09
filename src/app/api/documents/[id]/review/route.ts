@@ -300,7 +300,7 @@ export async function GET(
     console.log("[GET] Previous review:", prevReview?.id ?? "none");
 
     console.log("[GET] Step 5/6: Getting version chain...");
-    let versionChain;
+    let versionChain: Awaited<ReturnType<typeof getVersionChain>> = [];
     try {
       versionChain = await getVersionChain(id);
       console.log("[GET] Version chain length:", versionChain?.length ?? 0);
