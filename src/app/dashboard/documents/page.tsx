@@ -92,6 +92,7 @@ export default function DocumentsPage() {
         for (const doc of json.data as Document[]) {
           try {
             const reviewRes = await fetch(`/api/documents/${doc.id}/review`);
+            if (!reviewRes.headers.get("content-type")?.includes("application/json")) continue;
             const reviewJson = await reviewRes.json();
             if (reviewJson.success && reviewJson.data) {
               reviewMap[doc.id] = reviewJson.data;
@@ -135,6 +136,15 @@ export default function DocumentsPage() {
     setError(null);
     try {
       const res = await fetch(`/api/documents/${docId}/review`, { method: "POST" });
+      const ct = res.headers.get("content-type") || "";
+      if (!ct.includes("application/json")) {
+        const text = await res.text().catch(() => "");
+        console.error("Non-JSON response from review POST:", text.slice(0, 200));
+        setError("Review failed. Server returned an unexpected response.");
+        addToast("error", "Review failed. Server error.");
+        setReviewingId(null);
+        return;
+      }
       const json = await res.json();
       if (json.success && json.data) {
         setReviews((prev) => ({ ...prev, [docId]: json.data }));

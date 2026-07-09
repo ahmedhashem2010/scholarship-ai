@@ -1,11 +1,21 @@
-export const runtime = "nodejs";
-
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createApiClient } from "@/lib/supabase/api-auth";
 import { reviewDocument, calculateAverageScore, type ReviewScore } from "@/lib/ai-review";
 import { extractTextFromFile } from "@/lib/text-extract";
 import { getVersionChain } from "@/lib/document-versions";
+
+export const runtime = "nodejs";
+
+function safeJsonParse(raw: string): unknown {
+  try { return JSON.parse(raw); } catch { return null; }
+}
+
+function safeArray(raw: string): string[] {
+  const parsed = safeJsonParse(raw);
+  return Array.isArray(parsed) ? parsed : [];
+}
 
 export async function POST(
   request: NextRequest,
@@ -44,33 +54,21 @@ export async function POST(
       orderBy: { createdAt: "desc" },
     });
     if (existingReview) {
-      const rawScores = JSON.parse(existingReview.strengths);
+      const rawScores = safeJsonParse(existingReview.strengths);
       const isOldFormat = Array.isArray(rawScores) && rawScores.length > 0 && typeof rawScores[0] === "string";
+      const scores = isOldFormat ? null : (rawScores as ReviewScore | null);
       return NextResponse.json({
         success: true,
-        data: isOldFormat ? {
+        data: {
           id: existingReview.id,
           documentId: existingReview.documentId,
           userId: existingReview.userId,
-          score: existingReview.score,
-          overallQuality: { score: existingReview.score, strengthsSummary: "", weaknessesSummary: "" },
-          atsCompatibility: { score: existingReview.score, missingKeywords: [], improvements: [] },
-          competitiveness: { score: existingReview.score, uniqueStrengths: "", differentiation: "" },
-          topImprovements: JSON.parse(existingReview.suggestions),
-          quickWins: JSON.parse(existingReview.grammarIssues),
-          overallAssessment: existingReview.overallFeedback,
-          modelUsed: existingReview.modelUsed,
-          createdAt: existingReview.createdAt,
-        } : {
-          id: existingReview.id,
-          documentId: existingReview.documentId,
-          userId: existingReview.userId,
-          score: calculateAverageScore(rawScores as ReviewScore),
-          overallQuality: rawScores.overallQuality,
-          atsCompatibility: rawScores.atsCompatibility,
-          competitiveness: rawScores.competitiveness,
-          topImprovements: JSON.parse(existingReview.suggestions),
-          quickWins: JSON.parse(existingReview.grammarIssues),
+          score: scores ? calculateAverageScore(scores) : existingReview.score,
+          overallQuality: scores?.overallQuality ?? { score: existingReview.score, strengthsSummary: "", weaknessesSummary: "" },
+          atsCompatibility: scores?.atsCompatibility ?? { score: existingReview.score, missingKeywords: [], improvements: [] },
+          competitiveness: scores?.competitiveness ?? { score: existingReview.score, uniqueStrengths: "", differentiation: "" },
+          topImprovements: safeArray(existingReview.suggestions),
+          quickWins: safeArray(existingReview.grammarIssues),
           overallAssessment: existingReview.overallFeedback,
           modelUsed: existingReview.modelUsed,
           createdAt: existingReview.createdAt,
@@ -160,8 +158,8 @@ export async function POST(
       overallQuality: coaching.overallQuality,
       atsCompatibility: coaching.atsCompatibility,
       competitiveness: coaching.competitiveness,
-      topImprovements: JSON.parse(review.suggestions),
-      quickWins: JSON.parse(review.grammarIssues),
+      topImprovements: safeArray(review.suggestions),
+      quickWins: safeArray(review.grammarIssues),
       overallAssessment: review.overallFeedback,
       modelUsed: review.modelUsed,
       createdAt: review.createdAt,
@@ -215,38 +213,26 @@ export async function GET(
 
     const versionChain = await getVersionChain(id);
 
-    const rawScores = review ? JSON.parse(review.strengths) : null;
+    const rawScores = review ? safeJsonParse(review.strengths) : null;
     const isOldFormat = Array.isArray(rawScores) && rawScores.length > 0 && typeof rawScores[0] === "string";
+    const scores = isOldFormat ? null : (rawScores as ReviewScore | null);
 
     return NextResponse.json({
       success: true,
-      data: review ? (isOldFormat ? {
+      data: review ? {
         id: review.id,
         documentId: review.documentId,
         userId: review.userId,
-        score: review.score,
-        overallQuality: { score: review.score, strengthsSummary: "", weaknessesSummary: "" },
-        atsCompatibility: { score: review.score, missingKeywords: [], improvements: [] },
-        competitiveness: { score: review.score, uniqueStrengths: "", differentiation: "" },
-        topImprovements: JSON.parse(review.suggestions),
-        quickWins: JSON.parse(review.grammarIssues),
+        score: scores ? calculateAverageScore(scores) : review.score,
+        overallQuality: scores?.overallQuality ?? { score: review.score, strengthsSummary: "", weaknessesSummary: "" },
+        atsCompatibility: scores?.atsCompatibility ?? { score: review.score, missingKeywords: [], improvements: [] },
+        competitiveness: scores?.competitiveness ?? { score: review.score, uniqueStrengths: "", differentiation: "" },
+        topImprovements: safeArray(review.suggestions),
+        quickWins: safeArray(review.grammarIssues),
         overallAssessment: review.overallFeedback,
         modelUsed: review.modelUsed,
         createdAt: review.createdAt,
-      } : {
-        id: review.id,
-        documentId: review.documentId,
-        userId: review.userId,
-        score: calculateAverageScore(rawScores as ReviewScore),
-        overallQuality: rawScores.overallQuality,
-        atsCompatibility: rawScores.atsCompatibility,
-        competitiveness: rawScores.competitiveness,
-        topImprovements: JSON.parse(review.suggestions),
-        quickWins: JSON.parse(review.grammarIssues),
-        overallAssessment: review.overallFeedback,
-        modelUsed: review.modelUsed,
-        createdAt: review.createdAt,
-      }) : null,
+      } : null,
       document: {
         id: document.id,
         fileName: document.fileName,

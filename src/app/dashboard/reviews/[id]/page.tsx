@@ -39,6 +39,13 @@ export default function DocumentReviewPage() {
       setIsLoading(true)
 
       const response = await fetch(`/api/documents/${documentId}/review`)
+      const ct = response.headers.get("content-type") || ""
+      if (!ct.includes("application/json")) {
+        const text = await response.text().catch(() => "");
+        console.error("Non-JSON response from review API:", text.slice(0, 200));
+        setIsLoading(false);
+        return;
+      }
       const result = await response.json()
 
       if (result.success && result.data) {
