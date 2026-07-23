@@ -21,6 +21,9 @@ import {
   SlidersHorizontal,
   RotateCcw,
   X,
+  Sparkles,
+  MapPin,
+  Calendar,
 } from "lucide-react";
 import { useProfile } from "@/lib/profile-context";
 
@@ -163,26 +166,27 @@ export function ScholarshipCardList({ scholarships }: { scholarships: Scholarshi
   const activeFilterCount = [search, countryFilter !== "all", degreeFilter !== "all", competitionFilter !== "all", sortBy !== "deadline_asc"].filter(Boolean).length;
   const hasActiveFilters = activeFilterCount > 0;
 
-  function getBarColor(level: string): string {
+  function getCompetitionColor(level: string): string {
     switch (level) {
-      case "high": return "bg-red-500";
-      case "medium": return "bg-yellow-500";
-      case "low": return "bg-green-500";
-      default: return "bg-muted-foreground/30";
+      case "high": return "bg-gradient-to-r from-rose-500 to-pink-500";
+      case "medium": return "bg-gradient-to-r from-amber-500 to-orange-500";
+      case "low": return "bg-gradient-to-r from-emerald-500 to-teal-500";
+      default: return "bg-gradient-to-r from-gray-400 to-gray-500";
     }
   }
 
   return (
     <div className="space-y-6">
+      {/* Search & Filters */}
       <div className="flex flex-col gap-4">
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search scholarships by name, country, university..."
+              placeholder="Search by name, country, university..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 pr-8"
+              className="pl-11 pr-10 h-12 rounded-xl border-primary/10 bg-card"
             />
             {search && (
               <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
@@ -190,11 +194,15 @@ export function ScholarshipCardList({ scholarships }: { scholarships: Scholarshi
               </button>
             )}
           </div>
-          <Button variant="outline" onClick={() => setShowFilters(!showFilters)} className="gap-2 shrink-0">
+          <Button 
+            variant="outline" 
+            onClick={() => setShowFilters(!showFilters)} 
+            className="gap-2 shrink-0 h-12 rounded-xl border-primary/10 hover:bg-primary/5 hover:border-primary/20"
+          >
             <SlidersHorizontal className="h-4 w-4" />
             Filters
             {activeFilterCount > 0 && (
-              <span className="ml-1 inline-flex items-center justify-center h-5 min-w-5 rounded-full bg-primary text-primary-foreground text-xs font-medium px-1">
+              <span className="ml-1 inline-flex items-center justify-center h-5 min-w-5 rounded-full bg-primary text-white text-xs font-medium px-1">
                 {activeFilterCount}
               </span>
             )}
@@ -202,9 +210,11 @@ export function ScholarshipCardList({ scholarships }: { scholarships: Scholarshi
         </div>
 
         {showFilters && (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 p-4 rounded-lg border bg-muted/30">
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Country</label>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 p-5 rounded-2xl border border-primary/10 bg-gradient-to-br from-card to-primary/[0.02]">
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-primary flex items-center gap-1">
+                <MapPin className="h-3 w-3" /> Country
+              </label>
               <Select value={countryFilter} onValueChange={setCountryFilter}>
                 <SelectItem key="all" value="all">All Countries</SelectItem>
                 {countries.map((c) => (
@@ -213,8 +223,10 @@ export function ScholarshipCardList({ scholarships }: { scholarships: Scholarshi
               </Select>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Degree</label>
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-primary flex items-center gap-1">
+                <GraduationCap className="h-3 w-3" /> Degree
+              </label>
               <Select value={degreeFilter} onValueChange={setDegreeFilter}>
                 <SelectItem key="all" value="all">All Degrees</SelectItem>
                 <SelectItem key="Bachelor" value="Bachelor">Bachelor</SelectItem>
@@ -223,8 +235,10 @@ export function ScholarshipCardList({ scholarships }: { scholarships: Scholarshi
               </Select>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Competition</label>
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-primary flex items-center gap-1">
+                <Sparkles className="h-3 w-3" /> Competition
+              </label>
               <Select value={competitionFilter} onValueChange={setCompetitionFilter}>
                 <SelectItem key="all" value="all">All Levels</SelectItem>
                 <SelectItem key="low" value="low">Low</SelectItem>
@@ -233,8 +247,10 @@ export function ScholarshipCardList({ scholarships }: { scholarships: Scholarshi
               </Select>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Sort by</label>
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-primary flex items-center gap-1">
+                <Calendar className="h-3 w-3" /> Sort by
+              </label>
               <Select value={sortBy} onValueChange={setSortBy}>
                 <SelectItem key="deadline_asc" value="deadline_asc">Deadline (Soonest)</SelectItem>
                 <SelectItem key="deadline_desc" value="deadline_desc">Deadline (Latest)</SelectItem>
@@ -244,7 +260,7 @@ export function ScholarshipCardList({ scholarships }: { scholarships: Scholarshi
             </div>
 
             <div className="flex items-end">
-              <Button variant="ghost" size="sm" onClick={resetFilters} className="gap-1.5">
+              <Button variant="ghost" size="sm" onClick={resetFilters} className="gap-1.5 text-primary hover:text-primary hover:bg-primary/10">
                 <RotateCcw className="h-3.5 w-3.5" />
                 Reset
               </Button>
@@ -253,23 +269,35 @@ export function ScholarshipCardList({ scholarships }: { scholarships: Scholarshi
         )}
       </div>
 
+      {/* Results Count */}
       <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
-          Showing {filtered.length} of {scholarships.length} scholarships
-          {profileDegree && matchMyDegree && <span className="text-primary ml-1">(matched to {profileDegree})</span>}
-        </p>
+        <div className="flex items-center gap-2">
+          <p className="text-sm text-muted-foreground">
+            Showing <span className="font-semibold text-foreground">{filtered.length}</span> of <span className="font-semibold text-foreground">{scholarships.length}</span> scholarships
+          </p>
+          {profileDegree && matchMyDegree && (
+            <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium">
+              Matched to {profileDegree}
+            </span>
+          )}
+        </div>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {/* Scholarship Grid */}
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {filtered.map((sch, i) => (
           <Card
             key={sch.id}
-            className="group flex flex-col overflow-hidden border bg-card animate-fade-in-up hover:-translate-y-1 hover:shadow-lg transition-all duration-200"
+            className="group relative overflow-hidden border border-primary/10 bg-gradient-to-br from-card to-primary/[0.02] hover:-translate-y-1.5 hover:shadow-xl hover:shadow-primary/10 hover:border-primary/20 transition-all duration-300"
             style={{ animationDelay: `${i * 0.05}s` }}
           >
-            <div className={`h-1.5 w-full flex-shrink-0 ${getBarColor(sch.competitionLevel)}`} />
+            {/* Competition Level Bar */}
+            <div className={`h-1 w-full ${getCompetitionColor(sch.competitionLevel)}`} />
+            
+            {/* Decorative Corner */}
+            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-primary/5 to-transparent rounded-bl-full" />
 
-            <CardHeader className="space-y-3 pb-2">
+            <CardHeader className="space-y-3 pb-2 relative">
               <div className="flex items-start justify-between">
                 <span className="text-3xl leading-none">{getCountryFlag(sch.country)}</span>
                 <div className="flex items-center gap-2">
@@ -278,11 +306,11 @@ export function ScholarshipCardList({ scholarships }: { scholarships: Scholarshi
                       type="checkbox"
                       checked={selected.has(sch.id)}
                       onChange={() => toggle(sch.id)}
-                      className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
+                      className="h-4 w-4 rounded border-primary/20 text-primary focus:ring-primary"
                     />
                     <span className="text-xs text-muted-foreground">Compare</span>
                   </label>
-                  <Badge variant={getCompetitionVariant(sch.competitionLevel)}>
+                  <Badge variant={getCompetitionVariant(sch.competitionLevel)} className="text-[10px] uppercase tracking-wider">
                     {sch.competitionLevel}
                   </Badge>
                 </div>
@@ -294,23 +322,23 @@ export function ScholarshipCardList({ scholarships }: { scholarships: Scholarshi
 
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
                 <span className="flex items-center gap-1">
-                  <Globe className="h-3.5 w-3.5 shrink-0" />
+                  <Globe className="h-3.5 w-3.5 shrink-0 text-primary/60" />
                   <span>{sch.country}</span>
                 </span>
                 {sch.university && (
                   <span className="flex items-center gap-1">
-                    <Building2 className="h-3.5 w-3.5 shrink-0" />
+                    <Building2 className="h-3.5 w-3.5 shrink-0 text-primary/60" />
                     <span className="truncate max-w-[160px]">{sch.university}</span>
                   </span>
                 )}
                 <span className="flex items-center gap-1">
-                  <GraduationCap className="h-3.5 w-3.5 shrink-0" />
+                  <GraduationCap className="h-3.5 w-3.5 shrink-0 text-primary/60" />
                   <span>{sch.degree}</span>
                 </span>
               </div>
             </CardHeader>
 
-            <CardContent className="flex-1 space-y-3 pt-0">
+            <CardContent className="flex-1 space-y-3 pt-0 relative">
               <p className="text-sm text-muted-foreground line-clamp-2">
                 {sch.description ?? "No description available."}
               </p>
@@ -331,9 +359,9 @@ export function ScholarshipCardList({ scholarships }: { scholarships: Scholarshi
               </div>
             </CardContent>
 
-            <div className="border-t px-6 py-3">
+            <div className="border-t border-primary/10 px-6 py-3 bg-primary/[0.02]">
               <Link href={`/scholarships/${sch.id}`}>
-                <Button variant="outline" size="sm" className="w-full gap-1.5 group/btn">
+                <Button variant="outline" size="sm" className="w-full gap-1.5 group/btn rounded-xl border-primary/20 hover:bg-primary hover:text-white hover:border-primary transition-all duration-300">
                   View Details
                   <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover/btn:translate-x-0.5" />
                 </Button>
@@ -343,13 +371,16 @@ export function ScholarshipCardList({ scholarships }: { scholarships: Scholarshi
         ))}
       </div>
 
+      {/* Empty State */}
       {filtered.length === 0 && (
-        <div className="text-center py-16">
-          <Search className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+        <div className="text-center py-16 rounded-2xl border-2 border-dashed border-primary/20 bg-primary/5">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
+            <Search className="h-8 w-8 text-primary" />
+          </div>
           <h2 className="text-lg font-semibold text-foreground">No scholarships found</h2>
           <p className="text-muted-foreground text-sm mt-1">Try adjusting your filters or search terms</p>
           {hasActiveFilters && (
-            <Button variant="outline" size="sm" onClick={resetFilters} className="mt-4 gap-1.5">
+            <Button variant="outline" size="sm" onClick={resetFilters} className="mt-4 gap-1.5 rounded-xl border-primary/20 hover:bg-primary/5">
               <RotateCcw className="h-3.5 w-3.5" />
               Reset Filters
             </Button>
@@ -357,12 +388,14 @@ export function ScholarshipCardList({ scholarships }: { scholarships: Scholarshi
         </div>
       )}
 
+      {/* Compare Button */}
       {selected.size >= 2 && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
           <Button
             onClick={() => router.push(`/dashboard/compare?ids=${Array.from(selected).join(",")}`)}
-            className="shadow-lg"
+            className="shadow-xl shadow-primary/20 rounded-xl px-6"
           >
+            <Sparkles className="h-4 w-4 mr-2" />
             Compare Selected ({selected.size})
           </Button>
         </div>

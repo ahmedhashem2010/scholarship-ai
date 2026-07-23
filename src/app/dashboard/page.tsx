@@ -8,7 +8,6 @@ import { useLanguage } from "@/contexts/LanguageContext"
 import { useProfile } from "@/lib/profile-context"
 import { DocumentProgress } from "@/components/DocumentProgress"
 import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
 import { cn } from "@/lib/utils"
 import {
   Upload,
@@ -17,11 +16,11 @@ import {
   ArrowRight,
   GraduationCap,
   Globe,
-  TrendingUp,
   Sparkles,
-  BookOpen,
   Award,
-  User,
+  Zap,
+  Target,
+  ChevronRight,
 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -50,26 +49,35 @@ interface Document {
 const ScholarshipCard = memo(function ScholarshipCard({ scholarship, rank }: { scholarship: Scholarship; rank: number }) {
   return (
     <Link href={`/scholarships/${scholarship.id}`} className="group block">
-      <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-5 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/5">
-        <div className="mb-3 flex items-start justify-between">
-          <Badge variant="outline" className="text-xs">
-            {rank <= 3 ? ["🥇", "🥈", "🥉"][rank - 1] : `#${rank}`} Match
-          </Badge>
-          <span className="text-xs text-muted-foreground">{scholarship.field}</span>
+      <div className="relative overflow-hidden rounded-2xl border border-primary/10 bg-gradient-to-br from-card to-primary/[0.02] p-5 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-primary/10 hover:border-primary/20">
+        <div className="absolute top-0 right-0 h-20 w-20 bg-gradient-to-bl from-primary/10 to-transparent rounded-bl-full" />
+        <div className="relative">
+          <div className="mb-3 flex items-start justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">{rank <= 3 ? ["🥇", "🥈", "🥉"][rank - 1] : ""}</span>
+              <Badge variant="outline" className="text-xs border-primary/20 bg-primary/5 text-primary">
+                {scholarship.fitScore}% Match
+              </Badge>
+            </div>
+            <span className="text-xs text-muted-foreground">{scholarship.field}</span>
+          </div>
+          <h3 className="mb-1.5 text-base font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2">{scholarship.name}</h3>
+          <p className="mb-3 text-sm text-muted-foreground">{scholarship.flag} {scholarship.country}</p>
+          <div className="flex items-center justify-between text-xs">
+            <span className="flex items-center gap-1 text-muted-foreground">
+              <Clock className="h-3 w-3" />
+              {scholarship.deadline}
+            </span>
+            <span className={cn(
+              "px-2 py-0.5 rounded-full text-xs font-medium",
+              scholarship.daysLeft <= 30 
+                ? "bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300" 
+                : "bg-primary/10 text-primary"
+            )}>
+              {scholarship.daysLeft <= 0 ? "Overdue" : `${scholarship.daysLeft}d left`}
+            </span>
+          </div>
         </div>
-        <h3 className="mb-1 text-base font-semibold text-foreground group-hover:text-primary">{scholarship.name}</h3>
-        <p className="mb-3 text-sm text-muted-foreground">{scholarship.flag} {scholarship.country}</p>
-        <div className="mb-3 flex items-center justify-between text-xs">
-          <span className="text-muted-foreground">{scholarship.deadline}</span>
-          <span className={scholarship.daysLeft <= 30 ? "font-medium text-orange-500" : "text-muted-foreground"}>
-            {scholarship.daysLeft <= 0 ? "Overdue" : `${scholarship.daysLeft}d left`}
-          </span>
-        </div>
-        <div className="mb-2 flex items-center justify-between text-xs">
-          <span className="font-medium text-foreground">Match Score</span>
-          <span className="font-bold text-primary">{scholarship.fitScore}%</span>
-        </div>
-        <Progress value={scholarship.fitScore} className="h-1.5" />
       </div>
     </Link>
   )
@@ -199,17 +207,17 @@ export default function DashboardPage() {
   }
 
   const stats = [
-    { icon: BookOpen, label: "Active Scholarships", value: scholarships.length, color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-100 dark:bg-blue-950" },
-    { icon: Award, label: "Documents Ready", value: documents.filter(d => d.score >= 6).length, color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-100 dark:bg-emerald-950" },
-    { icon: TrendingUp, label: "Avg Score", value: documents.length > 0 ? Math.round(documents.reduce((a, d) => a + d.score, 0) / documents.length) : "--", color: "text-purple-600 dark:text-purple-400", bg: "bg-purple-100 dark:bg-purple-950" },
-    { icon: Clock, label: "Upcoming Deadlines", value: scholarships.filter(s => s.daysLeft <= 30).length, color: "text-orange-600 dark:text-orange-400", bg: "bg-orange-100 dark:bg-orange-950" },
+    { icon: Target, label: "Scholarships", value: scholarships.length, color: "text-primary", bg: "bg-primary/10", accent: "from-primary/20 to-primary/5" },
+    { icon: Award, label: "Ready Docs", value: documents.filter(d => d.score >= 6).length, color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-100 dark:bg-emerald-950", accent: "from-emerald-200 to-emerald-50 dark:from-emerald-900 dark:to-emerald-950" },
+    { icon: Zap, label: "Avg Score", value: documents.length > 0 ? Math.round(documents.reduce((a, d) => a + d.score, 0) / documents.length) : "--", color: "text-amber-600 dark:text-amber-400", bg: "bg-amber-100 dark:bg-amber-950", accent: "from-amber-200 to-amber-50 dark:from-amber-900 dark:to-amber-950" },
+    { icon: Clock, label: "Urgent", value: scholarships.filter(s => s.daysLeft <= 30).length, color: "text-rose-600 dark:text-rose-400", bg: "bg-rose-100 dark:bg-rose-950", accent: "from-rose-200 to-rose-50 dark:from-rose-900 dark:to-rose-950" },
   ]
 
   const quickActions = [
-    { icon: Upload, label: "Upload Document", href: "/dashboard/documents", desc: "Get AI feedback" },
-    { icon: Search, label: "Browse Scholarships", href: "/scholarships", desc: "Find opportunities" },
-    { icon: Sparkles, label: "AI Writing Help", href: "/dashboard/reviews", desc: "Draft assistance" },
-    { icon: Globe, label: "Country Guides", href: "/help", desc: "Study abroad tips" },
+    { icon: Upload, label: "Upload", href: "/dashboard/documents", desc: "Get AI review", gradient: "from-primary/20 to-primary/5" },
+    { icon: Search, label: "Discover", href: "/scholarships", desc: "Find matches", gradient: "from-emerald-200 to-emerald-50 dark:from-emerald-900 dark:to-emerald-950" },
+    { icon: Sparkles, label: "AI Writer", href: "/dashboard/reviews", desc: "Draft help", gradient: "from-amber-200 to-amber-50 dark:from-amber-900 dark:to-amber-950" },
+    { icon: Globe, label: "Guides", href: "/help", desc: "Study abroad", gradient: "from-violet-200 to-violet-50 dark:from-violet-900 dark:to-violet-950" },
   ]
 
   return (
@@ -218,26 +226,38 @@ export default function DashboardPage() {
 
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Hero Section */}
-        <div className="relative mb-10 overflow-hidden rounded-3xl bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 p-8 sm:p-10">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,hsl(var(--primary)/0.12),transparent_60%)]" />
+        <div className="relative mb-10 overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary/90 to-emerald-600 p-8 sm:p-10 text-white shadow-2xl shadow-primary/20">
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMSIgZmlsbD0id2hpdGUiIGZpbGwtb3BhY2l0eT0iMC4xIi8+PC9zdmc+')] opacity-40" />
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-300/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+          
           <div className="relative flex items-start justify-between">
             <div>
-              <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/15 text-primary ring-1 ring-primary/20">
-                  <User className="h-6 w-6" />
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm">
+                  <Sparkles className="h-6 w-6" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-foreground sm:text-3xl">
+                  <h1 className="text-2xl font-bold sm:text-3xl">
                     Welcome back!
                   </h1>
-                  <p className="mt-1 text-muted-foreground">
+                  <p className="mt-0.5 text-white/80">
                     Your Top {scholarships.length || 5} Scholarships are ready
                   </p>
                 </div>
               </div>
+              <div className="mt-4 flex items-center gap-4">
+                <div className="flex items-center gap-2 rounded-full bg-white/20 backdrop-blur-sm px-4 py-2">
+                  <Target className="h-4 w-4" />
+                  <span className="text-sm font-medium">{scholarships.length} matches found</span>
+                </div>
+                <div className="flex items-center gap-2 rounded-full bg-white/20 backdrop-blur-sm px-4 py-2">
+                  <Zap className="h-4 w-4" />
+                  <span className="text-sm font-medium">{documents.length} documents</span>
+                </div>
+              </div>
             </div>
           </div>
-          <div className="mt-6 h-1.5 w-24 rounded-full bg-gradient-to-r from-primary to-primary/40" />
         </div>
 
         {/* Stats Row */}
@@ -245,14 +265,18 @@ export default function DashboardPage() {
           {stats.map((stat, i) => (
             <div
               key={i}
-              className="group relative overflow-hidden rounded-2xl border border-border bg-card p-6 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/5"
+              className={cn(
+                "group relative overflow-hidden rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl",
+                `hover:shadow-${stat.color.replace('text-', '')}/10`
+              )}
             >
+              <div className={cn("absolute inset-0 bg-gradient-to-br opacity-50", stat.accent)} />
               <div className="relative flex items-start justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
                   <p className="mt-2 text-3xl font-bold text-foreground">{stat.value}</p>
                 </div>
-                <div className={cn("flex h-11 w-11 items-center justify-center rounded-xl", stat.bg, stat.color)}>
+                <div className={cn("flex h-12 w-12 items-center justify-center rounded-xl", stat.bg, stat.color)}>
                   <stat.icon className="h-5 w-5" />
                 </div>
               </div>
@@ -264,12 +288,18 @@ export default function DashboardPage() {
         <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {quickActions.map((action, i) => (
             <Link key={i} href={action.href} className="group block">
-              <div className="relative overflow-hidden rounded-2xl border-2 border-dashed border-border bg-card p-6 text-center transition-all duration-200 hover:border-primary/50 hover:bg-primary/[0.03] hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/5">
-                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-transform duration-200 group-hover:scale-110 group-hover:bg-primary/15">
-                  <action.icon className="h-6 w-6" />
+              <div className={cn(
+                "relative overflow-hidden rounded-2xl border border-border bg-card p-6 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-primary/30",
+              )}>
+                <div className={cn("absolute inset-0 bg-gradient-to-br opacity-30 group-hover:opacity-50 transition-opacity", action.gradient)} />
+                <div className="relative">
+                  <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-all duration-300 group-hover:scale-110 group-hover:bg-primary/20 group-hover:shadow-lg group-hover:shadow-primary/20">
+                    <action.icon className="h-6 w-6" />
+                  </div>
+                  <p className="text-sm font-semibold text-foreground">{action.label}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{action.desc}</p>
+                  <ChevronRight className="mx-auto mt-3 h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-primary" />
                 </div>
-                <p className="text-sm font-semibold text-foreground">{action.label}</p>
-                <p className="mt-1 text-xs text-muted-foreground">{action.desc}</p>
               </div>
             </Link>
           ))}
@@ -282,8 +312,8 @@ export default function DashboardPage() {
               <h2 className="text-lg font-semibold text-foreground">
                 Your Top Matches
               </h2>
-              <Link href="/scholarships" className="text-sm font-medium text-primary hover:underline">
-                View All <ArrowRight className="ml-1 inline h-3 w-3" />
+              <Link href="/scholarships" className="flex items-center gap-1 text-sm font-medium text-primary hover:underline group">
+                View All <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
               </Link>
             </div>
             {scholarships.length > 0 ? (
@@ -293,11 +323,11 @@ export default function DashboardPage() {
                 ))}
               </div>
             ) : (
-              <div className="rounded-2xl border-2 border-dashed border-border p-10 text-center">
-                <GraduationCap className="mx-auto mb-3 h-8 w-8 text-muted-foreground" />
+              <div className="rounded-2xl border-2 border-dashed border-primary/20 bg-primary/5 p-10 text-center">
+                <GraduationCap className="mx-auto mb-3 h-8 w-8 text-primary" />
                 <p className="text-sm font-medium text-muted-foreground">Complete your profile to get matched</p>
-                <Link href="/onboarding" className="mt-4 inline-flex h-7 items-center justify-center rounded-[min(var(--radius-md),12px)] bg-primary px-2.5 text-[0.8rem] font-medium whitespace-nowrap text-primary-foreground transition-all hover:bg-primary/80">
-                  Complete Profile
+                <Link href="/onboarding" className="mt-4 inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-white transition-all hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20">
+                  Complete Profile <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
             )}
