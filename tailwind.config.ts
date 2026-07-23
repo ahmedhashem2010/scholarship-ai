@@ -11,50 +11,50 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        border: "hsl(var(--heroui-divider))",
-        input: "hsl(var(--heroui-default-300))",
-        ring: "hsl(var(--heroui-focus))",
-        background: "hsl(var(--heroui-background))",
-        foreground: "hsl(var(--heroui-foreground))",
+        border: "#d1ddd9",
+        input: "#d1ddd9",
+        ring: "#0d9488",
+        background: "#f4fdf9",
+        foreground: "#1a3a30",
         card: {
-          DEFAULT: "hsl(var(--heroui-content1))",
-          foreground: "hsl(var(--heroui-foreground))",
+          DEFAULT: "#ffffff",
+          foreground: "#1a3a30",
         },
         muted: {
-          DEFAULT: "hsl(var(--heroui-default-100))",
-          foreground: "hsl(var(--heroui-default-500))",
+          DEFAULT: "#edf5f1",
+          foreground: "#6b8f82",
         },
         accent: {
-          DEFAULT: "hsl(var(--heroui-content2))",
-          foreground: "hsl(var(--heroui-foreground))",
+          DEFAULT: "#e4f0ec",
+          foreground: "#1a3a30",
         },
         popover: {
-          DEFAULT: "hsl(var(--heroui-content1))",
-          foreground: "hsl(var(--heroui-foreground))",
+          DEFAULT: "#ffffff",
+          foreground: "#1a3a30",
         },
         primary: {
-          DEFAULT: "hsl(var(--heroui-primary))",
-          foreground: "hsl(var(--heroui-primary-foreground))",
+          DEFAULT: "#0d9488",
+          foreground: "#ffffff",
         },
         secondary: {
-          DEFAULT: "hsl(var(--heroui-secondary))",
-          foreground: "hsl(var(--heroui-secondary-foreground))",
+          DEFAULT: "#e4f0ec",
+          foreground: "#1a3a30",
         },
         destructive: {
-          DEFAULT: "hsl(var(--heroui-danger))",
-          foreground: "hsl(var(--heroui-danger-foreground))",
+          DEFAULT: "#dc2626",
+          foreground: "#ffffff",
         },
         success: {
-          DEFAULT: "hsl(var(--heroui-success))",
-          foreground: "hsl(var(--heroui-success-foreground))",
+          DEFAULT: "#16a34a",
+          foreground: "#ffffff",
         },
         warning: {
-          DEFAULT: "hsl(var(--heroui-warning))",
-          foreground: "hsl(var(--heroui-warning-foreground))",
+          DEFAULT: "#f59e0b",
+          foreground: "#ffffff",
         },
         danger: {
-          DEFAULT: "hsl(var(--heroui-danger))",
-          foreground: "hsl(var(--heroui-danger-foreground))",
+          DEFAULT: "#dc2626",
+          foreground: "#ffffff",
         },
         surface: "#FFFFFF",
         "score-low": "#EF4444",
@@ -63,9 +63,9 @@ const config: Config = {
         "score-excellent": "#10B981",
       },
       borderRadius: {
-        lg: "var(--heroui-radius-large)",
-        md: "calc(var(--heroui-radius-large) - 4px)",
-        sm: "calc(var(--heroui-radius-large) - 8px)",
+        lg: "14px",
+        md: "10px",
+        sm: "6px",
       },
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
