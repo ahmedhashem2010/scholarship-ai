@@ -20,9 +20,10 @@ const Avatar = forwardRef<HTMLDivElement, AvatarProps>(
         src={src}
         alt={alt}
         name={fallback}
+        radius="full"
         className={cn("shrink-0", className)}
         classNames={{
-          base: "bg-default-300",
+          base: "bg-primary/15 text-primary",
           img: "object-cover",
         }}
       >

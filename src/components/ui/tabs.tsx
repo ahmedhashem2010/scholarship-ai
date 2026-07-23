@@ -1,45 +1,45 @@
 "use client";
 
+import {
+  Tabs as HeroTabs,
+  Tab as HeroTab,
+} from "@heroui/react";
 import { cn } from "@/lib/utils";
 
-function Tabs({ children, className, ...props }: any) {
+interface TabsProps {
+  value?: string;
+  onValueChange?: (value: string) => void;
+  children: React.ReactNode;
+  className?: string;
+}
+
+function Tabs({ value, onValueChange, children, className }: TabsProps) {
   return (
-    <div data-slot="tabs" className={cn("flex flex-col gap-2", className)} {...props}>
+    <HeroTabs
+      selectedKey={value}
+      onSelectionChange={(key) => onValueChange?.(String(key))}
+      variant="light"
+      color="primary"
+      classNames={{
+        tabList: "gap-1 w-full relative rounded-xl p-1 bg-default-100",
+        cursor: "w-full bg-white shadow-md rounded-xl",
+        tab: "max-w-fit px-4 h-9",
+        tabContent: "group-data-[selected=true]:text-primary",
+      }}
+      className={cn("", className)}
+    >
       {children}
-    </div>
+    </HeroTabs>
   );
 }
 
-function TabsList({ children, className, ...props }: any) {
-  return (
-    <div
-      data-slot="tabs-list"
-      role="tablist"
-      className={cn(
-        "bg-default-100 text-default-foreground inline-flex h-9 w-fit items-center justify-center rounded-lg p-[3px]",
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </div>
-  );
+function TabsList(_props: any) {
+  return null;
 }
 
-function TabsTrigger({ children, value, className, ...props }: any) {
+function TabsTrigger({ children, value, ...props }: any) {
   return (
-    <button
-      role="tab"
-      data-slot="tabs-trigger"
-      data-state="inactive"
-      className={cn(
-        "inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap transition-all focus-visible:ring-2 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:shadow-sm",
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </button>
+    <HeroTab key={value} title={children} {...props} />
   );
 }
 
@@ -47,8 +47,7 @@ function TabsContent({ children, value, className, ...props }: any) {
   return (
     <div
       role="tabpanel"
-      data-slot="tabs-content"
-      className={cn("flex-1 outline-none", className)}
+      className={cn("mt-2 outline-none", className)}
       {...props}
     >
       {children}

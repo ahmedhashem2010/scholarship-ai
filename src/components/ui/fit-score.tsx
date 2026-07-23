@@ -24,7 +24,7 @@ export function FitScore({ score, size = "md", className, showLabel = true }: Fi
   return (
     <div className={cn("relative inline-flex items-center justify-center", className)}>
       <svg width={d} height={d} className="-rotate-90">
-        <circle cx={d / 2} cy={d / 2} r={r} fill="none" stroke="#F1F5F9" strokeWidth={strokes[size]} />
+        <circle cx={d / 2} cy={d / 2} r={r} fill="none" stroke="currentColor" strokeWidth={strokes[size]} className="text-default-200" />
         <circle
           cx={d / 2}
           cy={d / 2}

@@ -12,7 +12,11 @@ function Accordion({
   ...props
 }: React.ComponentProps<typeof HeroAccordion>) {
   return (
-    <HeroAccordion className={cn("", className)} {...(props as any)}>
+    <HeroAccordion
+      variant="light"
+      className={cn("", className)}
+      {...(props as any)}
+    >
       {children}
     </HeroAccordion>
   );
@@ -24,7 +28,10 @@ function AccordionItem({
   ...props
 }: React.ComponentProps<typeof HeroAccordionItem>) {
   return (
-    <HeroAccordionItem className={cn("border-b", className)} {...(props as any)}>
+    <HeroAccordionItem
+      className={cn("border-b border-divider", className)}
+      {...(props as any)}
+    >
       {children}
     </HeroAccordionItem>
   );

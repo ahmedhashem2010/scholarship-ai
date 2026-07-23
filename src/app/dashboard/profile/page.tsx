@@ -10,10 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import {
   Select,
-  SelectContent,
   SelectItem,
-  SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
 import { Loader2, Save, User } from "lucide-react"
@@ -154,92 +151,72 @@ export default function ProfilePage() {
             <div className="space-y-2">
               <Label htmlFor="country">Country</Label>
               <Select value={profile.country} onValueChange={(value: string) => handleChange("country", value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select country" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Egypt">Egypt</SelectItem>
-                  <SelectItem value="Saudi Arabia">Saudi Arabia</SelectItem>
-                  <SelectItem value="UAE">UAE</SelectItem>
-                  <SelectItem value="Jordan">Jordan</SelectItem>
-                  <SelectItem value="Lebanon">Lebanon</SelectItem>
-                  <SelectItem value="Iraq">Iraq</SelectItem>
-                  <SelectItem value="Syria">Syria</SelectItem>
-                  <SelectItem value="Yemen">Yemen</SelectItem>
-                  <SelectItem value="Oman">Oman</SelectItem>
-                  <SelectItem value="Qatar">Qatar</SelectItem>
-                  <SelectItem value="Bahrain">Bahrain</SelectItem>
-                  <SelectItem value="Kuwait">Kuwait</SelectItem>
-                  <SelectItem value="Palestine">Palestine</SelectItem>
-                  <SelectItem value="Algeria">Algeria</SelectItem>
-                  <SelectItem value="Morocco">Morocco</SelectItem>
-                  <SelectItem value="Tunisia">Tunisia</SelectItem>
-                  <SelectItem value="Libya">Libya</SelectItem>
-                  <SelectItem value="Sudan">Sudan</SelectItem>
-                  <SelectItem value="Mauritania">Mauritania</SelectItem>
-                  <SelectItem value="Somalia">Somalia</SelectItem>
-                  <SelectItem value="Djibouti">Djibouti</SelectItem>
-                  <SelectItem value="Comoros">Comoros</SelectItem>
-                  <SelectItem value="Other">Other</SelectItem>
-                </SelectContent>
+                <SelectItem value="Egypt">Egypt</SelectItem>
+                <SelectItem value="Saudi Arabia">Saudi Arabia</SelectItem>
+                <SelectItem value="UAE">UAE</SelectItem>
+                <SelectItem value="Jordan">Jordan</SelectItem>
+                <SelectItem value="Lebanon">Lebanon</SelectItem>
+                <SelectItem value="Iraq">Iraq</SelectItem>
+                <SelectItem value="Syria">Syria</SelectItem>
+                <SelectItem value="Yemen">Yemen</SelectItem>
+                <SelectItem value="Oman">Oman</SelectItem>
+                <SelectItem value="Qatar">Qatar</SelectItem>
+                <SelectItem value="Bahrain">Bahrain</SelectItem>
+                <SelectItem value="Kuwait">Kuwait</SelectItem>
+                <SelectItem value="Palestine">Palestine</SelectItem>
+                <SelectItem value="Algeria">Algeria</SelectItem>
+                <SelectItem value="Morocco">Morocco</SelectItem>
+                <SelectItem value="Tunisia">Tunisia</SelectItem>
+                <SelectItem value="Libya">Libya</SelectItem>
+                <SelectItem value="Sudan">Sudan</SelectItem>
+                <SelectItem value="Mauritania">Mauritania</SelectItem>
+                <SelectItem value="Somalia">Somalia</SelectItem>
+                <SelectItem value="Djibouti">Djibouti</SelectItem>
+                <SelectItem value="Comoros">Comoros</SelectItem>
+                <SelectItem value="Other">Other</SelectItem>
               </Select>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="educationLevel">Current Education</Label>
               <Select value={profile.educationLevel} onValueChange={(value: string) => handleChange("educationLevel", value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select education level" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="high-school">High School</SelectItem>
-                  <SelectItem value="bachelor">Bachelor&apos;s Degree</SelectItem>
-                  <SelectItem value="master">Master&apos;s Degree</SelectItem>
-                  <SelectItem value="phd">PhD / Doctorate</SelectItem>
-                </SelectContent>
+                <SelectItem value="high-school">High School</SelectItem>
+                <SelectItem value="bachelor">Bachelor&apos;s Degree</SelectItem>
+                <SelectItem value="master">Master&apos;s Degree</SelectItem>
+                <SelectItem value="phd">PhD / Doctorate</SelectItem>
               </Select>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="major">Field of Study</Label>
               <Select value={profile.major} onValueChange={(value: string) => handleChange("major", value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select field" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Computer Science">Computer Science</SelectItem>
-                  <SelectItem value="Engineering">Engineering</SelectItem>
-                  <SelectItem value="Medicine">Medicine</SelectItem>
-                  <SelectItem value="Business">Business</SelectItem>
-                  <SelectItem value="Law">Law</SelectItem>
-                  <SelectItem value="Economics">Economics</SelectItem>
-                  <SelectItem value="Arts & Humanities">Arts &amp; Humanities</SelectItem>
-                  <SelectItem value="Natural Sciences">Natural Sciences</SelectItem>
-                  <SelectItem value="Social Sciences">Social Sciences</SelectItem>
-                  <SelectItem value="Education">Education</SelectItem>
-                  <SelectItem value="Agriculture">Agriculture</SelectItem>
-                  <SelectItem value="Architecture">Architecture</SelectItem>
-                  <SelectItem value="Pharmacy">Pharmacy</SelectItem>
-                  <SelectItem value="Dentistry">Dentistry</SelectItem>
-                  <SelectItem value="Nursing">Nursing</SelectItem>
-                  <SelectItem value="Information Technology">Information Technology</SelectItem>
-                  <SelectItem value="Other">Other</SelectItem>
-                </SelectContent>
+                <SelectItem value="Computer Science">Computer Science</SelectItem>
+                <SelectItem value="Engineering">Engineering</SelectItem>
+                <SelectItem value="Medicine">Medicine</SelectItem>
+                <SelectItem value="Business">Business</SelectItem>
+                <SelectItem value="Law">Law</SelectItem>
+                <SelectItem value="Economics">Economics</SelectItem>
+                <SelectItem value="Arts & Humanities">Arts &amp; Humanities</SelectItem>
+                <SelectItem value="Natural Sciences">Natural Sciences</SelectItem>
+                <SelectItem value="Social Sciences">Social Sciences</SelectItem>
+                <SelectItem value="Education">Education</SelectItem>
+                <SelectItem value="Agriculture">Agriculture</SelectItem>
+                <SelectItem value="Architecture">Architecture</SelectItem>
+                <SelectItem value="Pharmacy">Pharmacy</SelectItem>
+                <SelectItem value="Dentistry">Dentistry</SelectItem>
+                <SelectItem value="Nursing">Nursing</SelectItem>
+                <SelectItem value="Information Technology">Information Technology</SelectItem>
+                <SelectItem value="Other">Other</SelectItem>
               </Select>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="targetDegree">Target Degree</Label>
               <Select value={profile.targetDegree} onValueChange={(value: string) => handleChange("targetDegree", value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select target degree" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="bachelor">Bachelor&apos;s</SelectItem>
-                  <SelectItem value="master">Master&apos;s</SelectItem>
-                  <SelectItem value="phd">PhD</SelectItem>
-                  <SelectItem value="exchange">Exchange Program</SelectItem>
-                </SelectContent>
+                <SelectItem value="bachelor">Bachelor&apos;s</SelectItem>
+                <SelectItem value="master">Master&apos;s</SelectItem>
+                <SelectItem value="phd">PhD</SelectItem>
+                <SelectItem value="exchange">Exchange Program</SelectItem>
               </Select>
             </div>
 
@@ -251,18 +228,13 @@ export default function ProfilePage() {
             <div className="space-y-2">
               <Label htmlFor="englishLevel">English Level</Label>
               <Select value={profile.englishLevel} onValueChange={(value: string) => handleChange("englishLevel", value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select level" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="beginner">Beginner</SelectItem>
-                  <SelectItem value="intermediate">Intermediate</SelectItem>
-                  <SelectItem value="advanced">Advanced</SelectItem>
-                  <SelectItem value="fluent">Fluent</SelectItem>
-                  <SelectItem value="native">Native</SelectItem>
-                  <SelectItem value="TOEFL">TOEFL</SelectItem>
-                  <SelectItem value="IELTS">IELTS</SelectItem>
-                </SelectContent>
+                <SelectItem value="beginner">Beginner</SelectItem>
+                <SelectItem value="intermediate">Intermediate</SelectItem>
+                <SelectItem value="advanced">Advanced</SelectItem>
+                <SelectItem value="fluent">Fluent</SelectItem>
+                <SelectItem value="native">Native</SelectItem>
+                <SelectItem value="TOEFL">TOEFL</SelectItem>
+                <SelectItem value="IELTS">IELTS</SelectItem>
               </Select>
             </div>
           </div>

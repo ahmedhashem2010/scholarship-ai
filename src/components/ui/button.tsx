@@ -54,9 +54,10 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         color={colorMap[variant]}
         size={sizeMap[size]}
         isIconOnly={isIcon}
+        radius="lg"
         className={cn(
+          "font-medium",
           isLink && "p-0 h-auto min-h-0 text-primary underline underline-offset-4 hover:opacity-80",
-          variant === "destructive" && "bg-danger text-white",
           className
         )}
         {...(props as any)}

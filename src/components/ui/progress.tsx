@@ -21,6 +21,7 @@ const Progress = forwardRef<HTMLDivElement, ProgressProps>(
         className={cn("w-full", className)}
         color="primary"
         size="sm"
+        radius="full"
         {...(props as any)}
       />
     );

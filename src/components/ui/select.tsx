@@ -1,78 +1,51 @@
 "use client";
 
-import { createContext, useContext, forwardRef } from "react";
 import { cn } from "@/lib/utils";
+import { ChevronDown } from "lucide-react";
 
-interface SelectContextType {
+interface SelectProps {
   value?: string;
   onValueChange?: (value: string) => void;
+  children?: any;
+  className?: string;
 }
 
-const SelectContext = createContext<SelectContextType>({});
+function Select({ value, onValueChange, children, className }: SelectProps) {
+  const items: { value: string; label: string }[] = [];
 
-function Select({ children, value, onValueChange, ...props }: any) {
+  const extractItems = (node: any): void => {
+    if (!node) return;
+    if (Array.isArray(node)) {
+      node.forEach(extractItems);
+      return;
+    }
+    if (node?.props?.value !== undefined) {
+      items.push({ value: node.props.value, label: String(node.props.children ?? node.props.value) });
+    }
+  };
+
+  extractItems(children);
+
   return (
-    <SelectContext.Provider value={{ value, onValueChange }}>
-      <div data-slot="select" className="relative" {...props}>
-        {children}
-      </div>
-    </SelectContext.Provider>
+    <div className={cn("relative", className)}>
+      <select
+        value={value ?? ""}
+        onChange={(e) => onValueChange?.(e.target.value)}
+        className="flex h-12 w-full appearance-none items-center rounded-xl border border-default-200 bg-default-100 px-4 py-3 pr-10 text-sm text-foreground shadow-sm transition-colors hover:bg-default-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+      >
+        {items.map((item) => (
+          <option key={item.value} value={item.value}>
+            {item.label}
+          </option>
+        ))}
+      </select>
+      <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-default-400" />
+    </div>
   );
-}
-
-function SelectGroup({ children, ...props }: any) {
-  return <div data-slot="select-group" {...props}>{children}</div>;
-}
-
-const SelectValue = forwardRef<HTMLSpanElement, any>(
-  ({ placeholder, className }, _ref) => {
-    const { value } = useContext(SelectContext);
-    return (
-      <span className={cn("block truncate", !value && "text-default-400", className)}>
-        {value || placeholder}
-      </span>
-    );
-  }
-);
-SelectValue.displayName = "SelectValue";
-
-const SelectTrigger = forwardRef<HTMLButtonElement, any>(
-  ({ children, className }, _ref) => (
-    <button
-      type="button"
-      data-slot="select-trigger"
-      className={cn(
-        "flex h-10 w-full items-center justify-between rounded-md border border-default-300 bg-transparent px-3 py-2 text-sm shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50",
-        className
-      )}
-    >
-      {children}
-      <svg className="h-4 w-4 opacity-50 shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-      </svg>
-    </button>
-  )
-);
-SelectTrigger.displayName = "SelectTrigger";
-
-function SelectContent(_props: any) {
-  return null;
 }
 
 function SelectItem(_props: any) {
   return null;
 }
 
-function SelectSeparator({ className, ...props }: any) {
-  return <div className={cn("-mx-1 my-1 h-px bg-default-200", className)} {...props} />;
-}
-
-export {
-  Select,
-  SelectGroup,
-  SelectValue,
-  SelectTrigger,
-  SelectContent,
-  SelectItem,
-  SelectSeparator,
-};
+export { Select, SelectItem };

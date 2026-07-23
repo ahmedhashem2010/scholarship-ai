@@ -13,28 +13,21 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ className, label, helperText, errorMessage, isInvalid, ...props }, ref) => {
-    if (label || helperText || errorMessage) {
-      return (
-        <HeroInput
-          ref={ref}
-          label={label}
-          helperText={helperText}
-          errorMessage={errorMessage}
-          isInvalid={isInvalid}
-          className={cn("w-full", className)}
-          {...(props as any)}
-        />
-      );
-    }
-
     return (
-      <input
+      <HeroInput
         ref={ref}
-        className={cn(
-          "flex h-10 w-full rounded-md border border-default-300 bg-transparent px-3 py-2 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-default-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
-          className
-        )}
-        {...props}
+        label={label}
+        helperText={helperText}
+        errorMessage={errorMessage}
+        isInvalid={isInvalid}
+        radius="lg"
+        variant="flat"
+        classNames={{
+          input: "text-sm",
+          inputWrapper: "bg-default-100",
+        }}
+        className={cn("w-full", className)}
+        {...(props as any)}
       />
     );
   }

@@ -10,10 +10,7 @@ import { Input } from "@/components/ui/input";
 import { DeadlineIndicator } from "@/components/ui/deadline-indicator";
 import {
   Select,
-  SelectContent,
   SelectItem,
-  SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select";
 import {
   Search,
@@ -209,52 +206,40 @@ export function ScholarshipCardList({ scholarships }: { scholarships: Scholarshi
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-muted-foreground">Country</label>
               <Select value={countryFilter} onValueChange={setCountryFilter}>
-                <SelectTrigger><SelectValue placeholder="All countries" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Countries</SelectItem>
-                  {countries.map((c) => (
-                    <SelectItem key={c} value={c}>{c}</SelectItem>
-                  ))}
-                </SelectContent>
+                <SelectItem key="all" value="all">All Countries</SelectItem>
+                {countries.map((c) => (
+                  <SelectItem key={c} value={c}>{c}</SelectItem>
+                ))}
               </Select>
             </div>
 
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-muted-foreground">Degree</label>
               <Select value={degreeFilter} onValueChange={setDegreeFilter}>
-                <SelectTrigger><SelectValue placeholder="All degrees" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Degrees</SelectItem>
-                  <SelectItem value="Bachelor">Bachelor</SelectItem>
-                  <SelectItem value="Master">Master</SelectItem>
-                  <SelectItem value="PhD">PhD</SelectItem>
-                </SelectContent>
+                <SelectItem key="all" value="all">All Degrees</SelectItem>
+                <SelectItem key="Bachelor" value="Bachelor">Bachelor</SelectItem>
+                <SelectItem key="Master" value="Master">Master</SelectItem>
+                <SelectItem key="PhD" value="PhD">PhD</SelectItem>
               </Select>
             </div>
 
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-muted-foreground">Competition</label>
               <Select value={competitionFilter} onValueChange={setCompetitionFilter}>
-                <SelectTrigger><SelectValue placeholder="All levels" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Levels</SelectItem>
-                  <SelectItem value="low">Low</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                </SelectContent>
+                <SelectItem key="all" value="all">All Levels</SelectItem>
+                <SelectItem key="low" value="low">Low</SelectItem>
+                <SelectItem key="medium" value="medium">Medium</SelectItem>
+                <SelectItem key="high" value="high">High</SelectItem>
               </Select>
             </div>
 
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-muted-foreground">Sort by</label>
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="deadline_asc">Deadline (Soonest)</SelectItem>
-                  <SelectItem value="deadline_desc">Deadline (Latest)</SelectItem>
-                  <SelectItem value="name_asc">Name (A-Z)</SelectItem>
-                  <SelectItem value="name_desc">Name (Z-A)</SelectItem>
-                </SelectContent>
+                <SelectItem key="deadline_asc" value="deadline_asc">Deadline (Soonest)</SelectItem>
+                <SelectItem key="deadline_desc" value="deadline_desc">Deadline (Latest)</SelectItem>
+                <SelectItem key="name_asc" value="name_asc">Name (A-Z)</SelectItem>
+                <SelectItem key="name_desc" value="name_desc">Name (Z-A)</SelectItem>
               </Select>
             </div>
 

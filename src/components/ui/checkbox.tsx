@@ -21,6 +21,8 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
         onValueChange={onCheckedChange}
         isDisabled={disabled}
         id={id}
+        color="primary"
+        radius="md"
         className={cn("w-min", className)}
         {...(props as any)}
       />

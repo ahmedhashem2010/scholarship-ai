@@ -63,7 +63,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             <div
               key={toast.id}
               className={cn(
-                "flex items-start gap-3 rounded-lg border-l-4 bg-white p-4 shadow-lg ring-1 ring-black/5 animate-slide-in-right",
+                "flex items-start gap-3 rounded-xl border-l-4 bg-content1 p-4 shadow-float ring-1 ring-black/5 animate-slide-in-right",
                 colors[toast.type]
               )}
             >

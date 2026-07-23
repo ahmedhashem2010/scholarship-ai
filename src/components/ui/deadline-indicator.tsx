@@ -77,14 +77,16 @@ export function DeadlineIndicator({ deadline, className, showDate = true, size =
     <Chip
       variant="flat"
       color={color}
+      radius="md"
       startContent={<Icon className="h-3.5 w-3.5" />}
       className={cn("h-auto", className)}
       classNames={{
         content: "px-0",
       }}
     >
-      {label}
-      {showDate && <span className="ml-1.5 text-default-400 text-xs">· {dateStr}</span>}
+      <span className="contents">{label}
+        {showDate && <span className="ml-1.5 text-default-400 text-xs">· {dateStr}</span>}
+      </span>
     </Chip>
   );
 }

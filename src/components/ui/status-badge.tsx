@@ -48,13 +48,14 @@ export function StatusBadge({ status, className, size = "sm", showIcon = true }:
       color={config.color}
       variant="flat"
       size="sm"
+      radius="md"
       startContent={showIcon ? <Icon className="h-3 w-3" /> : undefined}
       classNames={{
         base: cn("h-auto", className),
         content: cn(size === "sm" ? "text-[11px] px-1" : "text-xs px-1"),
       }}
     >
-      {config.label}
+      <span className="contents">{config.label}</span>
     </Chip>
   );
 }

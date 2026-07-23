@@ -4,6 +4,7 @@ import {
   Dropdown as HeroDropdown,
   DropdownTrigger as HeroDropdownTrigger,
   DropdownItem as HeroDropdownItem,
+  DropdownMenu as HeroDropdownMenu,
 } from "@heroui/react";
 import { cn } from "@/lib/utils";
 import { useId } from "react";
@@ -18,16 +19,26 @@ function DropdownMenuTrigger({ children, ...props }: any) {
   );
 }
 
-function DropdownMenuContent({ children, ...props }: any) {
-  return <div {...props}>{children}</div>;
+function DropdownMenuContent({ children, className, ...props }: any) {
+  return (
+    <HeroDropdownMenu
+      variant="flat"
+      className={cn("min-w-[180px]", className)}
+      {...props}
+    >
+      {children}
+    </HeroDropdownMenu>
+  );
 }
 
-function DropdownMenuItem({ children, className, destructive }: any) {
+function DropdownMenuItem({ children, className, destructive, onClick, ...props }: any) {
   const id = useId();
   return (
     <HeroDropdownItem
       key={id}
       className={cn(destructive && "text-danger", className)}
+      onPress={onClick}
+      {...props}
     >
       {children}
     </HeroDropdownItem>
@@ -53,7 +64,7 @@ function DropdownMenuLabel({ children, className, ...props }: any) {
 }
 
 function DropdownMenuSeparator({ className, ...props }: any) {
-  return <div className={cn("-mx-1 my-1 h-px bg-default-200", className)} {...props} />;
+  return <div className={cn("my-1 h-px bg-divider", className)} {...props} />;
 }
 
 function DropdownMenuShortcut({ className, ...props }: any) {

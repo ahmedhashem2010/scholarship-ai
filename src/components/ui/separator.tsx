@@ -1,24 +1,25 @@
 "use client";
 
 import { forwardRef, type HTMLAttributes } from "react";
-import { Divider as HeroDivider } from "@heroui/react";
 import { cn } from "@/lib/utils";
 
-interface SeparatorProps extends HTMLAttributes<HTMLHRElement> {
+interface SeparatorProps extends HTMLAttributes<HTMLDivElement> {
   orientation?: "horizontal" | "vertical";
   decorative?: boolean;
 }
 
-const Separator = forwardRef<HTMLHRElement, SeparatorProps>(
+const Separator = forwardRef<HTMLDivElement, SeparatorProps>(
   ({ className, orientation = "horizontal", decorative = true, ...props }, ref) => (
-    <HeroDivider
-      ref={ref as any}
-      orientation={orientation}
+    <div
+      ref={ref}
+      role={decorative ? "none" : "separator"}
+      aria-orientation={!decorative ? orientation : undefined}
       className={cn(
-        orientation === "horizontal" ? "w-full h-px" : "h-full w-px",
+        "shrink-0 bg-divider",
+        orientation === "horizontal" ? "h-px w-full" : "h-full w-px",
         className
       )}
-      {...(props as any)}
+      {...props}
     />
   )
 );
