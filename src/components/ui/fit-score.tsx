@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "@/lib/utils";
 
 interface FitScoreProps {
@@ -38,7 +40,7 @@ export function FitScore({ score, size = "md", className, showLabel = true }: Fi
       </svg>
       <span className={cn("absolute font-bold text-foreground tabular-nums", fontSize[size])}>
         {score}
-        {showLabel && <span className="text-[0.5em] font-normal text-muted-foreground">%</span>}
+        {showLabel && <span className="text-[0.5em] font-normal text-default-500">%</span>}
       </span>
     </div>
   );

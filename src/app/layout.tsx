@@ -4,7 +4,7 @@ import { Inter, Poppins, Tajawal } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
 import { LanguageProvider } from "@/contexts/LanguageContext";
-import { ToastProvider } from "@/components/ui/toast";
+import { HeroUIProvider } from "@/components/hero-ui-provider";
 import dynamic from "next/dynamic";
 import { Analytics } from "@/components/analytics";
 import { ProfileProvider } from "@/lib/profile-context";
@@ -38,23 +38,23 @@ export default function RootLayout({
         >
           Skip to main content
         </a>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
-          <LanguageProvider>
-            <ToastProvider>
+        <HeroUIProvider>
+          <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+            <LanguageProvider>
               <ProfileProvider>
-              <CreditsProvider>
-              <div className="min-h-screen bg-background">
-                <main id="main-content" className="flex-1 min-w-0">
-                  {children}
-                </main>
-              </div>
-              <ChatWidget />
-              <Analytics />
-              </CreditsProvider>
+                <CreditsProvider>
+                  <div className="min-h-screen bg-background">
+                    <main id="main-content" className="flex-1 min-w-0">
+                      {children}
+                    </main>
+                  </div>
+                  <ChatWidget />
+                  <Analytics />
+                </CreditsProvider>
               </ProfileProvider>
-            </ToastProvider>
-          </LanguageProvider>
-        </ThemeProvider>
+            </LanguageProvider>
+          </ThemeProvider>
+        </HeroUIProvider>
       </body>
     </html>
   );

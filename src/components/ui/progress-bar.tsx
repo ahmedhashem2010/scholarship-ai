@@ -35,7 +35,7 @@ export function ProgressBar({
 
   return (
     <div className={cn("flex items-center gap-3", className)}>
-      <div className={cn("flex-1 rounded-full bg-slate-100 overflow-hidden", heights[size])}>
+      <div className={cn("flex-1 rounded-full bg-default-200 overflow-hidden", heights[size])}>
         <div
           className={cn(
             "h-full rounded-full transition-all duration-700 ease-out",
@@ -46,7 +46,7 @@ export function ProgressBar({
         />
       </div>
       {showLabel && (
-        <span className="text-xs font-semibold text-slate-600 min-w-[3ch] tabular-nums">
+        <span className="text-xs font-semibold text-default-600 min-w-[3ch] tabular-nums">
           {Math.round(pct)}%
         </span>
       )}

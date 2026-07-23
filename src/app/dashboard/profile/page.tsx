@@ -153,7 +153,7 @@ export default function ProfilePage() {
 
             <div className="space-y-2">
               <Label htmlFor="country">Country</Label>
-              <Select value={profile.country} onValueChange={(value) => handleChange("country", value)}>
+              <Select value={profile.country} onValueChange={(value: string) => handleChange("country", value)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select country" />
                 </SelectTrigger>
@@ -187,7 +187,7 @@ export default function ProfilePage() {
 
             <div className="space-y-2">
               <Label htmlFor="educationLevel">Current Education</Label>
-              <Select value={profile.educationLevel} onValueChange={(value) => handleChange("educationLevel", value)}>
+              <Select value={profile.educationLevel} onValueChange={(value: string) => handleChange("educationLevel", value)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select education level" />
                 </SelectTrigger>
@@ -202,7 +202,7 @@ export default function ProfilePage() {
 
             <div className="space-y-2">
               <Label htmlFor="major">Field of Study</Label>
-              <Select value={profile.major} onValueChange={(value) => handleChange("major", value)}>
+              <Select value={profile.major} onValueChange={(value: string) => handleChange("major", value)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select field" />
                 </SelectTrigger>
@@ -230,7 +230,7 @@ export default function ProfilePage() {
 
             <div className="space-y-2">
               <Label htmlFor="targetDegree">Target Degree</Label>
-              <Select value={profile.targetDegree} onValueChange={(value) => handleChange("targetDegree", value)}>
+              <Select value={profile.targetDegree} onValueChange={(value: string) => handleChange("targetDegree", value)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select target degree" />
                 </SelectTrigger>
@@ -250,7 +250,7 @@ export default function ProfilePage() {
 
             <div className="space-y-2">
               <Label htmlFor="englishLevel">English Level</Label>
-              <Select value={profile.englishLevel} onValueChange={(value) => handleChange("englishLevel", value)}>
+              <Select value={profile.englishLevel} onValueChange={(value: string) => handleChange("englishLevel", value)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select level" />
                 </SelectTrigger>

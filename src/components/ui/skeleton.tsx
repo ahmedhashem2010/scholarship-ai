@@ -1,3 +1,6 @@
+"use client";
+
+import { Skeleton as HeroSkeleton } from "@heroui/react";
 import { cn } from "@/lib/utils";
 
 interface SkeletonProps {
@@ -16,10 +19,9 @@ export function Skeleton({ className, variant = "text", width, height }: Skeleto
   };
 
   return (
-    <div
-      className={cn("skeleton", variants[variant], className)}
+    <HeroSkeleton
+      className={cn(variants[variant], className)}
       style={{ width, height }}
-      aria-hidden="true"
     />
   );
 }
