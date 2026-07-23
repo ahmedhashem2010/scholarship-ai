@@ -1,5 +1,4 @@
 import type { Config } from "tailwindcss";
-const { heroui } = require("@heroui/react");
 
 const config: Config = {
   darkMode: "class",
@@ -11,61 +10,60 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        border: "#d1ddd9",
-        input: "#d1ddd9",
-        ring: "#0d9488",
-        background: "#f4fdf9",
-        foreground: "#1a3a30",
+        border: "rgb(var(--border) / <alpha-value>)",
+        input: "rgb(var(--input) / <alpha-value>)",
+        ring: "rgb(var(--ring) / <alpha-value>)",
+        background: "rgb(var(--background) / <alpha-value>)",
+        foreground: "rgb(var(--foreground) / <alpha-value>)",
         card: {
-          DEFAULT: "#ffffff",
-          foreground: "#1a3a30",
+          DEFAULT: "rgb(var(--card) / <alpha-value>)",
+          foreground: "rgb(var(--card-foreground) / <alpha-value>)",
         },
         muted: {
-          DEFAULT: "#edf5f1",
-          foreground: "#6b8f82",
+          DEFAULT: "rgb(var(--muted) / <alpha-value>)",
+          foreground: "rgb(var(--muted-foreground) / <alpha-value>)",
         },
         accent: {
-          DEFAULT: "#e4f0ec",
-          foreground: "#1a3a30",
+          DEFAULT: "rgb(var(--accent) / <alpha-value>)",
+          foreground: "rgb(var(--accent-foreground) / <alpha-value>)",
         },
         popover: {
-          DEFAULT: "#ffffff",
-          foreground: "#1a3a30",
+          DEFAULT: "rgb(var(--popover) / <alpha-value>)",
+          foreground: "rgb(var(--popover-foreground) / <alpha-value>)",
         },
         primary: {
-          DEFAULT: "#0d9488",
-          foreground: "#ffffff",
+          DEFAULT: "rgb(var(--primary) / <alpha-value>)",
+          foreground: "rgb(var(--primary-foreground) / <alpha-value>)",
         },
         secondary: {
-          DEFAULT: "#e4f0ec",
-          foreground: "#1a3a30",
+          DEFAULT: "rgb(var(--secondary) / <alpha-value>)",
+          foreground: "rgb(var(--secondary-foreground) / <alpha-value>)",
         },
         destructive: {
-          DEFAULT: "#dc2626",
-          foreground: "#ffffff",
+          DEFAULT: "rgb(var(--destructive) / <alpha-value>)",
+          foreground: "rgb(var(--destructive-foreground) / <alpha-value>)",
         },
         success: {
-          DEFAULT: "#16a34a",
-          foreground: "#ffffff",
+          DEFAULT: "rgb(var(--success) / <alpha-value>)",
+          foreground: "rgb(var(--success-foreground) / <alpha-value>)",
         },
         warning: {
-          DEFAULT: "#f59e0b",
-          foreground: "#ffffff",
+          DEFAULT: "rgb(var(--warning) / <alpha-value>)",
+          foreground: "rgb(var(--warning-foreground) / <alpha-value>)",
         },
         danger: {
-          DEFAULT: "#dc2626",
-          foreground: "#ffffff",
+          DEFAULT: "rgb(var(--danger) / <alpha-value>)",
+          foreground: "rgb(var(--danger-foreground) / <alpha-value>)",
         },
-        surface: "#FFFFFF",
         "score-low": "#EF4444",
         "score-medium": "#F59E0B",
         "score-high": "#22C55E",
         "score-excellent": "#10B981",
       },
       borderRadius: {
-        lg: "14px",
-        md: "10px",
-        sm: "6px",
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
@@ -94,9 +92,9 @@ const config: Config = {
         "elevated": "0 8px 24px -4px rgb(0 0 0 / 0.08)",
         "float": "0 12px 32px -4px rgb(0 0 0 / 0.12)",
         "modal": "0 24px 48px -12px rgb(0 0 0 / 0.18)",
-        "primary-glow": "0 8px 24px -4px rgb(14 165 133 / 0.25)",
-        "success-glow": "0 8px 16px -4px rgb(16 185 129 / 0.25)",
-        "warning-glow": "0 8px 16px -4px rgb(245 158 11 / 0.25)",
+        "primary-glow": "0 8px 24px -4px rgb(var(--primary) / 0.25)",
+        "success-glow": "0 8px 16px -4px rgb(var(--success) / 0.25)",
+        "warning-glow": "0 8px 16px -4px rgb(var(--warning) / 0.25)",
       },
       keyframes: {
         "fade-in": {
@@ -158,10 +156,6 @@ const config: Config = {
           "0%": { transform: "rotate(0deg)" },
           "100%": { transform: "rotate(360deg)" },
         },
-        "gradient-x": {
-          "0%, 100%": { backgroundPosition: "0% 50%" },
-          "50%": { backgroundPosition: "100% 50%" },
-        },
       },
       animation: {
         "fade-in": "fade-in 0.5s ease-out",
@@ -179,120 +173,10 @@ const config: Config = {
         "float": "float 3s ease-in-out infinite",
         "pulse-soft": "pulse-soft 2s ease-in-out infinite",
         "spin-slow": "spin-slow 8s linear infinite",
-        "gradient-x": "gradient-x 3s ease infinite",
-      },
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "hero-glow": "radial-gradient(ellipse 80% 50% at 50% -20%, rgba(14,165,133,0.15), transparent)",
       },
     },
   },
-  plugins: [
-    heroui({
-      themes: {
-        light: {
-          background: 'oklch(0.990 0.004 160)',
-          foreground: 'oklch(0.230 0.030 170)',
-          card: {
-            DEFAULT: 'oklch(1.000 0 0)',
-            foreground: 'oklch(0.230 0.030 170)',
-          },
-          popover: {
-            DEFAULT: 'oklch(1.000 0 0)',
-            foreground: 'oklch(0.230 0.030 170)',
-          },
-          primary: {
-            DEFAULT: 'oklch(0.580 0.160 165)',
-            foreground: 'oklch(0.990 0 0)',
-          },
-          secondary: {
-            DEFAULT: 'oklch(0.950 0.010 160)',
-            foreground: 'oklch(0.350 0.050 170)',
-          },
-          muted: {
-            DEFAULT: 'oklch(0.965 0.006 160)',
-            foreground: 'oklch(0.500 0.030 170)',
-          },
-          accent: {
-            DEFAULT: 'oklch(0.930 0.015 160)',
-            foreground: 'oklch(0.280 0.040 170)',
-          },
-          success: {
-            DEFAULT: 'oklch(0.650 0.190 150)',
-            foreground: 'oklch(0.990 0 0)',
-          },
-          warning: {
-            DEFAULT: 'oklch(0.780 0.150 80)',
-            foreground: 'oklch(0.250 0.050 80)',
-          },
-          danger: {
-            DEFAULT: 'oklch(0.600 0.220 25)',
-            foreground: 'oklch(0.990 0 0)',
-          },
-          border: 'oklch(0.910 0.010 160)',
-          input: 'oklch(0.910 0.010 160)',
-          ring: 'oklch(0.580 0.160 165)',
-          divider: 'oklch(0.920 0.008 160)',
-          content1: 'oklch(1.000 0 0)',
-          content2: 'oklch(0.975 0.005 160)',
-          content3: 'oklch(0.960 0.008 160)',
-          content4: 'oklch(0.940 0.012 160)',
-          focus: 'oklch(0.580 0.160 165)',
-          overlay: 'oklch(0 0 0 / 0.54)',
-        },
-        dark: {
-          background: 'oklch(0.180 0.020 170)',
-          foreground: 'oklch(0.940 0.010 160)',
-          card: {
-            DEFAULT: 'oklch(0.220 0.020 170)',
-            foreground: 'oklch(0.940 0.010 160)',
-          },
-          popover: {
-            DEFAULT: 'oklch(0.220 0.020 170)',
-            foreground: 'oklch(0.940 0.010 160)',
-          },
-          primary: {
-            DEFAULT: 'oklch(0.700 0.150 165)',
-            foreground: 'oklch(0.180 0.020 170)',
-          },
-          secondary: {
-            DEFAULT: 'oklch(0.250 0.020 170)',
-            foreground: 'oklch(0.900 0.010 160)',
-          },
-          muted: {
-            DEFAULT: 'oklch(0.250 0.020 170)',
-            foreground: 'oklch(0.600 0.020 170)',
-          },
-          accent: {
-            DEFAULT: 'oklch(0.280 0.020 170)',
-            foreground: 'oklch(0.920 0.010 160)',
-          },
-          success: {
-            DEFAULT: 'oklch(0.700 0.180 150)',
-            foreground: 'oklch(0.180 0.020 170)',
-          },
-          warning: {
-            DEFAULT: 'oklch(0.780 0.150 80)',
-            foreground: 'oklch(0.200 0.040 80)',
-          },
-          danger: {
-            DEFAULT: 'oklch(0.650 0.220 25)',
-            foreground: 'oklch(0.990 0 0)',
-          },
-          border: 'oklch(0.320 0.020 170)',
-          input: 'oklch(0.320 0.020 170)',
-          ring: 'oklch(0.700 0.150 165)',
-          divider: 'oklch(0.300 0.020 170)',
-          content1: 'oklch(0.220 0.020 170)',
-          content2: 'oklch(0.200 0.020 170)',
-          content3: 'oklch(0.180 0.020 170)',
-          content4: 'oklch(0.160 0.020 170)',
-          focus: 'oklch(0.700 0.150 165)',
-          overlay: 'oklch(0 0 0 / 0.54)',
-        },
-      },
-    }),
-  ],
+  plugins: [],
 };
 
 export default config;
