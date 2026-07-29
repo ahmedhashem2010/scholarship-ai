@@ -40,7 +40,8 @@ export default function SignupPage() {
     const data = await res.json().catch(() => ({}));
 
     if (!res.ok) {
-      setError(data.error || "Something went wrong");
+      // `debug` is only ever present outside production — see the signup route.
+      setError(data.debug ? `${data.error}\n\n[dev] ${data.debug}` : data.error || "Something went wrong");
       setLoading(false);
       return;
     }

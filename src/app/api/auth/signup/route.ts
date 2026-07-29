@@ -112,6 +112,13 @@ export async function POST(req: NextRequest) {
           "Your account was created but we couldn't send the confirmation email. Please try requesting a new link in a moment.",
         code: "email_failed",
         email: cleanEmail,
+        // Outside production, hand the actual SMTP failure to the browser.
+        // Without this the only clue is a server log the person debugging
+        // may not be looking at — and "couldn't send" is true of a wrong
+        // password, a blocked port and a bad From address alike.
+        ...(process.env.NODE_ENV !== "production"
+          ? { debug: emailResult.reason }
+          : {}),
       },
       { status: 502 }
     );
