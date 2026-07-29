@@ -72,11 +72,11 @@ export function UserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => router.push('/dashboard/profile')}>
-          <UserCircle className="mr-2 h-4 w-4" />
+          <UserCircle className="me-2 h-4 w-4" />
           My Profile
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => router.push('/dashboard/credits')}>
-          <CreditCard className="mr-2 h-4 w-4" />
+          <CreditCard className="me-2 h-4 w-4" />
           Get Credits
         </DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -84,7 +84,7 @@ export function UserNav() {
           onClick={handleLogout}
           className="text-red-600 focus:text-red-600 dark:text-red-400"
         >
-          <LogOut className="mr-2 h-4 w-4" />
+          <LogOut className="me-2 h-4 w-4" />
           Log out
         </DropdownMenuItem>
       </DropdownMenuContent>

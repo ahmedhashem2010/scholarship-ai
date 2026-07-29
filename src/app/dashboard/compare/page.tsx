@@ -151,13 +151,13 @@ function ComparePageContent() {
         <div className="h-40 rounded-2xl bg-gradient-to-br from-primary via-primary-700 to-primary-900 animate-pulse" />
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-32 rounded-xl bg-slate-100 animate-pulse" />
+            <div key={i} className="h-32 rounded-xl bg-muted animate-pulse" />
           ))}
         </div>
-        <div className="h-96 rounded-xl bg-slate-100 animate-pulse" />
+        <div className="h-96 rounded-xl bg-muted animate-pulse" />
         <div className="grid gap-4 lg:grid-cols-2">
-          <div className="h-48 rounded-xl bg-slate-100 animate-pulse" />
-          <div className="h-48 rounded-xl bg-slate-100 animate-pulse" />
+          <div className="h-48 rounded-xl bg-muted animate-pulse" />
+          <div className="h-48 rounded-xl bg-muted animate-pulse" />
         </div>
       </div>
     );
@@ -368,14 +368,14 @@ function ComparePageContent() {
           <div className="overflow-x-auto">
             <table className="w-full min-w-[700px]">
               <thead>
-                <tr className="border-b border-slate-200 bg-slate-50">
-                  <th className="sticky left-0 z-10 bg-slate-50 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-4 py-3.5 w-44">
+                <tr className="border-b border-border bg-muted">
+                  <th className="sticky start-0 z-10 bg-muted text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3.5 w-44">
                     Category
                   </th>
                   {scholarships.map((s) => {
                     const m = getMatch(s.id);
                     return (
-                      <th key={s.id} className="text-center px-4 py-3.5 border-l border-slate-200 min-w-[200px]">
+                      <th key={s.id} className="text-center px-4 py-3.5 border-l border-border min-w-[200px]">
                         <div className="flex flex-col items-center gap-1.5">
                           <div className="flex items-center gap-1.5">
                             <span className="text-lg">{getFlag(s.country)}</span>
@@ -392,17 +392,17 @@ function ComparePageContent() {
               </thead>
               <tbody>
                 {/* Basic Info */}
-                <tr className="border-b border-slate-100">
+                <tr className="border-b border-border">
                   <td colSpan={scholarships.length + 1} className="bg-primary-50/40 px-4 py-2 text-xs font-semibold text-primary">
                     Basic Information
                   </td>
                 </tr>
-                <tr className="border-b border-slate-100 even:bg-slate-50/50">
-                  <td className="text-xs font-medium text-slate-400 uppercase tracking-wider py-3 pr-4 whitespace-nowrap w-44 align-top px-4">
+                <tr className="border-b border-border even:bg-muted/50">
+                  <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
                     Country
                   </td>
                   {scholarships.map((s) => (
-                    <td key={s.id} className="px-4 py-3 text-sm border-l border-slate-100 align-top">
+                    <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
                       <span className="inline-flex items-center gap-1.5">
                         <span className="text-base">{getFlag(s.country)}</span>
                         <span>{s.country}</span>
@@ -410,75 +410,75 @@ function ComparePageContent() {
                     </td>
                   ))}
                 </tr>
-                <tr className="border-b border-slate-100 even:bg-slate-50/50">
-                  <td className="text-xs font-medium text-slate-400 uppercase tracking-wider py-3 pr-4 whitespace-nowrap w-44 align-top px-4">
+                <tr className="border-b border-border even:bg-muted/50">
+                  <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
                     University
                   </td>
                   {scholarships.map((s) => (
-                    <td key={s.id} className="px-4 py-3 text-sm border-l border-slate-100 align-top">
+                    <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
                       {s.university ?? <span className="text-muted-foreground">Various</span>}
                     </td>
                   ))}
                 </tr>
-                <tr className="border-b border-slate-100 even:bg-slate-50/50">
-                  <td className="text-xs font-medium text-slate-400 uppercase tracking-wider py-3 pr-4 whitespace-nowrap w-44 align-top px-4">
+                <tr className="border-b border-border even:bg-muted/50">
+                  <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
                     Degree
                   </td>
                   {scholarships.map((s) => (
-                    <td key={s.id} className="px-4 py-3 text-sm border-l border-slate-100 align-top">
+                    <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
                       {s.degree}
                     </td>
                   ))}
                 </tr>
 
                 {/* Requirements */}
-                <tr className="border-b border-slate-100">
+                <tr className="border-b border-border">
                   <td colSpan={scholarships.length + 1} className="bg-primary-50/40 px-4 py-2 text-xs font-semibold text-primary">
                     Requirements
                   </td>
                 </tr>
-                <tr className="border-b border-slate-100 even:bg-slate-50/50">
-                  <td className="text-xs font-medium text-slate-400 uppercase tracking-wider py-3 pr-4 whitespace-nowrap w-44 align-top px-4">
+                <tr className="border-b border-border even:bg-muted/50">
+                  <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
                     Education Level
                   </td>
                   {scholarships.map((s) => (
-                    <td key={s.id} className="px-4 py-3 text-sm border-l border-slate-100 align-top">
+                    <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
                       {parseArr(s.eligibleEducation).length > 0 ? parseArr(s.eligibleEducation).join(", ") : "Open to all"}
                     </td>
                   ))}
                 </tr>
-                <tr className="border-b border-slate-100 even:bg-slate-50/50">
-                  <td className="text-xs font-medium text-slate-400 uppercase tracking-wider py-3 pr-4 whitespace-nowrap w-44 align-top px-4">
+                <tr className="border-b border-border even:bg-muted/50">
+                  <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
                     Age Limit
                   </td>
                   {scholarships.map((s) => (
-                    <td key={s.id} className="px-4 py-3 text-sm border-l border-slate-100 align-top">
+                    <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
                       {s.minimumAge || s.maximumAge ? <Badge variant="gray">{s.minimumAge ?? 0}–{s.maximumAge ?? "No limit"}</Badge> : <span className="text-muted-foreground">No limit</span>}
                     </td>
                   ))}
                 </tr>
-                <tr className="border-b border-slate-100 even:bg-slate-50/50">
-                  <td className="text-xs font-medium text-slate-400 uppercase tracking-wider py-3 pr-4 whitespace-nowrap w-44 align-top px-4">
+                <tr className="border-b border-border even:bg-muted/50">
+                  <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
                     English Level
                   </td>
                   {scholarships.map((s) => (
-                    <td key={s.id} className="px-4 py-3 text-sm border-l border-slate-100 align-top">
+                    <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
                       {s.englishRequirement ?? "Not specified"}
                     </td>
                   ))}
                 </tr>
-                <tr className="border-b border-slate-100 even:bg-slate-50/50">
-                  <td className="text-xs font-medium text-slate-400 uppercase tracking-wider py-3 pr-4 whitespace-nowrap w-44 align-top px-4">
+                <tr className="border-b border-border even:bg-muted/50">
+                  <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
                     Documents
                   </td>
                   {scholarships.map((s) => {
                     const req = parseJSON(s.requirements);
                     const docs = (req.documents as string[]) ?? [];
                     return (
-                      <td key={s.id} className="px-4 py-3 text-sm border-l border-slate-100 align-top">
+                      <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
                         <ul className="space-y-1">
                           {docs.slice(0, 4).map((d: string, i: number) => (
-                            <li key={i} className="flex items-center gap-1.5 text-xs text-slate-600">
+                            <li key={i} className="flex items-center gap-1.5 text-xs text-muted-foreground">
                               <span>{getDocTypeIcon(d)}</span>
                               <span>{d.replace(/_/g, " ")}</span>
                             </li>
@@ -493,19 +493,19 @@ function ComparePageContent() {
                 </tr>
 
                 {/* Benefits */}
-                <tr className="border-b border-slate-100">
+                <tr className="border-b border-border">
                   <td colSpan={scholarships.length + 1} className="bg-primary-50/40 px-4 py-2 text-xs font-semibold text-primary">
                     Benefits
                   </td>
                 </tr>
-                <tr className="border-b border-slate-100 even:bg-slate-50/50">
-                  <td className="text-xs font-medium text-slate-400 uppercase tracking-wider py-3 pr-4 whitespace-nowrap w-44 align-top px-4">
+                <tr className="border-b border-border even:bg-muted/50">
+                  <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
                     Tuition
                   </td>
                   {scholarships.map((s) => {
                     const b = parseJSON(s.benefits);
                     return (
-                      <td key={s.id} className="px-4 py-3 text-sm border-l border-slate-100 align-top">
+                      <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
                         <span className="inline-flex items-center gap-1 text-success-700">
                           <CheckCircle2 className="h-3.5 w-3.5" />
                           {(b.tuition as string) ?? "Covered"}
@@ -514,41 +514,41 @@ function ComparePageContent() {
                     );
                   })}
                 </tr>
-                <tr className="border-b border-slate-100 even:bg-slate-50/50">
-                  <td className="text-xs font-medium text-slate-400 uppercase tracking-wider py-3 pr-4 whitespace-nowrap w-44 align-top px-4">
+                <tr className="border-b border-border even:bg-muted/50">
+                  <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
                     Stipend
                   </td>
                   {scholarships.map((s) => {
                     const b = parseJSON(s.benefits);
                     return (
-                      <td key={s.id} className="px-4 py-3 text-sm border-l border-slate-100 align-top">
+                      <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
                         {(b.allowance as string) ?? <span className="text-muted-foreground">&mdash;</span>}
                       </td>
                     );
                   })}
                 </tr>
-                <tr className="border-b border-slate-100 even:bg-slate-50/50">
-                  <td className="text-xs font-medium text-slate-400 uppercase tracking-wider py-3 pr-4 whitespace-nowrap w-44 align-top px-4">
+                <tr className="border-b border-border even:bg-muted/50">
+                  <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
                     Housing
                   </td>
                   {scholarships.map((s) => {
                     const b = parseJSON(s.benefits);
                     return (
-                      <td key={s.id} className="px-4 py-3 text-sm border-l border-slate-100 align-top">
+                      <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
                         {(b.housing as string) ?? <span className="text-muted-foreground">&mdash;</span>}
                       </td>
                     );
                   })}
                 </tr>
-                <tr className="border-b border-slate-100 even:bg-slate-50/50">
-                  <td className="text-xs font-medium text-slate-400 uppercase tracking-wider py-3 pr-4 whitespace-nowrap w-44 align-top px-4">
+                <tr className="border-b border-border even:bg-muted/50">
+                  <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
                     Travel
                   </td>
                   {scholarships.map((s) => {
                     const b = parseJSON(s.benefits);
                     const val = (b.travel as string) ?? "\u2014";
                     return (
-                      <td key={s.id} className="px-4 py-3 text-sm border-l border-slate-100 align-top">
+                      <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
                         {val.includes("airfare") || val.includes("travel") ? (
                           <span className="inline-flex items-center gap-1 text-success-700">
                             <CheckCircle2 className="h-3.5 w-3.5" />
@@ -559,14 +559,14 @@ function ComparePageContent() {
                     );
                   })}
                 </tr>
-                <tr className="border-b border-slate-100 even:bg-slate-50/50">
-                  <td className="text-xs font-medium text-slate-400 uppercase tracking-wider py-3 pr-4 whitespace-nowrap w-44 align-top px-4">
+                <tr className="border-b border-border even:bg-muted/50">
+                  <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
                     Insurance
                   </td>
                   {scholarships.map((s) => {
                     const b = parseJSON(s.benefits);
                     return (
-                      <td key={s.id} className="px-4 py-3 text-sm border-l border-slate-100 align-top">
+                      <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
                         {(b.insurance as string) ?? <span className="text-muted-foreground">&mdash;</span>}
                       </td>
                     );
@@ -574,42 +574,42 @@ function ComparePageContent() {
                 </tr>
 
                 {/* Application */}
-                <tr className="border-b border-slate-100">
+                <tr className="border-b border-border">
                   <td colSpan={scholarships.length + 1} className="bg-primary-50/40 px-4 py-2 text-xs font-semibold text-primary">
                     Application Status
                   </td>
                 </tr>
-                <tr className="border-b border-slate-100 even:bg-slate-50/50">
-                  <td className="text-xs font-medium text-slate-400 uppercase tracking-wider py-3 pr-4 whitespace-nowrap w-44 align-top px-4">
+                <tr className="border-b border-border even:bg-muted/50">
+                  <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
                     Deadline
                   </td>
                   {scholarships.map((s) => (
-                    <td key={s.id} className="px-4 py-3 text-sm border-l border-slate-100 align-top">
+                    <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
                       <DeadlineIndicator deadline={s.deadline} showDate size="sm" />
                     </td>
                   ))}
                 </tr>
-                <tr className="border-b border-slate-100 even:bg-slate-50/50">
-                  <td className="text-xs font-medium text-slate-400 uppercase tracking-wider py-3 pr-4 whitespace-nowrap w-44 align-top px-4">
+                <tr className="border-b border-border even:bg-muted/50">
+                  <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
                     Competition
                   </td>
                   {scholarships.map((s) => (
-                    <td key={s.id} className="px-4 py-3 text-sm border-l border-slate-100 align-top">
+                    <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
                       <Badge variant={getCompetitionColor(s.competitionLevel)}>
                         {s.competitionLevel === "high" ? "Hard" : s.competitionLevel === "medium" ? "Medium" : "Easy"}
                       </Badge>
                     </td>
                   ))}
                 </tr>
-                <tr className="border-b border-slate-100 even:bg-slate-50/50">
-                  <td className="text-xs font-medium text-slate-400 uppercase tracking-wider py-3 pr-4 whitespace-nowrap w-44 align-top px-4">
+                <tr className="border-b border-border even:bg-muted/50">
+                  <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
                     Your Progress
                   </td>
                   {scholarships.map((s) => {
                     const [ready, total] = getDocReadyCount(s.id);
                     const app = getApp(s.id);
                     return (
-                      <td key={s.id} className="px-4 py-3 text-sm border-l border-slate-100 align-top">
+                      <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
                         {app ? (
                           <div className="space-y-1.5">
                             <div className="flex items-center justify-between text-xs">
@@ -627,19 +627,19 @@ function ComparePageContent() {
                 </tr>
 
                 {/* Fit & Chances */}
-                <tr className="border-b border-slate-100">
+                <tr className="border-b border-border">
                   <td colSpan={scholarships.length + 1} className="bg-primary-50/40 px-4 py-2 text-xs font-semibold text-primary">
                     Your Chances
                   </td>
                 </tr>
-                <tr className="border-b border-slate-100 even:bg-slate-50/50">
-                  <td className="text-xs font-medium text-slate-400 uppercase tracking-wider py-3 pr-4 whitespace-nowrap w-44 align-top px-4">
+                <tr className="border-b border-border even:bg-muted/50">
+                  <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
                     Fit Score
                   </td>
                   {scholarships.map((s) => {
                     const m = getMatch(s.id);
                     return (
-                      <td key={s.id} className="px-4 py-3 text-sm border-l border-slate-100 align-top">
+                      <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
                         <div className="flex items-center justify-center">
                           {m ? <FitScore score={m.fitScore} size="md" /> : <span className="text-muted-foreground">&mdash;</span>}
                         </div>
@@ -647,14 +647,14 @@ function ComparePageContent() {
                     );
                   })}
                 </tr>
-                <tr className="border-b border-slate-100 even:bg-slate-50/50">
-                  <td className="text-xs font-medium text-slate-400 uppercase tracking-wider py-3 pr-4 whitespace-nowrap w-44 align-top px-4">
+                <tr className="border-b border-border even:bg-muted/50">
+                  <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
                     Success Probability
                   </td>
                   {scholarships.map((s) => {
                     const m = getMatch(s.id);
                     return (
-                      <td key={s.id} className="px-4 py-3 text-sm border-l border-slate-100 align-top">
+                      <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
                         {m ? (
                           <div className="flex flex-col items-center gap-1">
                             <span className="text-lg font-bold tabular-nums text-primary">{m.successProbability}%</span>
@@ -667,14 +667,14 @@ function ComparePageContent() {
                     );
                   })}
                 </tr>
-                <tr className="border-b border-slate-100 even:bg-slate-50/50">
-                  <td className="text-xs font-medium text-slate-400 uppercase tracking-wider py-3 pr-4 whitespace-nowrap w-44 align-top px-4">
+                <tr className="border-b border-border even:bg-muted/50">
+                  <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
                     Strengths
                   </td>
                   {scholarships.map((s) => {
                     const m = getMatch(s.id);
                     return (
-                      <td key={s.id} className="px-4 py-3 text-sm border-l border-slate-100 align-top">
+                      <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
                         {m ? (
                           <ul className="space-y-1">
                             {m.reasons.filter((r) => !r.toLowerCase().includes("may not") && !r.toLowerCase().includes("over")).slice(0, 2).map((r, i) => (
@@ -689,15 +689,15 @@ function ComparePageContent() {
                     );
                   })}
                 </tr>
-                <tr className="even:bg-slate-50/50">
-                  <td className="text-xs font-medium text-slate-400 uppercase tracking-wider py-3 pr-4 whitespace-nowrap w-44 align-top px-4">
+                <tr className="even:bg-muted/50">
+                  <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
                     Weaknesses
                   </td>
                   {scholarships.map((s) => {
                     const m = getMatch(s.id);
                     const weaknesses = m?.reasons.filter((r) => r.toLowerCase().includes("may not") || r.toLowerCase().includes("over")) ?? [];
                     return (
-                      <td key={s.id} className="px-4 py-3 text-sm border-l border-slate-100 align-top">
+                      <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
                         {m ? (
                           weaknesses.length > 0 ? (
                             <ul className="space-y-1">
@@ -856,12 +856,12 @@ function ComparePageContent() {
             )}
 
             {hasDiverseDocs && (
-              <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+              <div className="rounded-lg border border-border bg-muted p-3">
                 <div className="flex items-start gap-2">
-                  <FileText className="mt-0.5 h-4 w-4 shrink-0 text-slate-500" />
+                  <FileText className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
                   <div>
-                    <p className="font-medium text-slate-700">Different document requirements</p>
-                    <p className="mt-0.5 text-xs text-slate-500">
+                    <p className="font-medium text-muted-foreground">Different document requirements</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
                       These scholarships have different document requirements. Plan your document strategy carefully to avoid last-minute scrambling.
                     </p>
                   </div>
@@ -870,9 +870,9 @@ function ComparePageContent() {
             )}
 
             {!bestOverall && !bestChance && (
-              <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-center">
-                <BadgePercent className="mx-auto h-6 w-6 text-slate-400" />
-                <p className="mt-2 text-sm text-slate-500">Complete your profile to get AI-powered match analysis.</p>
+              <div className="rounded-lg border border-border bg-muted p-4 text-center">
+                <BadgePercent className="mx-auto h-6 w-6 text-muted-foreground" />
+                <p className="mt-2 text-sm text-muted-foreground">Complete your profile to get AI-powered match analysis.</p>
               </div>
             )}
           </CardContent>
@@ -880,7 +880,7 @@ function ComparePageContent() {
       </div>
 
       {/* Bottom Actions */}
-      <div className="flex items-center justify-between gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
+      <div className="flex items-center justify-between gap-4 rounded-xl border border-border bg-muted p-4">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <CheckCircle2 className="h-4 w-4 text-primary" />
           <span>Compare up to 6 scholarships at once</span>

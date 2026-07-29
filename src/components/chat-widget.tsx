@@ -73,7 +73,7 @@ export function ChatWidget() {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-4 right-4 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary-700 transition-all hover:scale-105 active:scale-95"
+        className="fixed bottom-4 end-4 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary-700 transition-all hover:scale-105 active:scale-95"
         aria-label="Open AI chat"
       >
         <MessageCircle className="h-5 w-5" />
@@ -82,7 +82,7 @@ export function ChatWidget() {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex w-80 sm:w-96 flex-col rounded-xl border bg-white shadow-2xl animate-fade-in-up overflow-hidden dark:bg-gray-800 dark:border-gray-700">
+    <div className="fixed bottom-4 end-4 z-50 flex w-80 sm:w-96 flex-col rounded-xl border bg-card shadow-2xl animate-fade-in-up overflow-hidden dark:bg-gray-800 dark:border-gray-700">
       <div className="flex items-center justify-between bg-gradient-to-r from-primary to-primary-700 px-4 py-3 text-white">
         <div className="flex items-center gap-2">
           <Bot className="h-5 w-5" />
@@ -128,20 +128,20 @@ export function ChatWidget() {
             <div key={i} className={`flex items-start gap-2 ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
               <div
                 className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${
-                  msg.role === "user" ? "bg-primary-100" : "bg-slate-100"
+                  msg.role === "user" ? "bg-primary-100" : "bg-muted"
                 }`}
               >
                 {msg.role === "user" ? (
                   <UserIcon className="h-3.5 w-3.5 text-primary" />
                 ) : (
-                  <Bot className="h-3.5 w-3.5 text-slate-600" />
+                  <Bot className="h-3.5 w-3.5 text-muted-foreground" />
                 )}
               </div>
               <div
                 className={`rounded-xl px-3 py-2 text-sm max-w-[85%] ${
                   msg.role === "user"
                     ? "bg-primary text-primary-foreground rounded-tr-sm"
-                    : "bg-slate-100 text-foreground rounded-tl-sm"
+                    : "bg-muted text-foreground rounded-tl-sm"
                 }`}
               >
                 {msg.content}
@@ -151,10 +151,10 @@ export function ChatWidget() {
         )}
         {loading && (
           <div className="flex items-start gap-2">
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-100">
-              <Bot className="h-3.5 w-3.5 text-slate-600" />
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted">
+              <Bot className="h-3.5 w-3.5 text-muted-foreground" />
             </div>
-            <div className="rounded-xl bg-slate-100 px-3 py-2 text-sm text-muted-foreground rounded-tl-sm">
+            <div className="rounded-xl bg-muted px-3 py-2 text-sm text-muted-foreground rounded-tl-sm">
               <span className="animate-pulse">Thinking...</span>
             </div>
           </div>

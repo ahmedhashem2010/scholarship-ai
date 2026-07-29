@@ -8,7 +8,13 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  // Runtime queries go through the TRANSACTION pooler (port 6543). Fast, and
+  // it survives serverless connection churn.
+  url       = env("DATABASE_URL")
+  // Schema changes (`prisma db push`, `migrate`) need a SESSION connection
+  // (port 5432). The transaction pooler cannot run ALTER TABLE / CREATE INDEX,
+  // so without this `db push` connects and then hangs forever with no error.
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -21,6 +27,7 @@ model User {
   reviews       Review[]
   payments      Payment[]
   applications  Application[]
+  roadmapMilestones RoadmapMilestone[]
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
 }
@@ -37,6 +44,26 @@ model UserProfile {
   targetDegree      String
   englishLevel      String
   englishScore      Int?
+
+  // --- English testing ------------------------------------------------------
+  // The old single `englishLevel` select mixed proficiency (beginner…fluent)
+  // with test types (IELTS, TOEFL) in one dropdown, so it couldn't answer the
+  // question that actually decides eligibility: does this student HAVE a score?
+  //
+  // hasEnglishTest: YES | WILLING | PREFER_WITHOUT
+  hasEnglishTest    String?
+  // IELTS | TOEFL | DUOLINGO | PTE | CAMBRIDGE
+  englishTestType   String?
+  englishTestDate   DateTime?
+  // <1M | 1-3M | 3-6M | 6M+
+  testTimeframe     String?
+
+  // Nationality and residence differ and both affect eligibility.
+  nationality       String?
+  // 4.0 | 5.0 | 100 (percentage)
+  gpaScale          String?
+  graduationYear    Int?
+  preferredCountries String[]
   gpa               Float?
   hasWorkExperience Boolean  @default(false)
   workYears         Int?
@@ -77,9 +104,37 @@ model Scholarship {
   competitionLevel    String           @default("medium")
   requiredDocuments   String[]
 
+  // --- Data quality & lifecycle -------------------------------------------
+  // Soft-delete. Expired scholarships and dead source links are hidden rather
+  // than deleted, so we keep the record (and its SEO page) without ever showing
+  // a student something they can't actually apply to.
+  isActive            Boolean          @default(true)
+  // Set true once a human has opened sourceUrl and confirmed the details.
+  // 195 of the seeded records were scraped and have never been checked.
+  isVerified          Boolean          @default(false)
+  verifiedAt          DateTime?
+  // Why a record was deactivated: EXPIRED | DEAD_LINK | DUPLICATE | UNVERIFIABLE
+  inactiveReason      String?
+  // When applications open. Needed by the roadmap generator to plan backwards
+  // from the deadline without scheduling tasks before the window exists.
+  applicationOpenDate DateTime?
+  // FIXED | ONGOING | ANNUAL | UNKNOWN
+  //
+  // A null `deadline` is ambiguous on its own: it can mean the scholarship is
+  // genuinely rolling ("no deadline, no application required") or that the
+  // scraper simply failed to capture a real date. Those need completely
+  // different messages to the student, so store which one it is.
+  deadlineType        String?          @default("UNKNOWN")
+  // Human-readable recurrence, e.g. "Opens annually from October 1 to May 1".
+  recurrenceNote      String?
+
   applications        Application[]
   createdAt           DateTime         @default(now())
   updatedAt           DateTime         @updatedAt
+
+  @@index([isActive, deadline])
+  @@index([country])
+  roadmapMilestones RoadmapMilestone[]
 }
 
 model Application {
@@ -108,10 +163,42 @@ model Payment {
   user      User     @relation(fields: [userId], references: [id])
   amount    Int
   credits   Int
+  // pending | approved | rejected | refunded
   status    String   @default("pending")
+
+  // stripe | vodafone_cash | instapay | bank_transfer
+  method    String   @default("stripe")
+  // Which CREDIT_PACKAGES entry was bought (see src/lib/pricing.ts)
+  packageId String?
+
+  // --- Stripe ---------------------------------------------------------------
+  // Unique so a retried webhook cannot grant credits twice. Stripe re-delivers
+  // any event that doesn't get a prompt 2xx, so without this a slow response
+  // silently doubles a user's credits.
+  stripeEventId   String? @unique
+  stripeSessionId String?
+
+  // --- Manual payment (Vodafone Cash / InstaPay / bank transfer) -------------
+  // Screenshot of the transfer, uploaded by the user.
+  receiptUrl      String?
+  // Transaction reference the student types in.
+  reference       String?
+  // Free-text note from the student.
+  userNote        String?
+
+  // --- Admin review ---------------------------------------------------------
+  reviewedAt      DateTime?
+  reviewedBy      String?
+  rejectionReason String?
+
   createdAt DateTime @default(now())
+  // @default(now()) is required, not optional: @updatedAt only maintains the
+  // value on future writes. Without a default, adding this column to a table
+  // that already has rows fails, and Prisma offers to reset the database.
+  updatedAt DateTime @default(now()) @updatedAt
 
   @@index([userId])
+  @@index([status, createdAt])
 }
 
 model ReferralCode {
@@ -179,4 +266,42 @@ model Review {
 
   @@index([documentId])
   @@index([userId])
+}
+
+/// A saved roadmap milestone.
+///
+/// The roadmap itself is generated deterministically from the deadline, so it
+/// does NOT need storing to be displayed. What needs storing is the student's
+/// relationship to it: which scholarships they're actually working on, which
+/// steps they've ticked off, and whether we've already nagged them about a
+/// given date. Without that, the roadmap is a pretty diagram they look at once.
+///
+/// Flat rather than a parent Roadmap + children: the unique constraint makes
+/// "save or update this roadmap" a single upsert per milestone, and every query
+/// we care about ("what's due for this user in the next 7 days") filters on
+/// user + date without needing a join.
+model RoadmapMilestone {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scholarshipId  String
+  scholarship    Scholarship @relation(fields: [scholarshipId], references: [id], onDelete: Cascade)
+
+  /// Matches MilestoneKey in src/lib/roadmap-generator.ts.
+  key            String
+  dueDate        DateTime
+  isDone         Boolean  @default(false)
+  doneAt         DateTime?
+
+  /// Set when a reminder email goes out, so a re-run can't send duplicates.
+  /// Nullable rather than a boolean so we keep the timestamp for debugging.
+  reminderSentAt DateTime?
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @default(now()) @updatedAt
+
+  @@unique([userId, scholarshipId, key])
+  @@index([userId, isDone])
+  /// Drives the reminder job: due soon, not done, not yet emailed.
+  @@index([dueDate, isDone, reminderSentAt])
 }

@@ -4,60 +4,72 @@
 
 @layer base {
   :root {
-    --background: 244 253 249;
-    --foreground: 26 58 48;
+    --background: 240 253 250;
+    --foreground: 19 78 74;
     --card: 255 255 255;
-    --card-foreground: 26 58 48;
+    --card-foreground: 19 78 74;
     --popover: 255 255 255;
-    --popover-foreground: 26 58 48;
+    --popover-foreground: 19 78 74;
     --primary: 13 148 136;
     --primary-foreground: 255 255 255;
-    --secondary: 228 240 236;
-    --secondary-foreground: 26 58 48;
-    --muted: 237 245 241;
-    --muted-foreground: 107 143 130;
-    --accent: 228 240 236;
-    --accent-foreground: 26 58 48;
+    /* Darker teal for TEXT — #0D9488 on a light bg is only ~3.1:1. */
+    --primary-text: 15 110 86;
+    --secondary: 45 212 191;
+    --secondary-foreground: 15 23 42;
+    --muted: 232 241 244;
+    --muted-foreground: 100 116 139;
+    --accent: 204 251 241;
+    --accent-foreground: 19 78 74;
     --destructive: 220 38 38;
     --destructive-foreground: 255 255 255;
     --success: 22 163 74;
     --success-foreground: 255 255 255;
-    --warning: 245 158 11;
+    --warning: 217 119 6;
     --warning-foreground: 255 255 255;
     --danger: 220 38 38;
     --danger-foreground: 255 255 255;
-    --border: 209 221 217;
-    --input: 209 221 217;
+    /* Teal-200, not grey. This is the single biggest "not dry" change. */
+    --border: 153 246 228;
+    --input: 153 246 228;
     --ring: 13 148 136;
+    --brand-deep: 6 78 59;
+    --brand-mid: 13 148 136;
+    --accent-warm: 217 119 6;
+    --accent-warm-soft: 254 243 199;
     --radius: 0.75rem;
   }
 
   .dark {
-    --background: 15 23 20;
-    --foreground: 220 230 225;
-    --card: 22 32 28;
-    --card-foreground: 220 230 225;
-    --popover: 22 32 28;
-    --popover-foreground: 220 230 225;
+    --background: 8 20 19;
+    --foreground: 236 253 245;
+    --card: 15 33 31;
+    --card-foreground: 236 253 245;
+    --popover: 15 33 31;
+    --popover-foreground: 236 253 245;
     --primary: 45 212 191;
-    --primary-foreground: 15 23 20;
-    --secondary: 30 42 36;
-    --secondary-foreground: 200 220 215;
-    --muted: 30 42 36;
-    --muted-foreground: 130 160 150;
-    --accent: 30 42 36;
-    --accent-foreground: 200 220 215;
+    --primary-foreground: 4 47 46;
+    --primary-text: 94 234 212;
+    --secondary: 20 184 166;
+    --secondary-foreground: 236 253 245;
+    --muted: 24 48 45;
+    --muted-foreground: 148 180 172;
+    --accent: 19 78 74;
+    --accent-foreground: 204 251 241;
     --destructive: 248 113 113;
-    --destructive-foreground: 15 23 20;
+    --destructive-foreground: 10 10 10;
     --success: 74 222 128;
-    --success-foreground: 15 23 20;
+    --success-foreground: 10 10 10;
     --warning: 251 191 36;
-    --warning-foreground: 15 23 20;
+    --warning-foreground: 10 10 10;
     --danger: 248 113 113;
-    --danger-foreground: 15 23 20;
-    --border: 40 55 48;
-    --input: 40 55 48;
+    --danger-foreground: 10 10 10;
+    --border: 22 78 71;
+    --input: 22 78 71;
     --ring: 45 212 191;
+    --brand-deep: 4 47 46;
+    --brand-mid: 13 148 136;
+    --accent-warm: 251 191 36;
+    --accent-warm-soft: 69 45 8;
   }
 
   * {
@@ -121,4 +133,243 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
+}
+
+/* ---------------------------------------------------------------------------
+   Majara (AA Majara) — DISPLAY face. Headlines only.
+
+   Leads the .font-display stack. Nitro sits behind it, so swapping back is
+   just a matter of which file is present.
+--------------------------------------------------------------------------- */
+@font-face {
+  font-family: "Majara";
+  src: url("/fonts/Majara-Regular.woff2") format("woff2"),
+       url("/fonts/Majara-Regular.ttf") format("truetype");
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088F, U+08A0-08FF,
+                 U+FB50-FDFF, U+FE70-FEFF, U+10E60-10E7F, U+1EC70-1ECBF,
+                 U+1ED00-1ED4F, U+1EE00-1EEFF;
+  /* One weight only — map the whole range to it rather than letting the
+     browser synthesise a bold, which breaks Arabic letter joins. */
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---------------------------------------------------------------------------
+   Nitro — DISPLAY face by MTtype Foundry. Headlines only.
+
+   Geometric, squared, high-impact Arabic. Exactly the sort of face that gives
+   a layout personality — and exactly the sort that becomes unreadable at 14px,
+   so it is scoped to .font-display and never touches body text or controls.
+
+   Use the FONTESK release (fontesk.com/nitro-arabic-font): same foundry,
+   explicitly licensed free for commercial use. The "MT Nitro Display" copies
+   on the aggregator sites don't state terms.
+--------------------------------------------------------------------------- */
+@font-face {
+  font-family: "Nitro";
+  src: url("/fonts/Nitro-Display.otf") format("opentype");
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088F, U+08A0-08FF,
+                 U+FB50-FDFF, U+FE70-FEFF, U+10E60-10E7F, U+1EC70-1ECBF,
+                 U+1ED00-1ED4F, U+1EE00-1EEFF;
+  /* Single weight. Nitro ships styles (Display / Oblique), not a weight axis,
+     so every weight maps to the same file — otherwise the browser fakes a bold
+     by smearing the outlines, which wrecks Arabic letter joins. */
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Nitro";
+  src: url("/fonts/Nitro-Oblique.otf") format("opentype");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* ---------------------------------------------------------------------------
+   Zafran — DISPLAY face, headlines only.
+
+   Boharat Cairo describe it as "an elegant industrial display typeface...
+   designed for use in headlines and posters". Display faces have tight
+   spacing and high stroke contrast that read as characterful at 40px and as
+   noise at 14px, so this is deliberately NOT applied to body text, buttons,
+   labels or form fields.
+
+   Exposed as .font-display and used on the hero h1 + section h2 only.
+--------------------------------------------------------------------------- */
+@font-face {
+  font-family: "Zafran";
+  src: url("/fonts/Zafran-Regular.woff2") format("woff2"),
+       url("/fonts/Zafran-Regular.ttf") format("truetype");
+  font-weight: 400 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Zafran";
+  src: url("/fonts/Zafran-Bold.woff2") format("woff2"),
+       url("/fonts/Zafran-Bold.ttf") format("truetype");
+  font-weight: 700 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-display {
+  font-family: "Majara", "Nitro", "Zafran", "RB", var(--font-arabic), var(--font-sans), system-ui, sans-serif;
+  /* Squared geometric faces read better with a little air at display sizes;
+     negative tracking closes the counters up too much. */
+  letter-spacing: 0;
+  /* Nitro's glyphs sit deeper than the fallback's — at 1.35 the descenders on
+     a second line get clipped by the hero's overflow-hidden. Arabic needs the
+     room regardless; a display face with this much vertical travel needs more. */
+  line-height: 1.6;
+  /* Belt and braces: never let a headline glyph be cropped by an ancestor. */
+  padding-block: 0.08em;
+  /* Majara's space glyph is very narrow — without this, "اعثر على" reads as a
+     single word. Display faces are drawn for short logo-style strings, so they
+     often under-set the word space; a full sentence needs it opened up. */
+  word-spacing: 0.22em;
+}
+
+/* ---------------------------------------------------------------------------
+   RB — Arabic display/UI face. Not on Google Fonts, so it's self-hosted from
+   public/fonts/ (see the README there for where to download it).
+
+   Loaded via @font-face rather than next/font/local on purpose: if the files
+   aren't present the browser simply falls through to the next family in the
+   stack, instead of the build failing.
+
+   `unicode-range` scopes RB to Arabic script only. Latin characters keep using
+   Plus Jakarta Sans, so a mixed string like "منحة DAAD" gets the right face for
+   each script rather than forcing Latin through an Arabic font.
+
+   woff2 is listed first and ttf second — drop a converted woff2 in and it will
+   be preferred automatically with no code change.
+--------------------------------------------------------------------------- */
+@font-face {
+  font-family: "RB";
+  src: url("/fonts/RB-Regular.woff2") format("woff2"),
+       url("/fonts/RB-Regular.ttf") format("truetype");
+  font-weight: 400 600;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088F, U+08A0-08FF,
+                 U+FB50-FDFF, U+FE70-FEFF, U+10E60-10E7F, U+1EC70-1ECBF,
+                 U+1ED00-1ED4F, U+1EE00-1EEFF;
+}
+
+@font-face {
+  font-family: "RB";
+  src: url("/fonts/RB-Bold.woff2") format("woff2"),
+       url("/fonts/RB-Bold.ttf") format("truetype");
+  font-weight: 700 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088F, U+08A0-08FF,
+                 U+FB50-FDFF, U+FE70-FEFF, U+10E60-10E7F, U+1EC70-1ECBF,
+                 U+1ED00-1ED4F, U+1EE00-1EEFF;
+}
+
+/* RB has only two weights. Faux-bolding Arabic distorts the letterforms and
+   breaks the joins, so let the two real weights do the work. */
+/* No real bold cut exists for Nitro, and synthesising one distorts Arabic
+   letterforms and breaks the joins between characters. */
+.font-display {
+  font-synthesis-weight: none;
+  font-synthesis-style: none;
+}
+
+[data-lang="ar"] {
+  font-synthesis-weight: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Arabic line-height.
+
+   Tailwind's font-size utilities bundle a line-height (text-5xl ships
+   line-height:1), and a responsive variant like lg:text-5xl therefore
+   overrides any unprefixed leading-* utility. At those tight values Arabic
+   headings collide: the ascenders of one line hit the descenders of the line
+   above, because Arabic has far more vertical travel than Latin.
+
+   Deliberately unlayered — plain CSS outside @layer wins against Tailwind's
+   utilities layer regardless of specificity, which is what we need here.
+--------------------------------------------------------------------------- */
+[data-lang="ar"] h1,
+[data-lang="ar"] h2,
+[data-lang="ar"] h3,
+[data-lang="ar"] h4 {
+  line-height: 1.5;
+}
+
+[data-lang="ar"] p,
+[data-lang="ar"] li {
+  line-height: 1.85;
+}
+
+/* ---------------------------------------------------------------------------
+   Richer surfaces.
+
+   A flat white page with hairline borders is safe but cold. These give the
+   layout large areas of colour and real depth so sections read as distinct
+   places rather than one long document.
+--------------------------------------------------------------------------- */
+.brand-band {
+  background:
+    radial-gradient(ellipse 60% 80% at 85% 15%, rgb(20 184 166 / 0.55), transparent 60%),
+    radial-gradient(ellipse 50% 70% at 10% 90%, rgb(217 119 6 / 0.28), transparent 60%),
+    linear-gradient(135deg, rgb(var(--brand-deep)) 0%, rgb(var(--brand-mid)) 100%);
+}
+
+.brand-band-soft {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgb(var(--primary) / 0.10), transparent 70%),
+    rgb(var(--background));
+}
+
+.card-raised {
+  background: rgb(var(--card));
+  border: 1px solid rgb(var(--border));
+  border-radius: 1rem;
+  box-shadow: 0 1px 2px rgb(13 148 136 / 0.06), 0 10px 30px -14px rgb(13 148 136 / 0.22);
+  transition: box-shadow .2s ease, transform .2s ease;
+}
+.card-raised:hover {
+  box-shadow: 0 1px 2px rgb(13 148 136 / 0.08), 0 20px 44px -18px rgb(13 148 136 / 0.35);
+  transform: translateY(-2px);
+}
+.dark .card-raised {
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px -12px rgb(0 0 0 / 0.6);
+}
+
+.text-warm { color: rgb(var(--accent-warm)); }
+.bg-warm-soft { background: rgb(var(--accent-warm-soft)); }
+
+/* ---------------------------------------------------------------------------
+   iOS zoom-on-focus
+   ---------------------------------------------------------------------------
+   Safari on iPhone auto-zooms the whole page when a focused form control has a
+   font-size below 16px — and it does NOT zoom back out on blur. Every input in
+   this app is `text-sm` (14px), so tapping the email field on signup left users
+   stranded on a zoomed, horizontally-scrolling page. It reads as the site being
+   broken rather than as a browser behaviour.
+
+   Forced to 16px on small screens only, so the desktop design is unchanged.
+   Unlayered so it beats Tailwind's `utilities` layer without !important.
+--------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+/* Long unbroken strings — URLs, emails, scraped titles without spaces — are a
+   common source of horizontal overflow on narrow screens. */
+body {
+  overflow-wrap: break-word;
 }

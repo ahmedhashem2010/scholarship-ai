@@ -44,7 +44,7 @@ export function Sidebar() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="fixed top-3 left-3 z-40 flex h-8 w-8 items-center justify-center rounded-lg bg-white shadow-md ring-1 ring-black/5 lg:hidden"
+        className="fixed top-3 start-3 z-40 flex h-8 w-8 items-center justify-center rounded-lg bg-card shadow-md ring-1 ring-black/5 lg:hidden"
         aria-label="Open menu"
       >
         <Menu className="h-4 w-4" />
@@ -59,7 +59,7 @@ export function Sidebar() {
 
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r bg-white transition-transform duration-300 lg:translate-x-0 lg:static lg:z-auto dark:bg-gray-900 dark:border-gray-700",
+          "fixed inset-y-0 start-0 z-50 flex w-64 flex-col border-r bg-card transition-transform duration-300 lg:translate-x-0 lg:static lg:z-auto dark:bg-gray-900 dark:border-gray-700",
           open ? "translate-x-0" : "-translate-x-full"
         )}
       >

@@ -57,6 +57,13 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         radius="lg"
         className={cn(
           "font-medium",
+          // HeroUI's `bordered` + `color="default"` renders a border so faint it's
+          // effectively invisible — the secondary CTA looked like plain text and
+          // nobody would know it was clickable. Force our own visible border.
+          variant === "outline" &&
+            "border-2 border-border bg-transparent text-foreground hover:bg-muted hover:border-border",
+          variant === "secondary" && "bg-secondary text-secondary-foreground hover:bg-muted",
+          variant === "ghost" && "bg-transparent text-foreground hover:bg-muted",
           isLink && "p-0 h-auto min-h-0 text-primary underline underline-offset-4 hover:opacity-80",
           className
         )}

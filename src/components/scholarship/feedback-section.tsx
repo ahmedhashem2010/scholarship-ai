@@ -116,7 +116,7 @@ export function FeedbackSection({
                 <label
                   htmlFor={isChecklist ? item.id : undefined}
                   className={cn(
-                    "text-sm leading-relaxed text-foreground/90",
+                    "text-sm leading-relaxed text-white/90",
                     isChecklist && "cursor-pointer",
                     item.completed && "text-muted-foreground line-through"
                   )}

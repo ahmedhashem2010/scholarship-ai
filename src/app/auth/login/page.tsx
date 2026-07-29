@@ -2,35 +2,83 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState, type FormEvent } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { GraduationCap, Mail, Lock, Eye, EyeOff } from "lucide-react";
 
-export default function LoginPage() {
+/** Messages for the codes `/auth/confirm` redirects here with. */
+const LINK_ERRORS: Record<string, string> = {
+  link_expired: "That confirmation link has expired. Enter your email below and we'll send a fresh one.",
+  link_invalid: "That confirmation link has already been used or isn't valid any more.",
+  invalid_link: "That link was malformed. Request a new one below.",
+};
+
+/** Only allow same-site paths back out of the login redirect. */
+function safeRedirect(raw: string | null): string {
+  if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return "/dashboard";
+  return raw;
+}
+
+function LoginPageContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(
+    LINK_ERRORS[searchParams.get("error") ?? ""] ?? null
+  );
+  const [needsConfirm, setNeedsConfirm] = useState(
+    Boolean(LINK_ERRORS[searchParams.get("error") ?? ""])
+  );
+  const [notice, setNotice] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
+
+  async function resendConfirmation() {
+    if (!email) {
+      setError("Enter your email address first.");
+      return;
+    }
+    setNotice(null);
+    const res = await fetch("/api/auth/resend-verification", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      setError(data.error || "Couldn't send a new link. Try again shortly.");
+      return;
+    }
+    setError(null);
+    setNotice("Check your inbox — a new confirmation link is on its way.");
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
+    setNotice(null);
     setLoading(true);
 
     const supabase = createClient();
-    const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
+    const { error: authError } = await supabase.auth.signInWithPassword({
+      email: email.trim().toLowerCase(),
+      password,
+    });
 
     if (authError) {
       if (authError.message === "Invalid login credentials") {
         setError("Invalid email or password. Please try again.");
-      } else if (authError.message === "Email not confirmed") {
-        setError("Please confirm your email first. Check your inbox for the confirmation link.");
+      } else if (/not confirmed/i.test(authError.message)) {
+        // Not a dead end: offer the fix inline rather than telling them to go
+        // and find an email that may never have arrived.
+        setError("You haven't confirmed your email yet.");
+        setNeedsConfirm(true);
       } else {
         setError(authError.message);
       }
@@ -38,7 +86,7 @@ export default function LoginPage() {
       return;
     }
 
-    router.push("/onboarding");
+    router.push(safeRedirect(searchParams.get("redirectTo")));
     router.refresh();
   }
 
@@ -64,14 +112,14 @@ export default function LoginPage() {
                   Email
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Mail className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <input
                     id="email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="w-full rounded-lg border border-input bg-background pl-9 pr-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
+                    className="w-full rounded-lg border border-input bg-background ps-9 pe-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
                     placeholder="you@example.com"
                   />
                 </div>
@@ -82,20 +130,20 @@ export default function LoginPage() {
                   Password
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Lock className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <input
                     id="password"
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="w-full rounded-lg border border-input bg-background pl-9 pr-9 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
+                    className="w-full rounded-lg border border-input bg-background ps-9 pe-9 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
                     placeholder="Enter your password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    className="absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                     tabIndex={-1}
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -104,8 +152,23 @@ export default function LoginPage() {
               </div>
 
               {error && (
-                <div className="rounded-lg bg-danger-50 border border-danger-200 p-3 text-sm text-danger-700">
-                  {error}
+                <div className="rounded-lg bg-danger/10 border border-danger/30 p-3 text-sm text-danger space-y-2">
+                  <p>{error}</p>
+                  {needsConfirm && (
+                    <button
+                      type="button"
+                      onClick={resendConfirmation}
+                      className="font-medium underline underline-offset-2"
+                    >
+                      Send me a new confirmation link
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {notice && (
+                <div className="rounded-lg bg-success/10 border border-success/30 p-3 text-sm text-success">
+                  {notice}
                 </div>
               )}
 
@@ -128,5 +191,14 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  // useSearchParams forces a suspense boundary in the App Router.
+  return (
+    <Suspense fallback={<div className="p-8 text-center text-muted-foreground">Loading…</div>}>
+      <LoginPageContent />
+    </Suspense>
   );
 }

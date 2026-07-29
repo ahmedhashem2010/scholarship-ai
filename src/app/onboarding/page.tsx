@@ -11,6 +11,8 @@ import { useCredits } from "@/lib/credits-context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
+import { EnglishStep, type EnglishAnswers } from "@/components/onboarding/english-step";
+
 const steps = [
   { title: "About You", icon: User },
   { title: "Education", icon: GraduationCap },
@@ -47,16 +49,6 @@ const targetDegrees = [
   { value: "summer-school", label: "Summer School" },
 ];
 
-const englishLevels = [
-  { value: "beginner", label: "Beginner", desc: "Basic understanding" },
-  { value: "intermediate", label: "Intermediate", desc: "Can read and write" },
-  { value: "advanced", label: "Advanced", desc: "Good academic English" },
-  { value: "fluent", label: "Fluent", desc: "Confident in all situations" },
-  { value: "native", label: "Native", desc: "Native speaker" },
-  { value: "TOEFL", label: "TOEFL", desc: "Test score available" },
-  { value: "IELTS", label: "IELTS", desc: "Test score available" },
-];
-
 const budgetOptions = [
   { value: "NONE", label: "No funding available" },
   { value: "LIMITED", label: "Limited (partial coverage needed)" },
@@ -82,6 +74,10 @@ export default function OnboardingPage() {
     major: "",
     targetDegree: "",
     englishLevel: "",
+    hasEnglishTest: "" as EnglishAnswers["hasEnglishTest"],
+    englishTestType: "",
+    englishTestDate: "",
+    testTimeframe: "",
     englishScore: "",
     gpa: "",
     hasWorkExperience: false,
@@ -113,7 +109,13 @@ export default function OnboardingPage() {
       case 0: return !!form.displayName && !!form.dateOfBirth && !!form.country;
       case 1: return !!form.educationLevel && !!form.targetDegree;
       case 2: return true;
-      case 3: return !!form.englishLevel;
+      // The branch answer is what matters. A student who picked
+      // "prefer scholarships without a test" has answered completely.
+      case 3:
+        if (!form.hasEnglishTest) return false;
+        if (form.hasEnglishTest === "YES") return !!form.englishTestType && !!form.englishScore;
+        if (form.hasEnglishTest === "WILLING") return !!form.testTimeframe;
+        return true;
       default: return true;
     }
   }
@@ -143,6 +145,10 @@ export default function OnboardingPage() {
       major: form.major || null,
       targetDegree: form.targetDegree,
       englishLevel: form.englishLevel,
+      hasEnglishTest: form.hasEnglishTest,
+      englishTestType: form.englishTestType || null,
+      englishTestDate: form.englishTestDate || null,
+      testTimeframe: form.testTimeframe || null,
       ...(form.englishScore ? { englishScore: form.englishScore } : {}),
       ...(form.gpa ? { gpa: form.gpa } : {}),
       hasWorkExperience: form.hasWorkExperience,
@@ -224,17 +230,17 @@ export default function OnboardingPage() {
                         ? "border-primary bg-primary text-primary-foreground"
                         : i === step
                         ? "border-primary text-primary"
-                        : "border-slate-300 text-slate-400"
+                        : "border-border text-muted-foreground"
                     }`}
                   >
                     {i < step ? <Check className="h-4 w-4" /> : <s.icon className="h-4 w-4" />}
                   </div>
-                  <span className={`mt-1.5 text-xs font-medium ${i <= step ? "text-primary" : "text-slate-400"}`}>
+                  <span className={`mt-1.5 text-xs font-medium ${i <= step ? "text-primary" : "text-muted-foreground"}`}>
                     {s.title}
                   </span>
                 </div>
                 {i < steps.length - 1 && (
-                  <div className={`mx-2 mb-6 h-0.5 w-12 sm:w-20 transition-colors duration-300 ${i < step ? "bg-primary" : "bg-slate-200"}`} />
+                  <div className={`mx-2 mb-6 h-0.5 w-12 sm:w-20 transition-colors duration-300 ${i < step ? "bg-primary" : "bg-muted"}`} />
                 )}
               </div>
             ))}
@@ -293,10 +299,10 @@ export default function OnboardingPage() {
                         key={el.value}
                         type="button"
                         onClick={() => update("educationLevel", el.value)}
-                        className={`rounded-xl border-2 px-4 py-3 text-left text-sm font-medium transition ${
+                        className={`rounded-xl border-2 px-4 py-3 text-start text-sm font-medium transition ${
                           form.educationLevel === el.value
                             ? "border-primary bg-primary-50 text-primary"
-                            : "border-slate-200 text-muted-foreground hover:border-slate-300"
+                            : "border-border text-muted-foreground hover:border-border"
                         }`}
                       >
                         {el.label}
@@ -328,7 +334,7 @@ export default function OnboardingPage() {
                         className={`rounded-xl border-2 px-4 py-3 text-center text-sm font-medium transition ${
                           form.targetDegree === td.value
                             ? "border-primary bg-primary-50 text-primary"
-                            : "border-slate-200 text-muted-foreground hover:border-slate-300"
+                            : "border-border text-muted-foreground hover:border-border"
                         }`}
                       >
                         {td.label}
@@ -360,7 +366,7 @@ export default function OnboardingPage() {
                       type="checkbox"
                       checked={form.hasWorkExperience}
                       onChange={(e) => update("hasWorkExperience", e.target.checked)}
-                      className="mt-1 h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary"
+                      className="mt-1 h-4 w-4 rounded border-border text-primary focus:ring-primary"
                     />
                     <div>
                       <span className="text-sm font-medium text-foreground">I have work experience</span>
@@ -388,7 +394,7 @@ export default function OnboardingPage() {
                       type="checkbox"
                       checked={form.hasResearch}
                       onChange={(e) => update("hasResearch", e.target.checked)}
-                      className="mt-1 h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary"
+                      className="mt-1 h-4 w-4 rounded border-border text-primary focus:ring-primary"
                     />
                     <div>
                       <span className="text-sm font-medium text-foreground">I have research experience</span>
@@ -400,44 +406,21 @@ export default function OnboardingPage() {
             )}
 
             {step === 3 && (
-              <div className="space-y-4 animate-fade-in">
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-1.5">English Level</label>
-                  <div className="grid gap-2 sm:grid-cols-2">
-                    {englishLevels.map((el) => (
-                      <button
-                        key={el.value}
-                        type="button"
-                        onClick={() => update("englishLevel", el.value)}
-                        className={`rounded-xl border-2 px-4 py-3 text-left transition ${
-                          form.englishLevel === el.value
-                            ? "border-primary bg-primary-50 text-primary"
-                            : "border-slate-200 text-muted-foreground hover:border-slate-300"
-                        }`}
-                      >
-                        <span className="text-sm font-medium">{el.label}</span>
-                        <span className="block text-xs text-muted-foreground mt-0.5">{el.desc}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                {(form.englishLevel === "TOEFL" || form.englishLevel === "IELTS") && (
-                  <div>
-                    <label className="block text-sm font-medium text-foreground mb-1.5">
-                      {form.englishLevel === "TOEFL" ? "TOEFL Score (0-120)" : "IELTS Score (0-9)"}
-                    </label>
-                    <input
-                      type="number"
-                      min={0}
-                      max={form.englishLevel === "TOEFL" ? 120 : 9}
-                      step={form.englishLevel === "IELTS" ? "0.5" : "1"}
-                      value={form.englishScore}
-                      onChange={(e) => update("englishScore", e.target.value)}
-                      className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
-                      placeholder={form.englishLevel === "TOEFL" ? "100" : "6.5"}
-                    />
-                  </div>
-                )}
+              <div className="space-y-6 animate-fade-in">
+                <EnglishStep
+                  value={{
+                    hasEnglishTest: form.hasEnglishTest,
+                    englishTestType: form.englishTestType,
+                    englishScore: form.englishScore,
+                    englishTestDate: form.englishTestDate,
+                    testTimeframe: form.testTimeframe,
+                    englishLevel: form.englishLevel,
+                  }}
+                  onChange={(patch) =>
+                    setForm((f) => ({ ...f, ...patch }))
+                  }
+                />
+
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-1.5">Budget / Funding</label>
                   <div className="grid gap-2 sm:grid-cols-2">
@@ -446,10 +429,10 @@ export default function OnboardingPage() {
                         key={b.value}
                         type="button"
                         onClick={() => update("budget", b.value)}
-                        className={`rounded-xl border-2 px-4 py-3 text-left text-sm font-medium transition ${
+                        className={`rounded-xl border-2 px-4 py-3 text-start text-sm font-medium transition ${
                           form.budget === b.value
                             ? "border-primary bg-primary-50 text-primary"
-                            : "border-slate-200 text-muted-foreground hover:border-slate-300"
+                            : "border-border text-muted-foreground hover:border-border"
                         }`}
                       >
                         {b.label}
@@ -473,12 +456,22 @@ export default function OnboardingPage() {
                     { label: "Major", value: form.major || "Not specified" },
                     { label: "Target Degree", value: getLabel(form.targetDegree, targetDegrees) },
                     { label: "GPA", value: form.gpa || "Not specified" },
-                    { label: "English Level", value: form.englishLevel === "TOEFL" || form.englishLevel === "IELTS" ? `${form.englishLevel} (${form.englishScore || "?"})` : getLabel(form.englishLevel, englishLevels) },
+                    {
+                      label: "English",
+                      value:
+                        form.hasEnglishTest === "YES"
+                          ? `${form.englishTestType} ${form.englishScore || "?"}`
+                          : form.hasEnglishTest === "WILLING"
+                            ? `Will take a test (${form.testTimeframe || "?"})`
+                            : form.hasEnglishTest === "PREFER_WITHOUT"
+                              ? "Prefers no English test"
+                              : "—",
+                    },
                     { label: "Work Experience", value: form.hasWorkExperience ? `${form.workYears || "?"} years` : "None" },
                     { label: "Research Experience", value: form.hasResearch ? "Yes" : "No" },
                     { label: "Budget", value: getLabel(form.budget, budgetOptions) || "Not specified" },
                   ].map((item) => (
-                    <div key={item.label} className="flex justify-between border-b border-slate-100 pb-2">
+                    <div key={item.label} className="flex justify-between border-b border-border pb-2">
                       <span className="text-sm text-muted-foreground">{item.label}</span>
                       <span className="text-sm font-medium text-foreground">{item.value}</span>
                     </div>

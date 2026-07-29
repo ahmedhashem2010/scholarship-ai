@@ -37,7 +37,7 @@ export default function SignupPage() {
       body: JSON.stringify({ email, password, name, referralCode: referralCode.trim() || undefined }),
     });
 
-    const data = await res.json();
+    const data = await res.json().catch(() => ({}));
 
     if (!res.ok) {
       setError(data.error || "Something went wrong");
@@ -46,7 +46,9 @@ export default function SignupPage() {
     }
 
     ConversionEvents.signup();
-    router.push("/auth/login");
+    // The account exists but is unverified. Send them to the "check your
+    // inbox" screen — not to login, which would only reject them.
+    router.push(`/auth/verify?email=${encodeURIComponent(email.trim().toLowerCase())}`);
     router.refresh();
   }
 
@@ -72,14 +74,14 @@ export default function SignupPage() {
                   Full Name
                 </label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <User className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <input
                     id="name"
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
-                    className="w-full rounded-lg border border-input bg-background pl-9 pr-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
+                    className="w-full rounded-lg border border-input bg-background ps-9 pe-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
                     placeholder="Ahmed Hassan"
                   />
                 </div>
@@ -90,14 +92,14 @@ export default function SignupPage() {
                   Email
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Mail className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <input
                     id="email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="w-full rounded-lg border border-input bg-background pl-9 pr-3 py-2 text-sm ring-offset-backspace focus:outline-none focus:ring-2 focus:ring-ring"
+                    className="w-full rounded-lg border border-input bg-background ps-9 pe-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
                     placeholder="you@example.com"
                   />
                 </div>
@@ -108,7 +110,7 @@ export default function SignupPage() {
                   Password
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Lock className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <input
                     id="password"
                     type={showPassword ? "text" : "password"}
@@ -116,13 +118,13 @@ export default function SignupPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     minLength={6}
-                    className="w-full rounded-lg border border-input bg-background pl-9 pr-9 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
+                    className="w-full rounded-lg border border-input bg-background ps-9 pe-9 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
                     placeholder="Min. 6 characters"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    className="absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                     tabIndex={-1}
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -135,20 +137,20 @@ export default function SignupPage() {
                   Referral Code <span className="text-muted-foreground font-normal">(optional)</span>
                 </label>
                 <div className="relative">
-                  <Gift className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Gift className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <input
                     id="referralCode"
                     type="text"
                     value={referralCode}
                     onChange={(e) => setReferralCode(e.target.value)}
-                    className="w-full rounded-lg border border-input bg-background pl-9 pr-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
+                    className="w-full rounded-lg border border-input bg-background ps-9 pe-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
                     placeholder="Enter a code"
                   />
                 </div>
               </div>
 
               {error && (
-                <div className="rounded-lg bg-danger-50 border border-danger-200 p-3 text-sm text-danger-700">
+                <div className="rounded-lg bg-danger/10 border border-danger/30 p-3 text-sm text-danger">
                   {error}
                 </div>
               )}
@@ -156,6 +158,10 @@ export default function SignupPage() {
               <Button type="submit" disabled={loading} className="w-full">
                 {loading ? "Creating account..." : "Create Account"}
               </Button>
+
+              <p className="text-center text-xs text-muted-foreground">
+                We&apos;ll email you a link to confirm your address.
+              </p>
             </form>
 
             <p className="mt-4 text-center text-sm text-muted-foreground">

@@ -1,264 +1,646 @@
+"use client";
+
+export const dynamic = "force-dynamic";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Calendar, MapPin, GraduationCap, ExternalLink, ArrowLeft, Clock, Award, BookOpen, CheckCircle2, Building2, Target, Sparkles } from "lucide-react";
+import { useParams } from "next/navigation";
+import {
+  ArrowLeft, ArrowRight, Calendar, MapPin, GraduationCap, ExternalLink,
+  CheckCircle2, Info, ShieldCheck, AlertTriangle, FileText,
+} from "lucide-react";
+import { Nav } from "@/components/nav";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useProfile } from "@/lib/profile-context";
+import { generateRoadmap, type Milestone } from "@/lib/roadmap-generator";
 
-function formatDate(d: Date | null): string {
-  if (!d) return "No deadline";
-  return d.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+/**
+ * Scholarship detail.
+ *
+ * The design goal here is honesty. Most of the catalogue is scraped and
+ * incomplete, so this page distinguishes three states for every fact:
+ *
+ *   stated + you match      → green, confident
+ *   stated + you don't      → red, a real blocker
+ *   not stated by source    → neutral "not listed", never implied either way
+ *
+ * The old page rendered missing data as absent, which read as "no requirement".
+ * A student could conclude they qualified when nobody had actually said so.
+ */
+
+interface Scholarship {
+  id: string;
+  nameEn: string;
+  nameAr: string;
+  country: string;
+  university: string | null;
+  degree: string;
+  deadline: string | null;
+  deadlineType: string | null;
+  applicationOpenDate: string | null;
+  recurrenceNote: string | null;
+  description: string | null;
+  benefits: string | null;
+  requirements: string | null;
+  sourceUrl: string | null;
+  eligibleCountries: string[];
+  eligibleEducation: string[];
+  fieldOfStudy: string[];
+  requiredDocuments: string[];
+  minimumAge: number | null;
+  maximumAge: number | null;
+  minimumGPA: number | null;
+  englishRequirement: string | null;
+  isVerified: boolean;
+  verifiedAt: string | null;
 }
 
-function getDaysLeft(deadline: Date | null): number | null {
-  if (!deadline) return null;
-  return Math.ceil((deadline.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-}
+const DOC_LABELS: Record<string, { ar: string; en: string }> = {
+  CV: { ar: "السيرة الذاتية", en: "CV / Resume" },
+  MOTIVATION_LETTER: { ar: "خطاب الدوافع", en: "Motivation letter" },
+  RECOMMENDATION_LETTER: { ar: "خطابات التوصية", en: "Recommendation letters" },
+  TRANSCRIPT: { ar: "كشف الدرجات", en: "Academic transcript" },
+  RESEARCH_PROPOSAL: { ar: "مقترح بحثي", en: "Research proposal" },
+  PASSPORT: { ar: "جواز السفر", en: "Passport" },
+  ENGLISH_TEST: { ar: "شهادة إجادة الإنجليزية", en: "English test certificate" },
+  ESSAY: { ar: "مقال", en: "Essay" },
+};
 
-function getCountryFlag(country: string): string {
-  const flags: Record<string, string> = { Japan: "🇯🇵", Hungary: "🇭🇺", "United Kingdom": "🇬🇧", "United States": "🇺🇸", Canada: "🇨🇦", Germany: "🇩🇪", Netherlands: "🇳🇱", Poland: "🇵🇱", France: "🇫🇷", Italy: "🇮🇹", China: "🇨🇳", Turkey: "🇹🇷", Russia: "🇷🇺", Australia: "🇦🇺" };
-  return flags[country] ?? "🌍";
-}
+export default function ScholarshipDetailPage() {
+  const params = useParams();
+  const { pick, num, isRTL } = useLanguage();
+  const { profile } = useProfile();
+  const Back = isRTL ? ArrowRight : ArrowLeft;
 
-function tryParseJson(raw: string | null): Record<string, unknown> | null {
-  if (!raw) return null;
-  try { return JSON.parse(raw) as Record<string, unknown>; } catch { return null; }
-}
+  const [s, setS] = useState<Scholarship | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
 
-function displayValue(value: unknown): string {
-  if (Array.isArray(value)) return value.map(String).join(", ");
-  if (typeof value === "object" && value !== null) return JSON.stringify(value);
-  return String(value ?? "");
-}
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch(`/api/scholarships/${params.id}`);
+        const json = await res.json();
+        if (!res.ok || !json.success) return setNotFound(true);
+        setS(json.data);
+      } catch {
+        setNotFound(true);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [params.id]);
 
-export default async function ScholarshipDetailPage({ params }: { params: { id: string } }) {
-  const scholarship = await prisma.scholarship.findUnique({ where: { id: params.id } });
-  if (!scholarship) notFound();
+  if (loading) return <DetailSkeleton />;
 
-  const benefits = tryParseJson(scholarship.benefits);
-  const requirements = tryParseJson(scholarship.requirements);
-  const daysLeft = getDaysLeft(scholarship.deadline);
-  const isUrgent = daysLeft !== null && daysLeft <= 30;
+  if (notFound || !s) {
+    return (
+      <>
+        <Nav />
+        <main className="page-container py-20 text-center">
+          <p className="text-lg font-medium text-foreground">
+            {pick("لم نعثر على هذه المنحة", "We couldn't find that scholarship")}
+          </p>
+          <Link href="/scholarships" className="mt-4 inline-block text-sm text-primary hover:underline">
+            {pick("تصفّح كل المنح", "Browse all scholarships")}
+          </Link>
+        </main>
+      </>
+    );
+  }
+
+  const days = s.deadline
+    ? Math.ceil((new Date(s.deadline).getTime() - Date.now()) / 86_400_000)
+    : null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-gray-900 dark:to-gray-900">
-      {/* Sticky header */}
-      <header className="sticky top-0 z-30 border-b bg-white/90 backdrop-blur-md dark:bg-gray-900/90 dark:border-gray-700">
-        <div className="mx-auto flex h-14 max-w-4xl items-center gap-3 px-4 sm:px-6 lg:px-8">
-          <Link href="/scholarships">
-            <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground">
-              <ArrowLeft className="h-4 w-4" />
-              Back
-            </Button>
-          </Link>
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="text-lg">{getCountryFlag(scholarship.country)}</span>
-            <h1 className="truncate text-sm font-semibold text-foreground">{scholarship.nameEn}</h1>
-          </div>
-        </div>
-      </header>
+    <>
+      <Nav />
+      <main className="page-container py-6 sm:py-8">
+        <Link
+          href="/scholarships"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <Back className="h-4 w-4" />
+          {pick("كل المنح", "All scholarships")}
+        </Link>
 
-      <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-        {/* Hero card */}
-        <div className="relative mb-8 overflow-hidden rounded-2xl bg-gradient-to-br from-primary-900 via-primary-800 to-primary-700 p-6 sm:p-8 text-white shadow-xl">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.08),transparent_50%)]" />
-          <div className="relative">
-            <div className="mb-4 flex items-start justify-between">
-              <div className="flex items-center gap-3">
-                <span className="text-4xl">{getCountryFlag(scholarship.country)}</span>
-                <div>
-                  <p className="text-sm font-medium text-white/70">{scholarship.country}{scholarship.university ? ` · ${scholarship.university}` : ""}</p>
-                  <h1 className="text-h3 sm:text-h2 font-bold mt-1">{scholarship.nameEn}</h1>
-                  {scholarship.nameAr && <p className="mt-1 text-lg text-white/70" dir="rtl">{scholarship.nameAr}</p>}
-                </div>
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <Badge variant="outline" className="border-white/20 text-white/90 bg-white/10 rounded-full px-3 py-1">
-                <GraduationCap className="mr-1.5 h-3.5 w-3.5" />
-                {scholarship.degree}
-              </Badge>
-              {isUrgent ? (
-                <Badge className="bg-red-500 text-white rounded-full px-3 py-1">
-                  <Clock className="mr-1.5 h-3.5 w-3.5" />
-                  {daysLeft} days left
-                </Badge>
-              ) : daysLeft !== null ? (
-                <Badge variant="outline" className="border-white/20 text-white/90 bg-white/10 rounded-full px-3 py-1">
-                  <Calendar className="mr-1.5 h-3.5 w-3.5" />
-                  Due {formatDate(scholarship.deadline)}
-                </Badge>
-              ) : null}
-              <Badge variant="outline" className="border-white/20 text-white/90 bg-white/10 rounded-full px-3 py-1">
-                <Building2 className="mr-1.5 h-3.5 w-3.5" />
-                {scholarship.source ?? "Verified"}
-              </Badge>
-            </div>
-          </div>
-        </div>
-
-        <div className="grid gap-8 lg:grid-cols-3">
-          {/* Left column - main content */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Description */}
-            {scholarship.description && (
-              <Card className="border border-slate-200 rounded-xl shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <BookOpen className="h-4 w-4 text-primary" />
-                    About this Scholarship
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-slate-600 leading-relaxed dark:text-gray-300">{scholarship.description}</p>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Requirements */}
-            {requirements && (
-              <Card className="border border-slate-200 rounded-xl shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                    Requirements
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <JsonList data={requirements} />
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Benefits */}
-            {benefits && (
-              <Card className="border border-slate-200 rounded-xl shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <Award className="h-4 w-4 text-amber-500" />
-                    Benefits
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <JsonList data={benefits} />
-                </CardContent>
-              </Card>
+        {/* Header ------------------------------------------------------- */}
+        <header className="mt-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <VerificationBadge verified={s.isVerified} verifiedAt={s.verifiedAt} />
+            {days !== null && days > 0 && days <= 30 && (
+              <span className="rounded-full bg-[rgb(var(--accent-warm))]/15 px-2.5 py-1 text-xs font-medium text-[rgb(var(--accent-warm))]">
+                {pick(`متبقٍ ${num(days)} يوماً فقط`, `Only ${days} days left`)}
+              </span>
             )}
           </div>
 
-          {/* Right column - sidebar */}
-          <div className="space-y-6">
-            {/* Quick Info */}
-            <Card className="border border-slate-200 rounded-xl shadow-sm dark:border-gray-700 dark:bg-gray-800">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <Target className="h-4 w-4 text-primary" />
-                  Quick Info
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <InfoGrid
-                  rows={[
-                    { label: "Country", value: scholarship.country, icon: MapPin },
-                    { label: "University", value: scholarship.university ?? "Various", icon: Building2 },
-                    { label: "Degree", value: scholarship.degree, icon: GraduationCap },
-                    { label: "Deadline", value: formatDate(scholarship.deadline), icon: Calendar },
-                    { label: "Source", value: scholarship.source ?? "Manual", icon: Sparkles },
-                  ]}
+          <h1 className="font-display mt-3 text-2xl font-bold text-foreground sm:text-3xl">
+            {pick(s.nameAr, s.nameEn)}
+          </h1>
+
+          <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
+            <span className="inline-flex items-center gap-1.5">
+              <MapPin className="h-4 w-4" />
+              {s.country}
+            </span>
+            {s.university && (
+              <span className="inline-flex items-center gap-1.5">
+                <GraduationCap className="h-4 w-4" />
+                {s.university}
+              </span>
+            )}
+            <span className="inline-flex items-center gap-1.5">
+              <Calendar className="h-4 w-4" />
+              <DeadlineText deadline={s.deadline} deadlineType={s.deadlineType} days={days} />
+            </span>
+          </div>
+        </header>
+
+        <div className="mt-8 grid gap-6 lg:grid-cols-3">
+          <div className="space-y-6 lg:col-span-2">
+            {s.description && (
+              <Section title={pick("عن المنحة", "About this scholarship")}>
+                <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
+                  {s.description}
+                </p>
+              </Section>
+            )}
+
+            {s.benefits && (
+              <Section title={pick("ما تغطيه المنحة", "What it covers")}>
+                <BulletList text={s.benefits} tone="good" />
+              </Section>
+            )}
+
+            {s.requirements && (
+              <Section title={pick("شروط الأهلية", "Eligibility")}>
+                <BulletList text={s.requirements} />
+              </Section>
+            )}
+
+            {/* The differentiator: a dated plan, not just a date. */}
+            <RoadmapSection scholarship={s} profile={profile} />
+          </div>
+
+          {/* Facts panel ------------------------------------------------ */}
+          <aside className="space-y-4">
+            <div className="card-raised p-5">
+              <h2 className="text-sm font-semibold text-foreground">
+                {pick("المعايير", "At a glance")}
+              </h2>
+              <dl className="mt-4 space-y-3.5">
+                <Fact
+                  label={pick("الجنسيات المؤهلة", "Eligible nationalities")}
+                  values={s.eligibleCountries}
+                  allLabel={pick("جميع الجنسيات", "All nationalities")}
                 />
-              </CardContent>
-            </Card>
+                <Fact
+                  label={pick("الدرجات المقبولة", "Degree levels")}
+                  values={s.eligibleEducation}
+                />
+                <Fact
+                  label={pick("مجالات الدراسة", "Fields of study")}
+                  values={s.fieldOfStudy}
+                  allLabel={pick("جميع المجالات", "All fields")}
+                />
+                <Fact
+                  label={pick("العمر", "Age")}
+                  raw={
+                    s.minimumAge || s.maximumAge
+                      ? `${num(s.minimumAge ?? 18)}–${num(s.maximumAge ?? 99)}`
+                      : null
+                  }
+                />
+                <Fact
+                  label={pick("الحد الأدنى للمعدل", "Minimum GPA")}
+                  raw={s.minimumGPA ? num(s.minimumGPA) : null}
+                />
+                <Fact
+                  label={pick("الإنجليزية", "English")}
+                  raw={
+                    s.englishRequirement === "NOT_REQUIRED"
+                      ? pick("غير مطلوبة", "Not required")
+                      : s.englishRequirement
+                  }
+                />
+              </dl>
+            </div>
 
-            {/* Urgency Card */}
-            {daysLeft !== null && (
-              <Card className={`border rounded-xl shadow-sm ${isUrgent ? "border-red-200 bg-red-50/50 dark:border-red-900 dark:bg-red-900/20" : "border-slate-200 dark:border-gray-700 dark:bg-gray-800"}`}>
-                <CardContent className="p-5">
-                  <div className="flex items-center gap-3">
-                    <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${isUrgent ? "bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-300" : "bg-slate-100 text-slate-600 dark:bg-gray-700 dark:text-gray-300"}`}>
-                      <Clock className="h-6 w-6" />
-                    </div>
-                    <div>
-                      <p className={`text-sm font-medium ${isUrgent ? "text-red-800 dark:text-red-300" : "text-slate-600 dark:text-gray-300"}`}>Deadline</p>
-                      <p className={`text-xl font-bold ${isUrgent ? "text-red-700 dark:text-red-300" : "text-slate-900 dark:text-gray-100"}`}>
-                        {daysLeft > 0 ? `${daysLeft} days left` : "Past due"}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+            {s.requiredDocuments.length > 0 && (
+              <div className="card-raised p-5">
+                <h2 className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                  <FileText className="h-4 w-4 text-primary" />
+                  {pick("المستندات المطلوبة", "Required documents")}
+                </h2>
+                <ul className="mt-3 space-y-2">
+                  {s.requiredDocuments.map((d) => (
+                    <li key={d} className="flex items-start gap-2 text-sm text-muted-foreground">
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                      {DOC_LABELS[d] ? pick(DOC_LABELS[d].ar, DOC_LABELS[d].en) : d}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             )}
 
-            {/* CTA */}
-            <div className="space-y-3">
-              <Link href="/auth/signup">
-                <Button size="lg" className="w-full gap-2 text-base shadow-lg shadow-primary/20">
-                  <Target className="h-5 w-5" />
-                  Check Your Eligibility
-                </Button>
-              </Link>
-              <Link href="/scholarships">
-                <Button variant="outline" size="lg" className="w-full gap-2">
-                  <ExternalLink className="h-4 w-4" />
-                  Browse More Scholarships
-                </Button>
-              </Link>
-              {scholarship.sourceUrl && (
-                <a href={scholarship.sourceUrl} target="_blank" rel="noopener noreferrer">
-                  <Button variant="ghost" size="sm" className="w-full gap-1.5 text-xs text-muted-foreground">
-                    <ExternalLink className="h-3.5 w-3.5" />
-                    View official source
-                  </Button>
-                </a>
+            {s.sourceUrl && (
+              <a
+                href={s.sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3.5 text-sm font-semibold text-primary-foreground transition hover:opacity-90"
+              >
+                {pick("الصفحة الرسمية", "Official page")}
+                <ExternalLink className="h-4 w-4" />
+              </a>
+            )}
+
+            <p className="text-center text-xs leading-relaxed text-muted-foreground">
+              {pick(
+                "تحقّق دائماً من الصفحة الرسمية قبل التقديم — الشروط والمواعيد قد تتغيّر.",
+                "Always check the official page before applying — terms and deadlines change."
               )}
-            </div>
-          </div>
+            </p>
+          </aside>
         </div>
       </main>
+    </>
+  );
+}
+
+/* ------------------------------------------------------------------------- */
+
+function VerificationBadge({
+  verified,
+  verifiedAt,
+}: {
+  verified: boolean;
+  verifiedAt: string | null;
+}) {
+  const { pick } = useLanguage();
+  if (verified) {
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
+        <ShieldCheck className="h-3.5 w-3.5" />
+        {verifiedAt
+          ? pick(
+              `تم التحقق ${new Date(verifiedAt).toLocaleDateString("ar-EG")}`,
+              `Verified ${new Date(verifiedAt).toLocaleDateString("en-GB")}`
+            )
+          : pick("تم التحقق", "Verified")}
+      </span>
+    );
+  }
+  // Honest, not alarming: says what we know, not that the scholarship is bad.
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground">
+      <Info className="h-3.5 w-3.5" />
+      {pick("لم يُراجَع يدوياً بعد", "Not yet manually checked")}
+    </span>
+  );
+}
+
+function DeadlineText({
+  deadline,
+  deadlineType,
+  days,
+}: {
+  deadline: string | null;
+  deadlineType: string | null;
+  days: number | null;
+}) {
+  const { pick, num } = useLanguage();
+
+  if (deadline && days !== null) {
+    const d = new Date(deadline).toLocaleDateString(pick("ar-EG", "en-GB"), {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+    if (days <= 0) return <>{pick("انتهى الموعد", "Deadline passed")}</>;
+    return (
+      <>
+        {d} · {pick(`${num(days)} يوماً`, `${days} days`)}
+      </>
+    );
+  }
+  if (deadlineType === "ONGOING") {
+    return <>{pick("مفتوحة باستمرار", "Rolling — always open")}</>;
+  }
+  if (deadlineType === "ANNUAL") {
+    return <>{pick("تُفتح سنوياً", "Opens annually")}</>;
+  }
+  // Critically NOT "no deadline" — we simply don't know.
+  return <>{pick("الموعد غير مذكور في المصدر", "Deadline not stated by the source")}</>;
+}
+
+/**
+ * A single criterion.
+ *
+ * Three states, and the third is the one that matters: when the source doesn't
+ * state something we say so plainly instead of leaving a gap that reads as
+ * "no requirement".
+ */
+function Fact({
+  label,
+  values,
+  raw,
+  allLabel,
+}: {
+  label: string;
+  values?: string[];
+  raw?: string | null;
+  allLabel?: string;
+}) {
+  const { pick } = useLanguage();
+
+  let content: React.ReactNode;
+  if (values && values.length > 0) {
+    content =
+      values.length === 1 && (values[0] === "ALL" || values[0] === "ANY") ? (
+        <span className="text-foreground">{allLabel ?? values[0]}</span>
+      ) : (
+        <span className="text-foreground">{values.slice(0, 6).join("، ")}
+          {values.length > 6 && pick(` و${values.length - 6} أخرى`, ` +${values.length - 6} more`)}
+        </span>
+      );
+  } else if (raw) {
+    content = <span className="text-foreground">{raw}</span>;
+  } else {
+    content = (
+      <span className="text-muted-foreground">
+        {pick("غير مذكور", "Not stated")}
+      </span>
+    );
+  }
+
+  return (
+    <div>
+      <dt className="text-xs text-muted-foreground">{label}</dt>
+      <dd className="mt-0.5 text-sm">{content}</dd>
     </div>
   );
 }
 
-function InfoGrid({ rows }: { rows: { label: string; value: string; icon: React.ComponentType<{ className?: string }> }[] }) {
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <dl className="divide-y divide-slate-100 dark:divide-gray-700">
-      {rows.map(({ label, value, icon: Icon }) => (
-        <div key={label} className="flex items-center gap-3 py-3 text-sm">
-          <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
-          <dt className="text-muted-foreground">{label}</dt>
-          <dd className="ml-auto font-medium text-foreground text-right">{value}</dd>
-        </div>
-      ))}
-    </dl>
+    <section className="card-raised p-5 sm:p-6">
+      <h2 className="text-base font-semibold text-foreground">{title}</h2>
+      <div className="mt-3">{children}</div>
+    </section>
   );
 }
 
-function JsonList({ data }: { data: Record<string, unknown> }) {
+/** Source text arrives as newline-separated bullets. */
+function BulletList({ text, tone }: { text: string; tone?: "good" }) {
+  const items = text
+    .split("\n")
+    .map((l) => l.replace(/^[-•*]\s*/, "").trim())
+    .filter(Boolean);
+
+  if (items.length <= 1) {
+    return <p className="text-sm leading-relaxed text-muted-foreground">{text}</p>;
+  }
+
   return (
-    <dl className="divide-y divide-slate-100 dark:divide-gray-700">
-      {Object.entries(data).map(([key, value]) => (
-        <div key={key} className="py-3 text-sm">
-          <dt className="font-medium text-slate-700 capitalize mb-1 dark:text-gray-200">{key.replace(/_/g, " ")}</dt>
-          <dd className="text-slate-600 dark:text-gray-300">
-            {Array.isArray(value) ? (
-              <ul className="space-y-1.5">
-                {value.map((item, i) => (
-                  <li key={i} className="flex items-start gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
-                    <span>{String(item)}</span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <span>{displayValue(value)}</span>
-            )}
-          </dd>
-        </div>
+    <ul className="space-y-2">
+      {items.map((it, i) => (
+        <li key={i} className="flex items-start gap-2 text-sm leading-relaxed text-muted-foreground">
+          <CheckCircle2
+            className={`mt-0.5 h-4 w-4 shrink-0 ${tone === "good" ? "text-primary" : "text-muted-foreground/50"}`}
+          />
+          <span>{it}</span>
+        </li>
       ))}
-    </dl>
+    </ul>
+  );
+}
+
+
+/* ------------------------------------------------------------------------- */
+/* Roadmap                                                                    */
+/* ------------------------------------------------------------------------- */
+
+/**
+ * A listings site shows a deadline. This shows what to do and when.
+ *
+ * Students miss deadlines because they start three weeks too late, not because
+ * they forgot the date — so the plan works backwards from the deadline and
+ * accounts for the things with real lead times: referees need six weeks, IELTS
+ * results take two, universities are slow with transcripts.
+ */
+function RoadmapSection({
+  scholarship,
+  profile,
+}: {
+  scholarship: Scholarship;
+  profile: any;
+}) {
+  const { pick, num } = useLanguage();
+  const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
+
+  // Saved state has to survive a reload. Without this, someone who saved a plan
+  // yesterday returns to a button that still says "Save this plan" — so they
+  // press it again, unsure whether the first one worked. The upsert makes that
+  // harmless, but the uncertainty is the problem.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/roadmap");
+        if (!res.ok) return; // signed out — leave the button in its idle state
+        const json = await res.json();
+        const already = Array.isArray(json?.data)
+          && json.data.some((m: { scholarshipId: string }) => m.scholarshipId === scholarship.id);
+        if (already && !cancelled) setSaveState("saved");
+      } catch {
+        /* the button just stays idle */
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [scholarship.id]);
+
+  const roadmap = generateRoadmap({
+    deadline: scholarship.deadline ? new Date(scholarship.deadline) : null,
+    deadlineType: scholarship.deadlineType,
+    requiredDocuments: scholarship.requiredDocuments,
+    targetDegree: profile?.targetDegree ?? null,
+    hasEnglishTest: profile?.hasEnglishTest ?? null,
+    englishRequirement: scholarship.englishRequirement,
+  });
+
+  return (
+    <Section title={pick("خطتك الزمنية", "Your roadmap")}>
+      {roadmap.milestones.length === 0 ? (
+        <p className="text-sm leading-relaxed text-muted-foreground">
+          {pick(roadmap.reasonAr ?? "", roadmap.reasonEn ?? "")}
+        </p>
+      ) : (
+        <>
+          {roadmap.compressed && (
+            <div className="mb-5 flex items-start gap-2 rounded-xl border border-[rgb(var(--accent-warm))]/40 bg-[rgb(var(--accent-warm))]/10 p-3.5">
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[rgb(var(--accent-warm))]" />
+              <p className="text-xs leading-relaxed text-[rgb(var(--accent-warm))]">
+                {pick(roadmap.reasonAr ?? "", roadmap.reasonEn ?? "")}
+              </p>
+            </div>
+          )}
+
+          <ol>
+            {roadmap.milestones.map((m, i, arr) => (
+              <MilestoneRow key={m.key} m={m} last={i === arr.length - 1} />
+            ))}
+          </ol>
+
+          <div className="mt-5 border-t border-border pt-5">
+            <button
+              onClick={async () => {
+                setSaveState("saving");
+                try {
+                  const res = await fetch("/api/roadmap", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      scholarshipId: scholarship.id,
+                      milestones: roadmap.milestones.map((m) => ({
+                        key: m.key,
+                        dueDate: m.date.toISOString(),
+                      })),
+                    }),
+                  });
+                  setSaveState(res.ok ? "saved" : "error");
+                } catch {
+                  setSaveState("error");
+                }
+              }}
+              disabled={saveState === "saving"}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:opacity-90 disabled:opacity-60 sm:w-auto"
+            >
+              {saveState === "saved" ? (
+                <>
+                  <CheckCircle2 className="h-4 w-4" />
+                  {pick("تم الحفظ — سنذكّرك", "Saved — we'll remind you")}
+                </>
+              ) : saveState === "saving" ? (
+                pick("جارٍ الحفظ…", "Saving…")
+              ) : (
+                <>
+                  <Calendar className="h-4 w-4" />
+                  {pick("احفظ الخطة وذكّرني", "Save this plan and remind me")}
+                </>
+              )}
+            </button>
+
+            {saveState === "saved" && (
+              <Link
+                href="/dashboard/roadmap"
+                className="mt-3 block text-sm text-primary hover:underline"
+              >
+                {pick("عرض كل خططي", "View all my plans")}
+              </Link>
+            )}
+            {/* Deadlines get corrected and profiles change, so re-saving is a
+                real action, not a no-op — the upsert refreshes the dates while
+                keeping whatever the student has already ticked off. */}
+            {saveState === "error" && (
+              <p className="mt-2 text-sm text-destructive">
+                {pick(
+                  "تعذّر الحفظ. سجّل الدخول ثم حاول مرة أخرى.",
+                  "Couldn't save. Sign in and try again."
+                )}
+              </p>
+            )}
+
+            <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+              {pick(
+                `خطة تقديرية من ${num(roadmap.milestones.length)} خطوة مبنية على المواعيد المعتادة. عدّلها حسب ظروفك.`,
+                `An estimate — ${roadmap.milestones.length} steps based on typical lead times. Adjust it to your situation.`
+              )}
+            </p>
+          </div>
+        </>
+      )}
+    </Section>
+  );
+}
+
+function MilestoneRow({ m, last }: { m: Milestone; last: boolean }) {
+  const { pick, language } = useLanguage();
+
+  const date = m.date.toLocaleDateString(language === "ar" ? "ar-EG" : "en-GB", {
+    day: "numeric",
+    month: "short",
+  });
+
+  return (
+    <li className="flex gap-3">
+      <div className="flex flex-col items-center">
+        <span
+          className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${
+            m.critical
+              ? "bg-primary"
+              : m.overdue
+                ? "bg-[rgb(var(--accent-warm))]"
+                : "bg-border"
+          }`}
+        />
+        {!last && <span className="w-px flex-1 bg-border" />}
+      </div>
+
+      <div className="flex-1 pb-5">
+        <div className="flex flex-wrap items-baseline gap-x-2">
+          <span
+            className={`text-xs font-medium ${
+              m.overdue ? "text-[rgb(var(--accent-warm))]" : "text-muted-foreground"
+            }`}
+          >
+            {date}
+          </span>
+          <span
+            className={`text-sm ${
+              m.critical ? "font-semibold text-primary" : "text-foreground"
+            }`}
+          >
+            {pick(m.titleAr, m.titleEn)}
+          </span>
+          {m.overdue && (
+            <span className="text-xs text-[rgb(var(--accent-warm))]">
+              {pick("متأخر", "overdue")}
+            </span>
+          )}
+        </div>
+        {(m.noteAr || m.noteEn) && (
+          <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
+            {pick(m.noteAr ?? "", m.noteEn ?? "")}
+          </p>
+        )}
+      </div>
+    </li>
+  );
+}
+
+function DetailSkeleton() {
+  return (
+    <>
+      <Nav />
+      <main className="page-container animate-pulse py-8">
+        <div className="h-4 w-28 rounded bg-muted" />
+        <div className="mt-4 h-6 w-40 rounded-full bg-muted" />
+        <div className="mt-3 h-9 w-2/3 rounded bg-muted" />
+        <div className="mt-3 h-4 w-1/2 rounded bg-muted" />
+        <div className="mt-8 grid gap-6 lg:grid-cols-3">
+          <div className="space-y-6 lg:col-span-2">
+            <div className="h-40 rounded-xl bg-muted" />
+            <div className="h-32 rounded-xl bg-muted" />
+          </div>
+          <div className="space-y-4">
+            <div className="h-64 rounded-xl bg-muted" />
+            <div className="h-12 rounded-xl bg-muted" />
+          </div>
+        </div>
+      </main>
+    </>
   );
 }

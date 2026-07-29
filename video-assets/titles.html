@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Scholarship Hub — video title cards</title>
+<!--
+  Animated title cards for the competition video.
+
+  WHY THIS EXISTS
+  Paid motion-graphics tools produce something that looks like a template.
+  These are built from your actual brand tokens — the same teal, the same
+  radii, the same type scale as the product — so the video and the site look
+  like one thing. That coherence is what reads as "professional".
+
+  HOW TO USE
+  1. Open this file in Chrome. Press F11 for fullscreen.
+  2. Start your screen recorder (Win + Alt + R).
+  3. Click anywhere, or press SPACE, to play the next card.
+     Each card animates in, holds ~3s, then fades. Record the whole run.
+  4. In CapCut, cut the cards you want between your screen-recording clips.
+     Set the clip's blend mode or just hard-cut — the black background is
+     designed to cut cleanly against footage.
+
+  Press R to replay the current card. Press 1-6 to jump to a specific card.
+
+  All animation is CSS. No dependencies, no build step, works offline.
+-->
+<style>
+  /* Brand tokens, lifted from src/app/globals.css so the video matches the
+     product exactly rather than approximately. */
+  :root {
+    --brand-deep: rgb(6, 78, 59);
+    --brand-mid: rgb(13, 148, 136);
+    --teal-light: rgb(94, 234, 212);
+    --teal-pale: rgb(153, 246, 228);
+    --warm: rgb(251, 191, 36);
+    --ink: rgb(236, 253, 245);
+    --muted: rgb(148, 180, 172);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: #000;
+    overflow: hidden;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    cursor: none;
+  }
+
+  /* 16:9 stage. Everything scales from viewport width so the cards look
+     identical whether you record at 1080p or 1440p. */
+  .stage {
+    position: relative;
+    width: 100vw; height: 100vh;
+    display: grid; place-items: center;
+    background:
+      radial-gradient(ellipse 80% 60% at 30% 20%, rgba(13,148,136,0.28), transparent 60%),
+      radial-gradient(ellipse 70% 50% at 75% 80%, rgba(6,78,59,0.45), transparent 60%),
+      linear-gradient(135deg, #041614 0%, #062a26 100%);
+  }
+
+  .card {
+    display: none;
+    text-align: center;
+    padding: 0 8vw;
+    max-width: 1400px;
+  }
+  .card.active { display: block; }
+
+  /* --- Typography ------------------------------------------------------ */
+  .kicker {
+    font-size: 1.6vw;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--teal-light);
+    font-weight: 600;
+    margin-bottom: 2.2vh;
+  }
+  .headline {
+    font-size: 5.4vw;
+    line-height: 1.1;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+  .headline .accent { color: var(--teal-light); }
+  .headline .warm { color: var(--warm); }
+  .sub {
+    margin-top: 3vh;
+    font-size: 2vw;
+    line-height: 1.5;
+    color: var(--muted);
+    font-weight: 400;
+  }
+  .arabic {
+    font-size: 4.6vw;
+    direction: rtl;
+    line-height: 1.6;
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  /* --- Entrance animations --------------------------------------------- */
+  /* Staggered rather than everything-at-once: the eye lands on one thing,
+     then the next. Simultaneous entrances read as a PowerPoint transition. */
+  .card.active .kicker   { animation: riseIn 0.7s cubic-bezier(.16,1,.3,1) both; }
+  .card.active .headline { animation: riseIn 0.8s cubic-bezier(.16,1,.3,1) 0.12s both; }
+  .card.active .sub      { animation: riseIn 0.8s cubic-bezier(.16,1,.3,1) 0.26s both; }
+  .card.active .arabic   { animation: riseIn 0.8s cubic-bezier(.16,1,.3,1) 0.1s both; }
+  .card.active .stat     { animation: popIn 0.7s cubic-bezier(.34,1.56,.64,1) both; }
+  .card.active .stat:nth-child(2) { animation-delay: 0.14s; }
+  .card.active .stat:nth-child(3) { animation-delay: 0.28s; }
+
+  @keyframes riseIn {
+    from { opacity: 0; transform: translateY(2.4vh); filter: blur(6px); }
+    to   { opacity: 1; transform: translateY(0);     filter: blur(0); }
+  }
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.86); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  /* --- Stat row --------------------------------------------------------- */
+  .stats { display: flex; gap: 5vw; justify-content: center; margin-top: 5vh; }
+  .stat { text-align: center; }
+  .stat .num {
+    font-size: 5vw; font-weight: 700; color: var(--teal-light);
+    line-height: 1; letter-spacing: -0.03em;
+  }
+  .stat .lbl {
+    font-size: 1.3vw; color: var(--muted); margin-top: 1vh;
+    letter-spacing: 0.06em; text-transform: uppercase;
+  }
+
+  /* --- Timeline card ---------------------------------------------------- */
+  .timeline { margin-top: 5vh; display: flex; flex-direction: column; gap: 2.2vh; }
+  .step {
+    display: flex; align-items: center; gap: 1.6vw;
+    opacity: 0;
+    animation: slideIn 0.6s cubic-bezier(.16,1,.3,1) both;
+  }
+  .card.active .step:nth-child(1) { animation-delay: 0.25s; }
+  .card.active .step:nth-child(2) { animation-delay: 0.45s; }
+  .card.active .step:nth-child(3) { animation-delay: 0.65s; }
+  .card.active .step:nth-child(4) { animation-delay: 0.85s; }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-3vw); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  .dot {
+    width: 1.1vw; height: 1.1vw; border-radius: 50%;
+    background: var(--brand-mid); flex-shrink: 0;
+    box-shadow: 0 0 0 0.4vw rgba(13,148,136,0.18);
+  }
+  .step.final .dot { background: var(--warm); box-shadow: 0 0 0 0.4vw rgba(251,191,36,0.2); }
+  .step .when {
+    font-size: 1.5vw; color: var(--teal-light); font-weight: 600;
+    width: 12vw; text-align: start; letter-spacing: 0.03em;
+  }
+  .step .what { font-size: 2vw; color: var(--ink); font-weight: 500; }
+
+  /* --- Logo card -------------------------------------------------------- */
+  .logo-row { display: flex; align-items: center; justify-content: center; gap: 1.6vw; }
+  .mark {
+    width: 7vw; height: 7vw; border-radius: 1.6vw;
+    background: linear-gradient(135deg, var(--brand-mid), var(--teal-light));
+    display: grid; place-items: center;
+    font-size: 3.6vw; font-weight: 700; color: var(--brand-deep);
+    box-shadow: 0 1vw 3vw rgba(13,148,136,0.35);
+  }
+  .wordmark { font-size: 4.4vw; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; }
+
+  /* Progress hint — invisible in the recording, useful while rehearsing.
+     Press H to hide it entirely before the real take. */
+  .hint {
+    position: fixed; bottom: 2vh; left: 50%; transform: translateX(-50%);
+    font-size: 0.9vw; color: rgba(255,255,255,0.22); letter-spacing: 0.1em;
+  }
+  .hint.hidden { display: none; }
+</style>
+</head>
+<body>
+
+<div class="stage">
+
+  <!-- 1 — Cold open -->
+  <div class="card active" data-card="1">
+    <div class="kicker">The problem</div>
+    <div class="headline">
+      Students don't miss scholarships<br>because they forget the deadline.
+    </div>
+    <div class="sub">They miss them because they started <span style="color:var(--warm)">three weeks too late.</span></div>
+  </div>
+
+  <!-- 2 — Arabic hook -->
+  <div class="card" data-card="2">
+    <div class="kicker">Arabic-first</div>
+    <div class="arabic">منصّة المنح الدراسية<br>الأولى بالعربية</div>
+    <div class="sub">Built for students across the Middle East and North Africa</div>
+  </div>
+
+  <!-- 3 — The differentiator -->
+  <div class="card" data-card="3">
+    <div class="kicker">What makes it different</div>
+    <div class="headline">Every site shows a date.<br><span class="accent">We show the plan.</span></div>
+    <div class="timeline">
+      <div class="step"><span class="dot"></span><span class="when">120 days out</span><span class="what">Start IELTS preparation</span></div>
+      <div class="step"><span class="dot"></span><span class="when">60 days out</span><span class="what">Request recommendation letters</span></div>
+      <div class="step"><span class="dot"></span><span class="when">14 days out</span><span class="what">Assemble every document</span></div>
+      <div class="step final"><span class="dot"></span><span class="when">Deadline</span><span class="what">Submit — a week early</span></div>
+    </div>
+  </div>
+
+  <!-- 4 — Honesty -->
+  <div class="card" data-card="4">
+    <div class="kicker">Why it can be trusted</div>
+    <div class="headline">When the source doesn't say,<br><span class="accent">we say "not listed".</span></div>
+    <div class="sub">A tool that tells you you qualify when nobody has said so<br>is worse than no tool at all.</div>
+  </div>
+
+  <!-- 5 — Numbers -->
+  <div class="card" data-card="5">
+    <div class="kicker">Today</div>
+    <div class="stats">
+      <div class="stat"><div class="num">234</div><div class="lbl">Scholarships</div></div>
+      <div class="stat"><div class="num">15</div><div class="lbl">Dated steps</div></div>
+      <div class="stat"><div class="num">2</div><div class="lbl">Languages</div></div>
+    </div>
+    <div class="sub" style="margin-top:6vh">Free to search. Free to match. Free to plan.</div>
+  </div>
+
+  <!-- 6 — Close -->
+  <div class="card" data-card="6">
+    <div class="logo-row">
+      <div class="mark">S</div>
+      <div class="wordmark">Scholarship Hub</div>
+    </div>
+    <div class="sub" style="margin-top:4vh">
+      <!-- Replace with your real domain before recording. -->
+      scholarshiphub.example
+    </div>
+  </div>
+
+</div>
+
+<div class="hint">SPACE / click → next · R → replay · 1-6 → jump · H → hide this</div>
+
+<script>
+  const cards = Array.from(document.querySelectorAll('.card'));
+  const hint = document.querySelector('.hint');
+  let i = 0;
+
+  function show(n) {
+    if (n < 0 || n >= cards.length) return;
+    cards.forEach(c => c.classList.remove('active'));
+    i = n;
+    // Force a reflow so the CSS animations restart from the beginning
+    // rather than being skipped because the element was already animated.
+    void cards[i].offsetWidth;
+    cards[i].classList.add('active');
+  }
+
+  function next() { show((i + 1) % cards.length); }
+  function replay() { const n = i; show(-1); cards.forEach(c => c.classList.remove('active')); void cards[n].offsetWidth; show(n); }
+
+  document.body.addEventListener('click', next);
+  document.addEventListener('keydown', (e) => {
+    if (e.code === 'Space') { e.preventDefault(); next(); }
+    else if (e.key.toLowerCase() === 'r') replay();
+    else if (e.key.toLowerCase() === 'h') hint.classList.toggle('hidden');
+    else if (/^[1-9]$/.test(e.key)) show(parseInt(e.key, 10) - 1);
+  });
+</script>
+</body>
+</html>

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { scholarshipCreateSchema, scholarshipQuerySchema } from "@/lib/validations/scholarship";
 import { successResponse, handleApiError } from "@/lib/api-utils";
 import { createApiClient } from "@/lib/supabase/api-auth";
+import { withVisibility } from "@/lib/scholarship-filters";
 import type { Prisma } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
@@ -13,20 +14,25 @@ export async function GET(request: NextRequest) {
       Object.fromEntries(request.nextUrl.searchParams.entries())
     );
 
-    const where: Prisma.ScholarshipWhereInput = {};
+    const filters: Prisma.ScholarshipWhereInput = {};
 
     if (query.country) {
-      where.country = query.country;
+      filters.country = query.country;
     }
     if (query.degree) {
-      where.degree = query.degree;
+      filters.degree = query.degree;
     }
     if (query.search) {
-      where.OR = [
-        { nameAr: { contains: query.search } },
-        { nameEn: { contains: query.search } },
+      filters.OR = [
+        { nameAr: { contains: query.search, mode: "insensitive" } },
+        { nameEn: { contains: query.search, mode: "insensitive" } },
+        { university: { contains: query.search, mode: "insensitive" } },
       ];
     }
+
+    // Visibility rules are merged in rather than set directly, so a caller
+    // can't accidentally overwrite them by assigning `where.OR` for search.
+    const where = withVisibility(filters);
 
     const orderBy: Prisma.ScholarshipOrderByWithRelationInput = (() => {
       switch (query.sort) {

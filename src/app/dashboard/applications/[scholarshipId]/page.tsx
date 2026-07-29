@@ -100,7 +100,7 @@ function getDocumentIcon(type: string) {
     case "TRANSCRIPT":
       return <BookOpen size={size} className="text-emerald-500" />;
     default:
-      return <FileText size={size} className="text-slate-500" />;
+      return <FileText size={size} className="text-muted-foreground" />;
   }
 }
 
@@ -256,9 +256,9 @@ export default function ApplicationJourneyPage() {
       <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-slate-50 to-white">
         <div className="flex flex-col items-center gap-4">
           <div className="relative">
-            <div className="h-12 w-12 animate-spin rounded-full border-4 border-slate-200 border-t-indigo-600" />
+            <div className="h-12 w-12 animate-spin rounded-full border-4 border-border border-t-indigo-600" />
           </div>
-          <p className="text-sm font-medium text-slate-500">
+          <p className="text-sm font-medium text-muted-foreground">
             Loading your application...
           </p>
         </div>
@@ -273,10 +273,10 @@ export default function ApplicationJourneyPage() {
           <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
             <AlertCircle size={32} className="text-red-500" />
           </div>
-          <p className="mb-2 text-lg font-semibold text-slate-900">
+          <p className="mb-2 text-lg font-semibold text-foreground">
             Something went wrong
           </p>
-          <p className="mb-6 text-sm text-slate-500">
+          <p className="mb-6 text-sm text-muted-foreground">
             {error ?? "Application not found"}
           </p>
           <Button
@@ -341,7 +341,7 @@ export default function ApplicationJourneyPage() {
               value={app.progress}
               size="lg"
               animated
-              className="[&>div]:bg-white/20 [&>div>div]:bg-white"
+              className="[&>div]:bg-white/20 [&>div>div]:bg-card"
             />
           </div>
         </div>
@@ -369,7 +369,7 @@ export default function ApplicationJourneyPage() {
                               ? "bg-green-500 text-white shadow-md shadow-green-200"
                               : active
                                 ? "border-2 border-indigo-600 bg-indigo-50 text-indigo-600 shadow-md shadow-indigo-200 ring-2 ring-indigo-200"
-                                : "border-2 border-slate-200 bg-white text-slate-400"
+                                : "border-2 border-border bg-card text-muted-foreground"
                           }`}
                         >
                           {done ? (
@@ -386,7 +386,7 @@ export default function ApplicationJourneyPage() {
                               ? "text-green-700"
                               : active
                                 ? "font-semibold text-indigo-700"
-                                : "text-slate-400"
+                                : "text-muted-foreground"
                           }`}
                         >
                           {p.label}
@@ -397,7 +397,7 @@ export default function ApplicationJourneyPage() {
                           className={`mx-2 mt-0.5 h-0.5 flex-1 self-start sm:mx-4 ${
                             phase.current > p.num
                               ? "bg-green-500"
-                              : "bg-slate-200"
+                              : "bg-muted"
                           }`}
                           style={{ marginTop: "19px" }}
                         />
@@ -441,7 +441,7 @@ export default function ApplicationJourneyPage() {
                           ? "border-green-200 bg-green-50/60"
                           : needsWork
                             ? "border-red-200 bg-red-50/60"
-                            : "border-slate-200 bg-white hover:border-slate-300"
+                            : "border-border bg-card hover:border-border"
                       }`}
                     >
                       <div className="flex items-start justify-between gap-4">
@@ -452,14 +452,14 @@ export default function ApplicationJourneyPage() {
                                 ? "bg-green-100"
                                 : needsWork
                                   ? "bg-red-100"
-                                  : "bg-slate-100"
+                                  : "bg-muted"
                             }`}
                           >
                             {getDocumentIcon(doc.documentType)}
                           </div>
                           <div className="min-w-0 flex-1">
                             <div className="flex flex-wrap items-center gap-2">
-                              <span className="truncate text-sm font-medium text-slate-900">
+                              <span className="truncate text-sm font-medium text-foreground">
                                 {docTypeLabels[doc.documentType] ??
                                   doc.documentType}
                               </span>
@@ -478,7 +478,7 @@ export default function ApplicationJourneyPage() {
                                   size="sm"
                                   className="max-w-[120px]"
                                 />
-                                <span className="text-xs font-medium text-slate-500">
+                                <span className="text-xs font-medium text-muted-foreground">
                                   AI Score: {doc.aiScore}/10
                                 </span>
                               </div>
@@ -513,7 +513,7 @@ export default function ApplicationJourneyPage() {
                             <div className="flex gap-2">
                               {doc.uploadedDocument && (
                                 <a
-                                  href={doc.uploadedDocument.fileUrl}
+                                  href={`/api/documents/${doc.uploadedDocument.id}/file`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                 >
@@ -585,7 +585,7 @@ export default function ApplicationJourneyPage() {
                             <div className="flex items-center gap-2">
                               {doc.uploadedDocument && (
                                 <a
-                                  href={doc.uploadedDocument.fileUrl}
+                                  href={`/api/documents/${doc.uploadedDocument.id}/file`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                 >
@@ -653,7 +653,7 @@ export default function ApplicationJourneyPage() {
                         ? "bg-amber-50 border border-amber-200"
                         : deadlineUrgency.color === "green"
                           ? "bg-green-50 border border-green-200"
-                          : "bg-slate-50 border border-slate-200"
+                          : "bg-muted border border-border"
                   }`}
                 >
                   <p
@@ -664,7 +664,7 @@ export default function ApplicationJourneyPage() {
                           ? "text-amber-600"
                           : deadlineUrgency.color === "green"
                             ? "text-green-600"
-                            : "text-slate-600"
+                            : "text-muted-foreground"
                     }`}
                   >
                     {deadlineUrgency.daysLeft !== null
@@ -679,7 +679,7 @@ export default function ApplicationJourneyPage() {
                           ? "text-amber-500"
                           : deadlineUrgency.color === "green"
                             ? "text-green-500"
-                            : "text-slate-400"
+                            : "text-muted-foreground"
                     }`}
                   >
                     {deadlineUrgency.daysLeft !== null
@@ -687,7 +687,7 @@ export default function ApplicationJourneyPage() {
                       : "No deadline set"}
                   </p>
                   {sch.deadline && (
-                    <p className="mt-2 text-xs text-slate-500">
+                    <p className="mt-2 text-xs text-muted-foreground">
                       {new Date(sch.deadline).toLocaleDateString("en-US", {
                         month: "long",
                         day: "numeric",
@@ -708,12 +708,12 @@ export default function ApplicationJourneyPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm">
-                <div className="flex items-start gap-3 rounded-lg p-2.5 transition-colors hover:bg-slate-50">
+                <div className="flex items-start gap-3 rounded-lg p-2.5 transition-colors hover:bg-muted">
                   <div
                     className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${
                       app.progress >= 70
                         ? "bg-green-100 text-green-600"
-                        : "bg-slate-100 text-slate-400"
+                        : "bg-muted text-muted-foreground"
                     }`}
                   >
                     {app.progress >= 70 ? (
@@ -727,24 +727,24 @@ export default function ApplicationJourneyPage() {
                       className={`text-xs font-medium ${
                         app.progress >= 70
                           ? "text-green-700"
-                          : "text-slate-600"
+                          : "text-muted-foreground"
                       }`}
                     >
                       Complete all documents
                     </p>
-                    <p className="mt-0.5 text-[11px] text-slate-400">
+                    <p className="mt-0.5 text-[11px] text-muted-foreground">
                       {app.documents.filter((d) => d.status === "READY").length}
                       /{app.documents.length} ready
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3 rounded-lg p-2.5 transition-colors hover:bg-slate-50">
+                <div className="flex items-start gap-3 rounded-lg p-2.5 transition-colors hover:bg-muted">
                   <div
                     className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${
                       app.progress >= 90
                         ? "bg-green-100 text-green-600"
-                        : "bg-slate-100 text-slate-400"
+                        : "bg-muted text-muted-foreground"
                     }`}
                   >
                     {app.progress >= 90 ? (
@@ -758,12 +758,12 @@ export default function ApplicationJourneyPage() {
                       className={`text-xs font-medium ${
                         app.progress >= 90
                           ? "text-green-700"
-                          : "text-slate-600"
+                          : "text-muted-foreground"
                       }`}
                     >
                       Submit application
                     </p>
-                    <p className="mt-0.5 text-[11px] text-slate-400">
+                    <p className="mt-0.5 text-[11px] text-muted-foreground">
                       {daysLeft !== null
                         ? `${daysLeft} days to submit`
                         : "No deadline"}
@@ -771,15 +771,15 @@ export default function ApplicationJourneyPage() {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3 rounded-lg p-2.5 transition-colors hover:bg-slate-50">
-                  <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+                <div className="flex items-start gap-3 rounded-lg p-2.5 transition-colors hover:bg-muted">
+                  <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
                     <ChevronRight size={14} />
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-slate-600">
+                    <p className="text-xs font-medium text-muted-foreground">
                       Prepare for interview
                     </p>
-                    <p className="mt-0.5 text-[11px] text-slate-400">
+                    <p className="mt-0.5 text-[11px] text-muted-foreground">
                       After submission
                     </p>
                   </div>
@@ -878,7 +878,7 @@ export default function ApplicationJourneyPage() {
                     daysLeft !== null && daysLeft <= 30
                   ) &&
                   !app.documents.every((d) => d.status === "READY") && (
-                    <p className="text-xs text-slate-400">
+                    <p className="text-xs text-muted-foreground">
                       Continue working on your documents to get personalized
                       recommendations.
                     </p>
@@ -900,7 +900,7 @@ export default function ApplicationJourneyPage() {
                     {reqList.map((req, i) => (
                       <li
                         key={i}
-                        className="flex items-start gap-2 text-xs text-slate-600"
+                        className="flex items-start gap-2 text-xs text-muted-foreground"
                       >
                         <span className="mt-1 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-[9px] font-medium text-indigo-600">
                           {i + 1}

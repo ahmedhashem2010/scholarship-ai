@@ -181,15 +181,15 @@ export function ScholarshipCardList({ scholarships }: { scholarships: Scholarshi
       <div className="flex flex-col gap-4">
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute start-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search by name, country, university..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-11 pr-10 h-12 rounded-xl border-primary/10 bg-card"
+              className="ps-11 pe-10 h-12 rounded-xl border-primary/10 bg-card"
             />
             {search && (
-              <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+              <button onClick={() => setSearch("")} className="absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                 <X className="h-4 w-4" />
               </button>
             )}
@@ -202,7 +202,7 @@ export function ScholarshipCardList({ scholarships }: { scholarships: Scholarshi
             <SlidersHorizontal className="h-4 w-4" />
             Filters
             {activeFilterCount > 0 && (
-              <span className="ml-1 inline-flex items-center justify-center h-5 min-w-5 rounded-full bg-primary text-white text-xs font-medium px-1">
+              <span className="ms-1 inline-flex items-center justify-center h-5 min-w-5 rounded-full bg-primary text-white text-xs font-medium px-1">
                 {activeFilterCount}
               </span>
             )}
@@ -210,7 +210,7 @@ export function ScholarshipCardList({ scholarships }: { scholarships: Scholarshi
         </div>
 
         {showFilters && (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 p-5 rounded-2xl border border-primary/10 bg-gradient-to-br from-card to-primary/[0.02]">
+          <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 p-5 rounded-2xl border border-primary/10 bg-gradient-to-br from-card to-primary/[0.02]">
             <div className="space-y-2">
               <label className="text-xs font-semibold text-primary flex items-center gap-1">
                 <MapPin className="h-3 w-3" /> Country
@@ -295,7 +295,7 @@ export function ScholarshipCardList({ scholarships }: { scholarships: Scholarshi
             <div className={`h-1 w-full ${getCompetitionColor(sch.competitionLevel)}`} />
             
             {/* Decorative Corner */}
-            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-primary/5 to-transparent rounded-bl-full" />
+            <div className="absolute top-0 end-0 w-24 h-24 bg-gradient-to-bl from-primary/5 to-transparent rounded-bl-full" />
 
             <CardHeader className="space-y-3 pb-2 relative">
               <div className="flex items-start justify-between">
@@ -395,7 +395,7 @@ export function ScholarshipCardList({ scholarships }: { scholarships: Scholarshi
             onClick={() => router.push(`/dashboard/compare?ids=${Array.from(selected).join(",")}`)}
             className="shadow-xl shadow-primary/20 rounded-xl px-6"
           >
-            <Sparkles className="h-4 w-4 mr-2" />
+            <Sparkles className="h-4 w-4 me-2" />
             Compare Selected ({selected.size})
           </Button>
         </div>

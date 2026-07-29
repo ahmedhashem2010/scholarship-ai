@@ -31,8 +31,8 @@ export default function ScholarshipsPage() {
           <div className="animate-pulse relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-primary-700 to-primary-900 p-6 sm:p-8 text-white">
             <div className="relative z-10">
               <div className="h-4 w-48 rounded bg-white/20" />
-              <div className="h-8 w-96 mt-4 rounded bg-white/20" />
-              <div className="h-4 w-72 mt-3 rounded bg-white/20" />
+              <div className="h-8 w-full max-w-96 mt-4 rounded bg-white/20" />
+              <div className="h-4 w-full max-w-72 mt-3 rounded bg-white/20" />
             </div>
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

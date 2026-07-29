@@ -16,7 +16,7 @@ export function ReviewDisplay({ review }: { review: ReviewScore }) {
             <div className="text-5xl font-bold text-blue-600 dark:text-blue-400">
               {mainScore}
             </div>
-            <div className="mt-2 text-lg text-gray-600 dark:text-gray-400">
+            <div className="mt-2 text-lg text-muted-foreground dark:text-gray-400">
               Overall Score (Average)
             </div>
           </CardTitle>
@@ -34,7 +34,7 @@ export function ReviewDisplay({ review }: { review: ReviewScore }) {
           <CardContent>
             <div className="text-3xl font-bold text-blue-600">
               {review.overallQuality.score}
-              <span className="text-lg text-gray-500">/10</span>
+              <span className="text-lg text-muted-foreground">/10</span>
             </div>
             <p className="mt-2 text-xs font-semibold text-green-600 dark:text-green-400">
               Strengths: {review.overallQuality.strengthsSummary}
@@ -54,9 +54,9 @@ export function ReviewDisplay({ review }: { review: ReviewScore }) {
           <CardContent>
             <div className="text-3xl font-bold text-green-600">
               {review.atsCompatibility.score}
-              <span className="text-lg text-gray-500">/10</span>
+              <span className="text-lg text-muted-foreground">/10</span>
             </div>
-            <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+            <p className="mt-2 text-xs text-muted-foreground dark:text-gray-400">
               <span className="font-semibold">Missing Keywords:</span>
               {review.atsCompatibility.missingKeywords.length > 0
                 ? ` ${review.atsCompatibility.missingKeywords.join(", ")}`
@@ -74,9 +74,9 @@ export function ReviewDisplay({ review }: { review: ReviewScore }) {
           <CardContent>
             <div className="text-3xl font-bold text-purple-600">
               {review.competitiveness.score}
-              <span className="text-lg text-gray-500">/10</span>
+              <span className="text-lg text-muted-foreground">/10</span>
             </div>
-            <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+            <p className="mt-2 text-xs text-muted-foreground dark:text-gray-400">
               {review.competitiveness.uniqueStrengths}
             </p>
           </CardContent>

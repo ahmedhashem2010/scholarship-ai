@@ -116,7 +116,7 @@ export default function GlossaryPage() {
         ))}
       </div>
 
-      <div className="rounded-2xl border-2 border-dashed border-slate-200 bg-white p-10 text-center">
+      <div className="rounded-2xl border-2 border-dashed border-border bg-card p-10 text-center">
         <Search className="mx-auto h-8 w-8 text-muted-foreground mb-3" />
         <h2 className="text-base font-semibold text-foreground mb-1">Can&apos;t find a term?</h2>
         <p className="text-sm text-muted-foreground">

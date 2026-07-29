@@ -48,10 +48,17 @@ export async function GET(
 
     const buffer = Buffer.from(await data.arrayBuffer());
 
+    // fileName is whatever the user named their upload. Interpolating it raw
+    // into a header lets a filename containing a quote or CRLF break out of
+    // the header value, so strip anything that isn't safe and keep the real
+    // name in the RFC 5987 form alongside it.
+    const asciiName = document.fileName.replace(/[^\x20-\x7E]/g, "_").replace(/["\\]/g, "_");
+    const utf8Name = encodeURIComponent(document.fileName);
+
     return new NextResponse(buffer, {
       headers: {
         "Content-Type": document.fileType || "application/octet-stream",
-        "Content-Disposition": `inline; filename="${document.fileName}"`,
+        "Content-Disposition": `inline; filename="${asciiName}"; filename*=UTF-8''${utf8Name}`,
         "Content-Length": String(buffer.length),
         "Cache-Control": "private, max-age=3600",
       },

@@ -9,6 +9,13 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      screens: {
+        // Small phones. Tailwind's smallest default is `sm` at 640px, which is
+        // a tablet — so anything "responsive" was really desktop-vs-tablet and
+        // 360-390px handsets got the tightest layout. Most MENA traffic is on
+        // exactly those devices.
+        xs: "400px",
+      },
       colors: {
         border: "rgb(var(--border) / <alpha-value>)",
         input: "rgb(var(--input) / <alpha-value>)",
@@ -66,9 +73,13 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
-        heading: ["var(--font-poppins)", "var(--font-sans)", "system-ui", "sans-serif"],
-        arabic: ["var(--font-arabic)", "Tajawal", "system-ui", "sans-serif"],
+        // "RB" first — it's unicode-range scoped to Arabic, so Latin glyphs skip
+        // it and land on Plus Jakarta Sans. IBM Plex Sans Arabic sits behind it
+        // as the fallback if the self-hosted RB files aren't present.
+        sans: ["RB", "var(--font-arabic)", "var(--font-sans)", "system-ui", "sans-serif"],
+        heading: ["RB", "var(--font-arabic)", "var(--font-sans)", "system-ui", "sans-serif"],
+        arabic: ["RB", "var(--font-arabic)", "system-ui", "sans-serif"],
+        latin: ["var(--font-sans)", "system-ui", "sans-serif"],
       },
       fontSize: {
         "display": ["3.5rem", { lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "800" }],

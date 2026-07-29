@@ -45,7 +45,7 @@ export function HelpTooltip({ text, side = "top", className = "" }: HelpTooltipP
       </button>
       {visible && (
         <div
-          className={`absolute z-50 w-56 rounded-lg border bg-white p-2.5 shadow-lg ring-1 ring-black/5 text-xs text-foreground animate-scale-in ${sideClasses[side]}`}
+          className={`absolute z-50 w-56 rounded-lg border bg-card p-2.5 shadow-lg ring-1 ring-black/5 text-xs text-foreground animate-scale-in ${sideClasses[side]}`}
         >
           {text}
         </div>

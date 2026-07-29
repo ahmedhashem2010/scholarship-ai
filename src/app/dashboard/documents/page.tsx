@@ -54,7 +54,7 @@ const TYPE_ICONS: Record<string, string> = {
   RESEARCH_PROPOSAL: "bg-amber-100 text-amber-600",
   RECOMMENDATION_LETTER: "bg-rose-100 text-rose-600",
   TRANSCRIPT: "bg-cyan-100 text-cyan-600",
-  OTHER: "bg-slate-100 text-slate-600",
+  OTHER: "bg-muted text-muted-foreground",
 };
 
 function formatSize(bytes: number): string {
@@ -232,10 +232,10 @@ export default function DocumentsPage() {
 
       {/* Empty State */}
       {!loading && !error && documents.length === 0 && (
-        <div className="animate-fade-in rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700 bg-card p-12 text-center">
+        <div className="animate-fade-in rounded-2xl border-2 border-dashed border-border dark:border-slate-700 bg-card p-12 text-center">
           <div className="mx-auto max-w-sm">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 mb-4">
-              <FileText className="h-7 w-7 text-slate-400" />
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-muted mb-4">
+              <FileText className="h-7 w-7 text-muted-foreground" />
             </div>
             <h2 className="text-lg font-semibold text-foreground mb-2">
               No documents yet
@@ -268,7 +268,7 @@ export default function DocumentsPage() {
                   <div className="flex items-start gap-3 sm:gap-4 min-w-0 flex-1">
                     <div className={cn(
                       "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg",
-                      TYPE_ICONS[doc.documentType] ?? "bg-slate-100 text-slate-600"
+                      TYPE_ICONS[doc.documentType] ?? "bg-muted text-muted-foreground"
                     )}>
                       <FileText className="h-5 w-5" />
                     </div>
@@ -283,9 +283,9 @@ export default function DocumentsPage() {
                         <Badge variant="outline" className="text-[11px]">
                           {TYPE_LABELS[doc.documentType] ?? doc.documentType}
                         </Badge>
-                        <span className="text-slate-300">&middot;</span>
+                        <span className="text-muted-foreground">&middot;</span>
                         <span>{formatSize(doc.fileSize)}</span>
-                        <span className="text-slate-300">&middot;</span>
+                        <span className="text-muted-foreground">&middot;</span>
                         <span>{formatDate(doc.uploadedAt)}</span>
                       </div>
                       {review && (
@@ -310,7 +310,7 @@ export default function DocumentsPage() {
 
                   <div className="flex items-center gap-1.5 shrink-0">
                     <a
-                      href={doc.fileUrl}
+                      href={`/api/documents/${doc.id}/file`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >

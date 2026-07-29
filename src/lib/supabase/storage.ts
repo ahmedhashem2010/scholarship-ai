@@ -18,8 +18,13 @@ async function ensureBucket() {
   const supabase = createAdminClient();
   const { data: buckets } = await supabase.storage.listBuckets();
   if (buckets?.some((b) => b.name === BUCKET)) return;
+  // PRIVATE. These are CVs, personal statements and recommendation letters —
+  // documents containing a student's full name, address, grades and referees.
+  // A public bucket means anyone who ever sees the URL keeps read access
+  // forever, with no auth and no expiry. Files are served instead through
+  // /api/documents/[id]/file, which checks ownership on every request.
   await supabase.storage.createBucket(BUCKET, {
-    public: true,
+    public: false,
     allowedMimeTypes: [
       "application/pdf",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -115,4 +120,63 @@ export async function ensureUserRecord(userId: string, email: string | undefined
     update: {},
     create: { id: userId, email },
   });
+}
+
+// ---------------------------------------------------------------------------
+// Payment receipts
+//
+// A SEPARATE bucket from `documents`, so that a policy mistake on one can't
+// expose the other. Both are private. Receipts are especially sensitive —
+// they're screenshots of bank and wallet transfers — so they are never served
+// through the app at all, only via short-lived signed URLs to the admin.
+// ---------------------------------------------------------------------------
+
+const RECEIPTS_BUCKET = "receipts";
+
+async function ensureReceiptsBucket() {
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return;
+  const supabase = createAdminClient();
+  const { data: buckets } = await supabase.storage.listBuckets();
+  if (buckets?.some((b) => b.name === RECEIPTS_BUCKET)) return;
+  await supabase.storage.createBucket(RECEIPTS_BUCKET, {
+    public: false,
+    allowedMimeTypes: ["image/png", "image/jpeg", "image/webp", "application/pdf"],
+    fileSizeLimit: 5 * 1024 * 1024,
+  });
+}
+
+/** Uploads a payment receipt. Returns the storage PATH, not a public URL. */
+export async function uploadReceipt(userId: string, file: File): Promise<string> {
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    throw new Error("Receipt upload requires SUPABASE_SERVICE_ROLE_KEY");
+  }
+  await ensureReceiptsBucket();
+
+  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-60);
+  const filePath = `${userId}/${Date.now()}_${safeName}`;
+
+  const supabase = createAdminClient();
+  const { error } = await supabase.storage
+    .from(RECEIPTS_BUCKET)
+    .upload(filePath, file, { cacheControl: "3600", upsert: false });
+
+  if (error) throw new Error(`Receipt upload failed: ${error.message}`);
+  return filePath;
+}
+
+/** Short-lived signed URL for an admin to view a receipt. */
+export async function getReceiptSignedUrl(
+  path: string,
+  expiresInSeconds = 300
+): Promise<string | null> {
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return null;
+  const supabase = createAdminClient();
+  const { data, error } = await supabase.storage
+    .from(RECEIPTS_BUCKET)
+    .createSignedUrl(path, expiresInSeconds);
+  if (error) {
+    console.error("[storage] Failed to sign receipt URL:", error.message);
+    return null;
+  }
+  return data?.signedUrl ?? null;
 }

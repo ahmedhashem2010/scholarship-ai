@@ -31,7 +31,7 @@ export function DashboardSkeleton() {
     <div className="page-container py-8 space-y-8">
       <div className="space-y-3">
         <Skeleton className="h-9 w-72" />
-        <Skeleton className="h-5 w-96" />
+        <Skeleton className="h-5 w-full max-w-96" />
         <Skeleton className="h-5 w-80" />
       </div>
       <Skeleton className="h-28 rounded-3xl" />

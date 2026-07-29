@@ -22,7 +22,7 @@ function Tabs({ value, onValueChange, children, className }: TabsProps) {
       color="primary"
       classNames={{
         tabList: "gap-1 w-full relative rounded-xl p-1 bg-default-100",
-        cursor: "w-full bg-white shadow-md rounded-xl",
+        cursor: "w-full bg-card shadow-md rounded-xl",
         tab: "max-w-fit px-4 h-9",
         tabContent: "group-data-[selected=true]:text-primary",
       }}

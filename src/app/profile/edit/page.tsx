@@ -259,14 +259,14 @@ export default function EditProfilePage() {
             <div className="border-t pt-4">
               <label className="flex items-start gap-3 cursor-pointer mb-3">
                 <input type="checkbox" checked={form.hasWorkExperience} onChange={(e) => update("hasWorkExperience", e.target.checked)}
-                  className="mt-1 h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary" />
+                  className="mt-1 h-4 w-4 rounded border-border text-primary focus:ring-primary" />
                 <div>
                   <span className="text-sm font-medium text-foreground">Work Experience</span>
                   <p className="text-xs text-muted-foreground">Include internships and part-time jobs</p>
                 </div>
               </label>
               {form.hasWorkExperience && (
-                <div className="ml-7 mb-3">
+                <div className="ms-7 mb-3">
                   <label className="block text-sm font-medium text-foreground mb-1.5">Years</label>
                   <input type="number" min={0} max={50} value={form.workYears} onChange={(e) => update("workYears", e.target.value)}
                     className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring max-w-[120px]" />
@@ -274,7 +274,7 @@ export default function EditProfilePage() {
               )}
               <label className="flex items-start gap-3 cursor-pointer">
                 <input type="checkbox" checked={form.hasResearch} onChange={(e) => update("hasResearch", e.target.checked)}
-                  className="mt-1 h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary" />
+                  className="mt-1 h-4 w-4 rounded border-border text-primary focus:ring-primary" />
                 <div>
                   <span className="text-sm font-medium text-foreground">Research Experience</span>
                   <p className="text-xs text-muted-foreground">Publications, research projects, or thesis work</p>

@@ -45,7 +45,7 @@ export function Header({ className }: HeaderProps) {
             <GraduationCap className="h-5 w-5 text-white" />
           </div>
           <div className="flex flex-col">
-            <span className="text-lg font-bold text-foreground leading-tight" style={{ fontFamily: 'var(--font-poppins)' }}>
+            <span className="text-lg font-bold text-foreground leading-tight">
               Scholarship
             </span>
             <span className="text-[10px] font-semibold uppercase tracking-widest text-primary">AI Finder</span>
@@ -86,7 +86,7 @@ export function Header({ className }: HeaderProps) {
             aria-label="Toggle language"
           >
             <Languages className="h-4 w-4" />
-            <span className="ml-1.5 text-xs">{language === "en" ? "عربي" : "English"}</span>
+            <span className="ms-1.5 text-xs">{language === "en" ? "عربي" : "English"}</span>
           </Button>
 
           <ThemeToggle />
@@ -106,7 +106,7 @@ export function Header({ className }: HeaderProps) {
       </div>
 
       {mobileMenuOpen && (
-        <nav className="border-border border-t bg-card/95 backdrop-blur-xl px-4 py-4 md:hidden" dir={isRTL ? "rtl" : "ltr"}>
+        <nav className="border-border border-t bg-white/95 backdrop-blur-xl px-4 py-4 md:hidden" dir={isRTL ? "rtl" : "ltr"}>
           <div className="mx-auto max-w-7xl flex flex-col gap-1">
             {navLinks.map(({ href, label }) => {
               const active = isActive(href)
@@ -131,7 +131,7 @@ export function Header({ className }: HeaderProps) {
                 <span className="text-xs font-semibold text-primary">{credits}</span>
               </div>
               <Button variant="outline" size="sm" onClick={toggleLanguage} className="rounded-full">
-                <Languages className="mr-1.5 h-4 w-4" />
+                <Languages className="me-1.5 h-4 w-4" />
                 {language === "en" ? "عربي" : "English"}
               </Button>
             </div>

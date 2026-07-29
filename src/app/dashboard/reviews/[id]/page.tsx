@@ -1,168 +1,544 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useParams } from "next/navigation"
-import { Header } from "@/components/scholarship/header"
-import { useLanguage } from "@/contexts/LanguageContext"
-import { ImprovementChecklist } from "@/components/ImprovementChecklist"
-import { ConfettiTrigger } from "@/components/scholarship/confetti-trigger"
-import { EmptyDocuments } from "@/components/scholarship/empty-states"
-import dynamic from "next/dynamic"
+export const dynamic = "force-dynamic";
 
-const ReviewDisplay = dynamic(() => import("@/components/ReviewDisplay").then(m => ({ default: m.ReviewDisplay })), {
-  loading: () => <div className="h-64 animate-pulse rounded-2xl bg-muted" />,
-})
-// PDF viewer disabled for competition submission
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Skeleton } from "@/components/ui/skeleton"
-import { cn } from "@/lib/utils"
-import { Upload, FileText, Clock, Target } from "lucide-react"
+import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import {
+  ArrowUpRight, Award, CheckCircle2, ExternalLink, FileText, Lightbulb,
+  Sparkles, TrendingUp, Upload, Zap, AlertCircle,
+} from "lucide-react";
+import { Nav } from "@/components/nav";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { ConfettiTrigger } from "@/components/scholarship/confetti-trigger";
 
-export default function DocumentReviewPage() {
-  const params = useParams()
-  const documentId = params.id as string
+/**
+ * Review results.
+ *
+ * The previous version of this page fetched a rich payload and then displayed
+ * about a third of it. `versionChain`, `prevScore`, `improvementScore`,
+ * `quickWins` and `overallAssessment` were all returned by the API and dropped
+ * on the floor — which meant the single most motivating fact we have ("your
+ * statement went from 5.8 to 7.4 after you rewrote it") was never shown to the
+ * student who paid for it.
+ *
+ * It also showed the "upload your first document" empty state when a document
+ * existed but hadn't been reviewed yet, telling users to redo work they'd
+ * already done instead of pointing at the button they actually needed.
+ */
 
-  const [isLoading, setIsLoading] = useState(true)
-  const { isRTL } = useLanguage()
-  const [reviewData, setReviewData] = useState<any>(null)
-  const [documentData, setDocumentData] = useState<any>(null)
-  const [showConfetti, setShowConfetti] = useState(false)
+interface ScoreBlock {
+  overallQuality: { score: number; strengthsSummary: string; weaknessesSummary: string };
+  atsCompatibility: { score: number; missingKeywords: string[]; improvements: string[] };
+  competitiveness: { score: number; uniqueStrengths: string; differentiation: string };
+}
 
-  useEffect(() => {
-    fetchReviewData()
-  }, [documentId])
+interface ReviewData extends ScoreBlock {
+  id: string;
+  score: number;
+  topImprovements: string[];
+  quickWins: string[];
+  overallAssessment: string;
+  createdAt: string;
+}
 
-  const fetchReviewData = async () => {
+interface DocumentData {
+  id: string;
+  fileName: string;
+  fileUrl: string | null;
+  documentType: string | null;
+  version: number;
+}
+
+interface VersionLink {
+  id: string;
+  version: number;
+  score: number | null;
+  isCurrent: boolean;
+}
+
+interface Payload {
+  data: ReviewData | null;
+  document: DocumentData | null;
+  prevScore: number | null;
+  versionChain: VersionLink[];
+}
+
+const DOC_TYPE_LABELS: Record<string, { ar: string; en: string }> = {
+  CV: { ar: "السيرة الذاتية", en: "CV" },
+  MOTIVATION_LETTER: { ar: "خطاب الدوافع", en: "Motivation letter" },
+  PERSONAL_STATEMENT: { ar: "البيان الشخصي", en: "Personal statement" },
+  RECOMMENDATION_LETTER: { ar: "خطاب توصية", en: "Recommendation letter" },
+  RESEARCH_PROPOSAL: { ar: "المقترح البحثي", en: "Research proposal" },
+  ESSAY: { ar: "مقال", en: "Essay" },
+};
+
+/** Scores are out of 10. Teal is the brand; amber and red carry real meaning. */
+function toneFor(score: number) {
+  if (score >= 8) return { text: "text-[rgb(var(--success))]", bg: "bg-[rgb(var(--success))]" };
+  if (score >= 6) return { text: "text-primary", bg: "bg-primary" };
+  if (score >= 4) return { text: "text-[rgb(var(--accent-warm))]", bg: "bg-[rgb(var(--accent-warm))]" };
+  return { text: "text-destructive", bg: "bg-destructive" };
+}
+
+export default function ReviewResultsPage() {
+  const params = useParams();
+  const documentId = typeof params.id === "string" ? params.id : "";
+  const { pick, num, isRTL } = useLanguage();
+
+  const [payload, setPayload] = useState<Payload | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [confetti, setConfetti] = useState(false);
+
+  const load = useCallback(async () => {
     try {
-      setIsLoading(true)
-
-      const response = await fetch(`/api/documents/${documentId}/review`)
-      const ct = response.headers.get("content-type") || ""
+      setLoading(true);
+      const res = await fetch(`/api/documents/${documentId}/review`);
+      const ct = res.headers.get("content-type") ?? "";
       if (!ct.includes("application/json")) {
-        const text = await response.text().catch(() => "");
-        console.error("Non-JSON response from review API:", text.slice(0, 200));
-        setIsLoading(false);
+        setError(pick("تعذّر تحميل المراجعة.", "Couldn't load this review."));
         return;
       }
-      const result = await response.json()
-
-      if (result.success && result.data) {
-        setReviewData(result.data)
-
-        if (result.data.overallQuality?.score > 8) {
-          setTimeout(() => setShowConfetti(true), 500)
-        }
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        setError(json.error ?? pick("تعذّر تحميل المراجعة.", "Couldn't load this review."));
+        return;
       }
-
-      if (result.document) {
-        setDocumentData(result.document)
-      }
-
-    } catch (error) {
-      console.error('Failed to fetch review:', error)
+      setPayload({
+        data: json.data ?? null,
+        document: json.document ?? null,
+        prevScore: json.prevScore ?? null,
+        versionChain: Array.isArray(json.versionChain) ? json.versionChain : [],
+      });
+      // Celebrate a genuinely strong result, not every result.
+      if (json.data?.overallQuality?.score >= 8) setTimeout(() => setConfetti(true), 400);
+    } catch {
+      setError(pick("تعذّر الاتصال بالخادم.", "Couldn't reach the server."));
     } finally {
-      setIsLoading(false)
+      setLoading(false);
     }
-  }
+  }, [documentId, pick]);
 
-  const handleUploadNewVersion = () => {
-    window.location.href = '/dashboard/documents'
-  }
+  useEffect(() => {
+    if (documentId) void load();
+  }, [documentId, load]);
 
-  if (!reviewData && !isLoading) {
+  if (loading) return <ReviewSkeleton />;
+
+  if (error || !payload?.document) {
     return (
-      <div className={cn("min-h-screen bg-background", isRTL && "rtl")}>
-        <Header />
-        <main className="mx-auto max-w-7xl px-4 py-6">
-          <EmptyDocuments onUploadClick={() => window.location.href = '/dashboard/documents'} />
+      <>
+        <Nav />
+        <main className="page-container py-20 text-center">
+          <AlertCircle className="mx-auto h-8 w-8 text-muted-foreground" />
+          <p className="mt-3 text-base font-medium text-foreground">
+            {error ?? pick("لم نعثر على هذا المستند", "We couldn't find that document")}
+          </p>
+          <Link
+            href="/dashboard/documents"
+            className="mt-4 inline-block text-sm text-primary hover:underline"
+          >
+            {pick("العودة إلى مستنداتي", "Back to my documents")}
+          </Link>
         </main>
-      </div>
-    )
+      </>
+    );
   }
+
+  const { data: review, document: doc, prevScore, versionChain } = payload;
+  const typeLabel = doc.documentType ? DOC_TYPE_LABELS[doc.documentType] ?? null : null;
+
+  // A document with no review is NOT an empty account. The old page sent these
+  // users back to re-upload a file they'd already uploaded successfully.
+  if (!review) {
+    return (
+      <>
+        <Nav />
+        <main className="page-container py-6 sm:py-8">
+          <DocHeader doc={doc} typeLabel={typeLabel} />
+          <div className="card-raised mt-8 p-8 text-center">
+            <Sparkles className="mx-auto h-9 w-9 text-primary" />
+            <h2 className="font-display mt-4 text-xl font-bold text-foreground">
+              {pick("هذا المستند لم يُراجَع بعد", "This document hasn't been reviewed yet")}
+            </h2>
+            <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+              {pick(
+                "رفعك للملف تم بنجاح. لم يتبقَّ سوى تشغيل المراجعة — تستغرق أقل من دقيقة وتكلّف رصيداً واحداً.",
+                "Your upload worked fine. All that's left is running the review — it takes under a minute and costs one credit."
+              )}
+            </p>
+            <Link href="/dashboard/documents">
+              <button className="mt-6 inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:opacity-90">
+                <Sparkles className="h-4 w-4" />
+                {pick("تشغيل المراجعة", "Run the review")}
+              </button>
+            </Link>
+          </div>
+        </main>
+      </>
+    );
+  }
+
+  const overall = review.score;
+  const delta = prevScore !== null ? Number((overall - prevScore).toFixed(1)) : null;
 
   return (
-    <div className={cn("min-h-screen bg-background", isRTL && "rtl")} dir={isRTL ? "rtl" : "ltr"}>
-      <ConfettiTrigger trigger={showConfetti} />
-      <Header />
+    <>
+      <ConfettiTrigger trigger={confetti} />
+      <Nav />
+      <main className="page-container py-6 sm:py-8">
+        <DocHeader doc={doc} typeLabel={typeLabel} />
 
-      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold text-foreground">
-                Your AI Review
-              </h1>
-              {documentData?.documentType && (
-                <Badge variant="secondary" className="gap-1">
-                  <Target className="h-3 w-3" />
-                  {documentData.documentType}
-                </Badge>
+        <div className="mt-8 grid gap-6 lg:grid-cols-3">
+          <div className="space-y-6 lg:col-span-2">
+            {/* Headline score ----------------------------------------- */}
+            <div className="card-raised overflow-hidden">
+              <div className="brand-band px-6 py-7 text-center text-white">
+                <p className="text-xs font-medium uppercase tracking-wide text-white/70">
+                  {pick("التقييم العام", "Overall score")}
+                </p>
+                <p className="font-display mt-1 text-5xl font-bold" dir="ltr">
+                  {num(overall)}
+                  <span className="text-2xl font-medium text-white/60">/{num(10)}</span>
+                </p>
+
+                {delta !== null && (
+                  <p
+                    className={`mt-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${
+                      delta > 0 ? "bg-white/20 text-white" : "bg-white/10 text-white/80"
+                    }`}
+                  >
+                    <TrendingUp className={`h-3.5 w-3.5 ${delta < 0 ? "rotate-180" : ""}`} />
+                    {delta > 0
+                      ? pick(
+                          `تحسّن ${num(Math.abs(delta))} نقطة عن النسخة السابقة`,
+                          `Up ${Math.abs(delta)} points from your last version`
+                        )
+                      : delta < 0
+                        ? pick(
+                            `انخفاض ${num(Math.abs(delta))} نقطة عن النسخة السابقة`,
+                            `Down ${Math.abs(delta)} points from your last version`
+                          )
+                        : pick("نفس تقييم النسخة السابقة", "Same as your last version")}
+                  </p>
+                )}
+              </div>
+
+              <div className="grid gap-px bg-border sm:grid-cols-3">
+                <SubScore
+                  icon={<Award className="h-4 w-4" />}
+                  label={pick("جودة المحتوى", "Content quality")}
+                  score={review.overallQuality.score}
+                />
+                <SubScore
+                  icon={<FileText className="h-4 w-4" />}
+                  label={pick("التوافق مع أنظمة الفرز", "ATS compatibility")}
+                  score={review.atsCompatibility.score}
+                />
+                <SubScore
+                  icon={<TrendingUp className="h-4 w-4" />}
+                  label={pick("القدرة التنافسية", "Competitiveness")}
+                  score={review.competitiveness.score}
+                />
+              </div>
+            </div>
+
+            {/* Strengths / weaknesses --------------------------------- */}
+            <div className="grid gap-4 sm:grid-cols-2">
+              {review.overallQuality.strengthsSummary && (
+                <Panel
+                  tone="good"
+                  title={pick("نقاط القوة", "What's working")}
+                  body={review.overallQuality.strengthsSummary}
+                />
+              )}
+              {review.overallQuality.weaknessesSummary && (
+                <Panel
+                  tone="warn"
+                  title={pick("ما يحتاج إلى عمل", "What needs work")}
+                  body={review.overallQuality.weaknessesSummary}
+                />
               )}
             </div>
-            <p className="mt-1 text-sm text-muted-foreground">
-              AI-powered feedback to strengthen your application
-            </p>
-          </div>
-          <Button className="gap-2" onClick={handleUploadNewVersion}>
-            <Upload className="h-4 w-4" />
-            Upload Improved Version
-          </Button>
-        </div>
 
-        <div className="grid gap-6 lg:grid-cols-5">
-          <div className="space-y-6 lg:col-span-3">
-            {isLoading ? (
-              <>
-                <Card>
-                  <CardContent className="flex items-center gap-6 p-6">
-                    <Skeleton className="h-16 w-16 rounded-full" />
-                    <div className="flex-1 space-y-3">
-                      <Skeleton className="h-4 w-full" />
-                      <Skeleton className="h-4 w-3/4" />
-                    </div>
-                  </CardContent>
-                </Card>
-                {[1, 2, 3].map((i) => (
-                  <Card key={i}>
-                    <CardContent className="p-4">
-                      <Skeleton className="h-5 w-32" />
-                      <Skeleton className="mt-2 h-4 w-full" />
-                    </CardContent>
-                  </Card>
-                ))}
-              </>
-            ) : (
-              <>
-                <ReviewDisplay review={reviewData} />
-                <ImprovementChecklist improvements={reviewData.topImprovements} />
-                <div className="rounded-lg bg-primary/5 p-4 text-center">
-                  <p className="mb-3 font-semibold text-foreground">Ready to improve?</p>
-                  <Button onClick={handleUploadNewVersion}>
-                    Upload Improved Version
-                  </Button>
+            {/* Top improvements --------------------------------------- */}
+            {review.topImprovements.length > 0 && (
+              <Section
+                icon={<Lightbulb className="h-4 w-4 text-primary" />}
+                title={pick("أهم التحسينات", "Top improvements")}
+                subtitle={pick(
+                  "مرتّبة حسب الأثر — ابدأ بالأولى.",
+                  "Ordered by impact — start with the first."
+                )}
+              >
+                <ol className="space-y-3">
+                  {review.topImprovements.map((item, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/12 text-xs font-bold text-primary">
+                        {num(i + 1)}
+                      </span>
+                      <p className="text-sm leading-relaxed text-muted-foreground">{item}</p>
+                    </li>
+                  ))}
+                </ol>
+              </Section>
+            )}
+
+            {/* Quick wins --------------------------------------------- */}
+            {review.quickWins.length > 0 && (
+              <Section
+                icon={<Zap className="h-4 w-4 text-[rgb(var(--accent-warm))]" />}
+                title={pick("إصلاحات سريعة", "Quick wins")}
+                subtitle={pick("دقائق معدودة لكل واحدة.", "A couple of minutes each.")}
+              >
+                <ul className="space-y-2">
+                  {review.quickWins.map((item, i) => (
+                    <li
+                      key={i}
+                      className="flex items-start gap-2.5 rounded-lg bg-[rgb(var(--accent-warm))]/10 p-3"
+                    >
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[rgb(var(--accent-warm))]" />
+                      <span className="text-sm text-muted-foreground">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </Section>
+            )}
+
+            {/* Missing keywords --------------------------------------- */}
+            {review.atsCompatibility.missingKeywords.length > 0 && (
+              <Section
+                icon={<FileText className="h-4 w-4 text-primary" />}
+                title={pick("كلمات مفتاحية ناقصة", "Missing keywords")}
+                subtitle={pick(
+                  "أنظمة الفرز الآلي تبحث عن هذه المصطلحات.",
+                  "Automated screening systems look for these terms."
+                )}
+              >
+                <div className="flex flex-wrap gap-2">
+                  {review.atsCompatibility.missingKeywords.map((k, i) => (
+                    <span
+                      key={i}
+                      className="rounded-full border border-border bg-muted px-2.5 py-1 text-xs text-muted-foreground"
+                    >
+                      {k}
+                    </span>
+                  ))}
                 </div>
-              </>
+              </Section>
+            )}
+
+            {review.overallAssessment && (
+              <div className="rounded-xl border-s-4 border-primary bg-card p-5">
+                <h3 className="text-sm font-semibold text-foreground">
+                  {pick("الخلاصة", "Overall assessment")}
+                </h3>
+                <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
+                  {review.overallAssessment}
+                </p>
+              </div>
             )}
           </div>
 
-          <div className="lg:col-span-2">
-            <div className="sticky top-24 h-[calc(100vh-8rem)]">
-              <div className="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
-                <FileText className="h-4 w-4" />
-                <span>{documentData?.documentType || "Document"}</span>
-                <span className="mx-1">·</span>
-                <Clock className="h-4 w-4" />
-                <span>Version {documentData?.version || 1}</span>
-              </div>
-              <div className="flex h-96 items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 p-4">
-                <p className="text-sm text-gray-500">PDF viewer temporarily disabled</p>
-              </div>
+          {/* Sidebar ------------------------------------------------- */}
+          <aside className="space-y-4">
+            <div className="card-raised p-5">
+              <h2 className="text-sm font-semibold text-foreground">
+                {pick("الخطوة التالية", "Next step")}
+              </h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {pick(
+                  "طبّق التحسينات أعلاه ثم ارفع نسخة جديدة — سنقارن التقييمين لك.",
+                  "Apply the improvements above, then upload a new version — we'll compare the scores for you."
+                )}
+              </p>
+              <Link href="/dashboard/documents">
+                <button className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition hover:opacity-90">
+                  <Upload className="h-4 w-4" />
+                  {pick("رفع نسخة محسّنة", "Upload improved version")}
+                </button>
+              </Link>
             </div>
-          </div>
+
+            {/* Version history — the reason to come back. */}
+            {versionChain.length > 1 && (
+              <div className="card-raised p-5">
+                <h2 className="text-sm font-semibold text-foreground">
+                  {pick("سجلّ النسخ", "Version history")}
+                </h2>
+                <ol className="mt-3 space-y-2">
+                  {versionChain.map((v) => (
+                    <li key={v.id}>
+                      <Link
+                        href={`/dashboard/reviews/${v.id}`}
+                        className={`flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors ${
+                          v.isCurrent
+                            ? "bg-primary/10 font-medium text-primary"
+                            : "text-muted-foreground hover:bg-muted"
+                        }`}
+                      >
+                        <span>{pick(`النسخة ${num(v.version)}`, `Version ${v.version}`)}</span>
+                        <span dir="ltr" className="tabular-nums">
+                          {v.score !== null ? `${num(v.score)}/10` : "—"}
+                        </span>
+                      </Link>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            )}
+
+            {/* The old page reserved 40% of the layout for a PDF viewer that
+                rendered "temporarily disabled". A link that works beats a
+                placeholder that doesn't. */}
+            {doc.fileUrl && (
+              <a
+                href={`/api/documents/${doc.id}/file`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="card-raised flex items-center gap-3 p-4 transition-colors hover:bg-muted"
+              >
+                <FileText className="h-5 w-5 shrink-0 text-muted-foreground" />
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-medium text-foreground">
+                    {doc.fileName}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {pick("فتح الملف الأصلي", "Open the original file")}
+                  </span>
+                </span>
+                <ExternalLink
+                  className={`h-4 w-4 shrink-0 text-muted-foreground ${isRTL ? "scale-x-[-1]" : ""}`}
+                />
+              </a>
+            )}
+          </aside>
         </div>
       </main>
+    </>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+
+function DocHeader({
+  doc,
+  typeLabel,
+}: {
+  doc: DocumentData;
+  typeLabel: { ar: string; en: string } | null;
+}) {
+  const { pick, num } = useLanguage();
+  return (
+    <>
+      <Link
+        href="/dashboard/documents"
+        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+      >
+        <ArrowUpRight className="h-4 w-4 rotate-180" />
+        {pick("مستنداتي", "My documents")}
+      </Link>
+      <header className="mt-4">
+        <div className="flex flex-wrap items-center gap-2">
+          {typeLabel && (
+            <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
+              {pick(typeLabel.ar, typeLabel.en)}
+            </span>
+          )}
+          <span className="rounded-full border border-border px-2.5 py-1 text-xs text-muted-foreground">
+            {pick(`النسخة ${num(doc.version)}`, `Version ${doc.version}`)}
+          </span>
+        </div>
+        <h1 className="font-display mt-3 truncate text-2xl font-bold text-foreground sm:text-3xl">
+          {doc.fileName}
+        </h1>
+      </header>
+    </>
+  );
+}
+
+function SubScore({
+  icon,
+  label,
+  score,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  score: number;
+}) {
+  const { num } = useLanguage();
+  const tone = toneFor(score);
+  return (
+    <div className="bg-card p-4">
+      <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+        {icon}
+        {label}
+      </div>
+      <p className={`mt-2 text-2xl font-bold ${tone.text}`} dir="ltr">
+        {num(score)}
+        <span className="text-sm font-medium text-muted-foreground">/{num(10)}</span>
+      </p>
+      <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted">
+        <div className={`h-full rounded-full ${tone.bg}`} style={{ width: `${score * 10}%` }} />
+      </div>
     </div>
-  )
+  );
+}
+
+function Panel({ tone, title, body }: { tone: "good" | "warn"; title: string; body: string }) {
+  const colour =
+    tone === "good"
+      ? "border-[rgb(var(--success))]/25 bg-[rgb(var(--success))]/10"
+      : "border-[rgb(var(--accent-warm))]/25 bg-[rgb(var(--accent-warm))]/10";
+  return (
+    <div className={`rounded-xl border p-4 ${colour}`}>
+      <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+      <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{body}</p>
+    </div>
+  );
+}
+
+function Section({
+  icon,
+  title,
+  subtitle,
+  children,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  subtitle?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="card-raised p-5">
+      <div className="flex items-center gap-2">
+        {icon}
+        <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+      </div>
+      {subtitle && <p className="mt-1 text-xs text-muted-foreground">{subtitle}</p>}
+      <div className="mt-4">{children}</div>
+    </div>
+  );
+}
+
+function ReviewSkeleton() {
+  return (
+    <>
+      <Nav />
+      <main className="page-container animate-pulse py-8">
+        <div className="h-4 w-32 rounded bg-muted" />
+        <div className="mt-4 h-8 w-2/3 rounded bg-muted" />
+        <div className="mt-8 grid gap-6 lg:grid-cols-3">
+          <div className="space-y-6 lg:col-span-2">
+            <div className="h-56 rounded-2xl bg-muted" />
+            <div className="h-32 rounded-2xl bg-muted" />
+            <div className="h-40 rounded-2xl bg-muted" />
+          </div>
+          <div className="h-48 rounded-2xl bg-muted" />
+        </div>
+      </main>
+    </>
+  );
 }

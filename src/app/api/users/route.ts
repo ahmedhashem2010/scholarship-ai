@@ -1,5 +1,11 @@
 export const runtime = "nodejs";
 
+// Reads auth cookies, so it can never be static. Declaring that up front
+// stops Next attempting a prerender at build time, failing, and printing a
+// DYNAMIC_SERVER_USAGE stack trace that looks like a broken build but isn't.
+export const dynamic = "force-dynamic";
+
+
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createApiClient } from "@/lib/supabase/api-auth";

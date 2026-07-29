@@ -31,7 +31,7 @@ function Select({ value, onValueChange, children, className }: SelectProps) {
       <select
         value={value ?? ""}
         onChange={(e) => onValueChange?.(e.target.value)}
-        className="flex h-12 w-full appearance-none items-center rounded-xl border border-default-200 bg-default-100 px-4 py-3 pr-10 text-sm text-foreground shadow-sm transition-colors hover:bg-default-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+        className="flex h-12 w-full appearance-none items-center rounded-xl border border-default-200 bg-default-100 px-4 py-3 pe-10 text-sm text-foreground shadow-sm transition-colors hover:bg-default-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
       >
         {items.map((item) => (
           <option key={item.value} value={item.value}>
@@ -39,7 +39,7 @@ function Select({ value, onValueChange, children, className }: SelectProps) {
           </option>
         ))}
       </select>
-      <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-default-400" />
+      <ChevronDown className="pointer-events-none absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-default-400" />
     </div>
   );
 }

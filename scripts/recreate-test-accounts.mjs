@@ -1,8 +1,15 @@
+import "./_env.mjs";
 import { PrismaClient } from "@prisma/client";
 
-const SUPABASE_URL = "https://kkqhvlizcbxikypsaxff.supabase.co";
-const ANON_KEY = "sb_publishable__89o5d0QJ9vjfE8aXW-cJQ_y20wiKIn";
-const SERVICE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtrcWh2bGl6Y2J4aWt5cHNheGZmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3ODM3NjU0NiwiZXhwIjoyMDkzOTUyNTQ2fQ.zU1ZUkhegXYPRXwV7Fb35jhh90WAr0qpqTYMtum0qfI";
+
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!SUPABASE_URL || !ANON_KEY || !SERVICE_KEY) {
+  console.error("Missing Supabase env vars. Set NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY and SUPABASE_SERVICE_ROLE_KEY in .env");
+  process.exit(1);
+}
 
 const HEADERS = {
   apikey: ANON_KEY,

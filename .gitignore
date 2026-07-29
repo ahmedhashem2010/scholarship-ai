@@ -1,6 +1,31 @@
 node_modules/
 .next/
-.env
-.env.local
 *.tsbuildinfo
 next-env.d.ts
+
+# Environment — never commit any of these.
+# The .env.* glob is deliberately broad: backups made during migrations have
+# historically been the way secrets leak into a repo.
+.env
+.env.*
+!.env.example
+
+# Local scratch
+tsc-day*.log
+tsconfig.check.json
+dev-server.log
+dev-server-err.log
+scholarship-verification-worklist.csv
+
+# Scraper page cache — large, regenerable
+.scrape-cache/
+
+.vercel
+.env*
+
+# Video render intermediates. Only the finished film is tracked; the WAV and
+# the frame/test dumps are regenerable and were adding ~16MB per commit.
+video-assets/out/*
+!video-assets/out/smartscholar.mp4
+video-assets/__pycache__/
+**/_*.png

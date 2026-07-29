@@ -121,9 +121,9 @@ export default function SuccessStoriesPage() {
                 <span className="text-sm">{getImprovementEmoji(story.initialScore, story.finalScore)}</span>
               </div>
 
-              <div className="rounded-lg bg-slate-50 p-3 relative">
-                <Quote className="h-3 w-3 text-muted-foreground absolute top-2 left-2" />
-                <p className="text-xs text-muted-foreground italic pl-4">
+              <div className="rounded-lg bg-muted p-3 relative">
+                <Quote className="h-3 w-3 text-muted-foreground absolute top-2 start-2" />
+                <p className="text-xs text-muted-foreground italic ps-4">
                   &ldquo;{story.quote}&rdquo;
                 </p>
               </div>
@@ -147,7 +147,7 @@ export default function SuccessStoriesPage() {
         ))}
       </div>
 
-      <div className="rounded-2xl border-2 border-dashed border-slate-200 bg-white p-10 text-center">
+      <div className="rounded-2xl border-2 border-dashed border-border bg-card p-10 text-center">
         <Award className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
         <h2 className="text-lg font-semibold text-foreground mb-2">Your success story starts here</h2>
         <p className="text-sm text-muted-foreground max-w-md mx-auto">

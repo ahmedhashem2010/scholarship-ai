@@ -5,6 +5,8 @@ export interface MatchParams {
   major: string | null;
   targetDegree: string;
   englishLevel: string;
+  /** YES | WILLING | PREFER_WITHOUT — see the onboarding English step. */
+  hasEnglishTest?: string | null;
   budget: string | null;
   gpa: number | null;
   hasResearch: boolean;
@@ -48,6 +50,10 @@ export interface MatchResult {
   isEligible: boolean;
   reasons: string[];
   disqualifiers: string[];
+  /** Criteria the source data doesn't specify. Not a mark against the user. */
+  unknowns: string[];
+  /** 0-100. How complete this scholarship's structured data is. */
+  dataCompleteness: number;
 }
 
 function parseStrArray(val: string | string[]): string[] {
@@ -108,40 +114,73 @@ export function matchScholarshipsToUser(
     let score = 0;
     const reasons: string[] = [];
     const disqualifiers: string[] = [];
+    // Facts we genuinely don't have, kept separate from real disqualifiers so
+    // the UI can say "unverified" instead of "you don't qualify".
+    const unknowns: string[] = [];
     const eligibleCountries = parseStrArray(scholarship.eligibleCountries);
     const eligibleEducation = parseStrArray(scholarship.eligibleEducation);
     const fieldOfStudy = parseStrArray(scholarship.fieldOfStudy);
 
-    const countryEligible = eligibleCountries.some((c) =>
-      c.toLowerCase() === "all" ||
-      c.toLowerCase() === "all middle east" ||
-      c.toLowerCase() === user.country.toLowerCase()
-    ) || eligibleCountries.map((c) => c.toLowerCase()).includes(user.country.toLowerCase());
+    // An empty eligibility array means WE DON'T KNOW, not "excluded".
+    // 195 of the 234 seeded scholarships were scraped without structured
+    // eligibility data. Treating empty as a mismatch put a fabricated red
+    // "✗ you don't qualify" on 83% of the catalogue — actively misleading, and
+    // the fastest possible way to lose a user's trust in the match score.
+    const countryKnown = eligibleCountries.length > 0;
+    const educationKnown = eligibleEducation.length > 0;
+    const fieldKnown = fieldOfStudy.length > 0;
 
-    if (countryEligible) {
-      score += 25;
-      reasons.push(`✓ ${user.country} is eligible for this scholarship`);
+    // Tri-state: true = confirmed eligible, false = confirmed excluded,
+    // null = unknown. Only an explicit false should ever block a user.
+    let countryEligible: boolean | null = null;
+    let eduMatch: boolean | null = null;
+
+    if (!countryKnown) {
+      // Neutral: no claim either way. Slightly below a confirmed match so
+      // verified scholarships rank above unverified ones.
+      score += 16;
+      unknowns.push("Eligible nationalities aren't listed — check the official page");
     } else {
-      score += 8;
-      disqualifiers.push(`✗ ${user.country} is not in the eligible countries list`);
-      reasons.push(`⚠ Open to other nationalities — may still apply`);
+      countryEligible = eligibleCountries.some((c) => {
+        const cl = c.toLowerCase();
+        return (
+          cl === "all" ||
+          cl === "any" ||
+          cl === "all middle east" ||
+          cl === user.country.toLowerCase()
+        );
+      });
+
+      if (countryEligible) {
+        score += 25;
+        reasons.push(`✓ ${user.country} is eligible for this scholarship`);
+      } else {
+        score += 8;
+        disqualifiers.push(`✗ ${user.country} is not in the eligible countries list`);
+      }
     }
 
     const targetUpper = user.targetDegree.toUpperCase();
-    const eduMatch = eligibleEducation.includes(targetUpper) || eligibleEducation.includes("ANY");
-    if (eduMatch) {
-      score += 20;
-      reasons.push(`✓ Accepts ${user.targetDegree} students`);
+
+    if (!educationKnown) {
+      score += 13;
+      unknowns.push("Accepted degree levels aren't listed — check the official page");
     } else {
-      const partialMatch = eligibleEducation.some((e) => targetUpper.includes(e) || e.includes(targetUpper));
-      if (partialMatch) {
-        score += 12;
-        disqualifiers.push(`⚠ ${user.targetDegree} is not directly listed, but similar levels are accepted`);
-        reasons.push(`⚠ Partially matches education level requirements`);
+      eduMatch = eligibleEducation.includes(targetUpper) || eligibleEducation.includes("ANY");
+      if (eduMatch) {
+        score += 20;
+        reasons.push(`✓ Accepts ${user.targetDegree} students`);
       } else {
-        score += 5;
-        disqualifiers.push(`✗ Degree level (${user.targetDegree}) not listed in eligibility`);
-        reasons.push(`⚠ Different education level — check specific requirements`);
+        const partialMatch = eligibleEducation.some(
+          (e) => targetUpper.includes(e) || e.includes(targetUpper)
+        );
+        if (partialMatch) {
+          score += 12;
+          reasons.push(`⚠ ${user.targetDegree} isn't listed directly, but a similar level is accepted`);
+        } else {
+          score += 5;
+          disqualifiers.push(`✗ Degree level (${user.targetDegree}) not listed in eligibility`);
+        }
       }
     }
 
@@ -158,25 +197,33 @@ export function matchScholarshipsToUser(
       reasons.push(`✓ Age ${userAge} is within the accepted range`);
     }
 
-    const fieldMatch = fieldOfStudy.some((f) => {
-      const fLower = f.toLowerCase();
-      return fLower === "any" ||
-        fLower === userMajor ||
-        userMajor.includes(fLower) ||
-        fLower.includes(userMajor) ||
-        (userMajor.split(/[\s,/]+/).some((word) => fLower.includes(word)));
-    });
-
-    if (fieldMatch && !fieldOfStudy.some((f) => f.toLowerCase() === "any")) {
-      score += 20;
-      reasons.push(`✓ Your field (${user.major ?? "N/A"}) aligns with their fields of study`);
-    } else if (fieldOfStudy.some((f) => f.toLowerCase() === "any")) {
-      score += 16;
-      reasons.push(`✓ All fields of study are accepted`);
+    if (!fieldKnown) {
+      score += 13;
+      unknowns.push("Eligible fields of study aren't listed — check the official page");
     } else {
-      score += 7;
-      const topFields = fieldOfStudy.slice(0, 3).join(", ");
-      reasons.push(`⚠ Your field (${user.major ?? "N/A"}) differs from listed: ${topFields}`);
+      const acceptsAny = fieldOfStudy.some((f) => f.toLowerCase() === "any");
+      const fieldMatch = fieldOfStudy.some((f) => {
+        const fLower = f.toLowerCase();
+        return (
+          fLower === "any" ||
+          fLower === userMajor ||
+          (userMajor.length > 0 && userMajor.includes(fLower)) ||
+          (userMajor.length > 0 && fLower.includes(userMajor)) ||
+          userMajor.split(/[\s,/]+/).some((word) => word.length > 2 && fLower.includes(word))
+        );
+      });
+
+      if (acceptsAny) {
+        score += 16;
+        reasons.push(`✓ All fields of study are accepted`);
+      } else if (fieldMatch) {
+        score += 20;
+        reasons.push(`✓ Your field (${user.major ?? "N/A"}) aligns with their fields of study`);
+      } else {
+        score += 7;
+        const topFields = fieldOfStudy.slice(0, 3).join(", ");
+        reasons.push(`⚠ Your field (${user.major ?? "N/A"}) differs from listed: ${topFields}`);
+      }
     }
 
     if (scholarship.minimumGPA !== null && user.gpa !== null) {
@@ -196,15 +243,45 @@ export function matchScholarshipsToUser(
       reasons.push(`✓ No minimum GPA requirement`);
     }
 
-    if (user.englishLevel === "ADVANCED" || user.englishLevel === "TOEFL" || user.englishLevel === "IELTS") {
-      score += 10;
-      reasons.push(`✓ Strong English proficiency`);
-    } else if (user.englishLevel === "INTERMEDIATE") {
-      score += 5;
-      reasons.push(`⚠ May need English test (TOEFL/IELTS)`);
+    // English is scored on whether the student HOLDS a certificate, not on how
+    // fluent they say they are. A fluent speaker without a score cannot apply
+    // to a scholarship requiring IELTS 6.5; a mediocre one holding 6.5 can.
+    const requiresEnglish =
+      scholarship.englishRequirement !== null &&
+      scholarship.englishRequirement !== "NOT_REQUIRED";
+
+    if (user.hasEnglishTest === "PREFER_WITHOUT") {
+      // A real, underserved segment. Rank no-test scholarships up hard and
+      // push the rest down without hiding them.
+      if (!requiresEnglish) {
+        score += 18;
+        reasons.push(`✓ لا تشترط اختبار لغة إنجليزية / No English test required`);
+      } else {
+        score += 2;
+        reasons.push(`⚠ تشترط اختبار إنجليزية — وأنت تفضّل تجنّبه`);
+      }
+    } else if (user.hasEnglishTest === "YES") {
+      score += 12;
+      reasons.push(`✓ لديك نتيجة اختبار سارية / You hold a test score`);
+    } else if (user.hasEnglishTest === "WILLING") {
+      if (requiresEnglish) {
+        score += 6;
+        unknowns.push(
+          "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+        );
+      } else {
+        score += 10;
+        reasons.push(`✓ لا تشترط اختبار لغة إنجليزية`);
+      }
     } else {
-      score += 3;
-      reasons.push(`⚠ English proficiency may need improvement`);
+      // Legacy profiles created before the branch existed.
+      if (user.englishLevel === "ADVANCED" || user.englishLevel === "TOEFL" || user.englishLevel === "IELTS") {
+        score += 10;
+      } else if (user.englishLevel === "INTERMEDIATE") {
+        score += 5;
+      } else {
+        score += 3;
+      }
     }
 
     const daysLeft = daysUntilDeadline(scholarship.deadline);
@@ -227,8 +304,11 @@ export function matchScholarshipsToUser(
         reasons.push(`✓ Plenty of time (${daysLeft} days until deadline)`);
       }
     } else {
+      // A null deadline means the scraper didn't capture one — NOT that the
+      // scholarship accepts applications indefinitely. Saying "no strict
+      // deadline" could cause someone to miss the real one.
       score += 3;
-      reasons.push(`✓ No strict deadline`);
+      unknowns.push("Deadline not listed — confirm on the official page before applying");
     }
 
     if (scholarship.requiresResearch) {
@@ -265,13 +345,30 @@ export function matchScholarshipsToUser(
 
     const successProbability = calcSuccessProbability(normalizedFitScore, user, scholarship.competitionLevel);
 
+    // Unknown never blocks — only an explicit `false` does. Someone must not be
+    // told they're ineligible because our scraper missed a field.
     const eligible = (
       score >= 30 &&
-      countryEligible &&
-      eduMatch &&
+      countryEligible !== false &&
+      eduMatch !== false &&
       (scholarship.minimumAge === null || userAge >= scholarship.minimumAge) &&
       (scholarship.maximumAge === null || userAge <= scholarship.maximumAge) &&
       (daysLeft === null || daysLeft > 0)
+    );
+
+    // How much structured data this record actually has. Surfaced in the UI so
+    // a user can tell a fully-verified scholarship from a thin scraped one.
+    const completenessChecks = [
+      countryKnown,
+      educationKnown,
+      fieldKnown,
+      scholarship.deadline !== null,
+      scholarship.requiredDocuments.length > 0,
+      scholarship.benefits !== null,
+      scholarship.requirements !== null,
+    ];
+    const dataCompleteness = Math.round(
+      (completenessChecks.filter(Boolean).length / completenessChecks.length) * 100
     );
 
     return {
@@ -283,12 +380,17 @@ export function matchScholarshipsToUser(
       isEligible: eligible,
       reasons,
       disqualifiers,
+      unknowns,
+      dataCompleteness,
     };
   });
 
   results.sort((a, b) => {
     if (a.isEligible !== b.isEligible) return a.isEligible ? -1 : 1;
-    return b.fitScore - a.fitScore;
+    if (b.fitScore !== a.fitScore) return b.fitScore - a.fitScore;
+    // Tie-break on data quality: a fully-specified scholarship is more useful
+    // to the user than a thin scraped record with the same score.
+    return b.dataCompleteness - a.dataCompleteness;
   });
 
   const MIN_RESULTS = 5;

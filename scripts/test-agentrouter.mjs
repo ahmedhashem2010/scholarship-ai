@@ -1,4 +1,10 @@
-const API_KEY = process.env.AGENTROUTER_API_KEY || "sk-IhDurXGRcXmtwNQ416fvQUWAXewIIkKk9b6MafxsCcIVXX86";
+import "./_env.mjs";
+
+const API_KEY = process.env.AGENTROUTER_API_KEY;
+if (!API_KEY) {
+  console.error("AGENTROUTER_API_KEY not set in .env");
+  process.exit(1);
+}
 
 const endpoints = [
   { url: "https://agentrouter.org/v1/chat/completions", name: "agentrouter.org" },

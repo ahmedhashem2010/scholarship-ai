@@ -116,13 +116,13 @@ export default function HelpPage() {
       </div>
 
       <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search questions..."
-          className="w-full rounded-xl border border-input bg-background pl-9 pr-4 py-2.5 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
+          className="w-full rounded-xl border border-input bg-background ps-9 pe-4 py-2.5 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
         />
       </div>
 
@@ -135,12 +135,12 @@ export default function HelpPage() {
                 const key = `${cat.category}-${i}`;
                 const isOpen = openItems.has(key);
                 return (
-                  <div key={key} className="rounded-xl border bg-white overflow-hidden transition-all">
+                  <div key={key} className="rounded-xl border bg-card overflow-hidden transition-all">
                     <button
                       onClick={() => toggle(key)}
-                      className="flex w-full items-center justify-between px-4 py-3.5 text-left hover:bg-muted/50 transition-colors"
+                      className="flex w-full items-center justify-between px-4 py-3.5 text-start hover:bg-muted/50 transition-colors"
                     >
-                      <span className="text-sm font-medium text-foreground pr-4">{item.q}</span>
+                      <span className="text-sm font-medium text-foreground pe-4">{item.q}</span>
                       {isOpen ? (
                         <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
                       ) : (

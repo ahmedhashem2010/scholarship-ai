@@ -102,7 +102,7 @@ export function ScholarshipCard({
           </p>
           <ul className="space-y-1.5">
             {match.reasons.slice(0, 3).map((r, i) => (
-              <li key={i} className="text-xs text-foreground/70 flex items-start gap-1.5">
+              <li key={i} className="text-xs text-white/70 flex items-start gap-1.5">
                 <span className="text-success mt-0.5 shrink-0">•</span>
                 <span>{r.replace(/^(Your|Open to|Accepts) /, "")}</span>
               </li>
@@ -113,7 +113,7 @@ export function ScholarshipCard({
         <div className="flex items-center justify-between gap-2">
           <div className="flex flex-wrap gap-1">
             {[parseBenefitValue(sch.benefits, "tuition"), parseBenefitValue(sch.benefits, "allowance")].filter(Boolean).slice(0, 2).map((b, i) => (
-              <span key={i} className="text-[11px] bg-slate-100 text-slate-600 rounded-md px-2 py-0.5">{b}</span>
+              <span key={i} className="text-[11px] bg-muted text-muted-foreground rounded-md px-2 py-0.5">{b}</span>
             ))}
           </div>
           <span className="text-sm font-semibold text-foreground">{getTotalValue(sch.benefits)}</span>
@@ -136,7 +136,7 @@ export function ScholarshipCard({
               type="checkbox"
               checked={isSelected}
               onChange={() => onToggleCompare(sch.id)}
-              className="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary"
+              className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
             />
             <span className="text-[11px] text-muted-foreground">Compare</span>
           </label>

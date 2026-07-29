@@ -16,7 +16,7 @@ export function EmptyDocuments({ onUploadClick }: EmptyDocumentsProps) {
           <FileText className="h-12 w-12 text-primary" />
         </div>
 
-        <h2 className="text-xl font-semibold text-foreground mb-2" style={{ fontFamily: 'var(--font-poppins)' }}>
+        <h2 className="text-xl font-semibold text-foreground mb-2">
           No documents yet
         </h2>
 

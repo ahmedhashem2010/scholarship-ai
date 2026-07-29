@@ -50,6 +50,27 @@ async function upsertProfile(userId: string, body: Record<string, unknown>) {
     targetDegree: (body.targetDegree as string) || "",
     englishLevel: (body.englishLevel as string) || "",
     englishScore: body.englishScore ? parseInt(body.englishScore as string) : null,
+
+    // --- English testing ----------------------------------------------------
+    // The question that actually decides eligibility isn't "how good is your
+    // English" — it's "do you HAVE a test score, and if not, will you sit one?"
+    // A student who prefers scholarships with no English requirement is a real
+    // and underserved segment, so it's a first-class answer here.
+    hasEnglishTest: (body.hasEnglishTest as string) || null,
+    englishTestType: (body.englishTestType as string) || null,
+    englishTestDate: body.englishTestDate ? new Date(body.englishTestDate as string) : null,
+    testTimeframe: (body.testTimeframe as string) || null,
+
+    nationality: (body.nationality as string) || null,
+    // Without a scale, a GPA is meaningless — 3.5 is excellent on 4.0 and
+    // mediocre on 5.0. The old code stored a bare float and silently compared
+    // it against scholarship minimums that assume 4.0.
+    gpaScale: (body.gpaScale as string) || null,
+    graduationYear: body.graduationYear ? parseInt(body.graduationYear as string) : null,
+    preferredCountries: Array.isArray(body.preferredCountries)
+      ? (body.preferredCountries as string[])
+      : [],
+
     gpa: body.gpa ? parseFloat(body.gpa as string) : null,
     hasWorkExperience: !!body.hasWorkExperience,
     workYears: body.workYears ? parseInt(body.workYears as string) : null,

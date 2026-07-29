@@ -1,569 +1,498 @@
-'use client';
+"use client";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
-import Link from 'next/link';
-import { ArrowRight, Check, Brain, Target, TrendingUp, Sparkles, Zap } from 'lucide-react';
-import { ThemeToggle } from '@/components/scholarship/theme-toggle';
+import Link from "next/link";
+import { useState } from "react";
+import {
+  ArrowLeft, ArrowRight, Check, ShieldCheck, Target,
+  CalendarClock, ChevronDown, Sparkles,
+} from "lucide-react";
+import { Nav } from "@/components/nav";
+import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { BRAND, VALUE_PROPS } from "@/lib/brand";
+import { CREDIT_PACKAGES, formatEGP, FREE_CREDITS_ON_SIGNUP } from "@/lib/pricing";
 
+/**
+ * Landing page.
+ *
+ * Rebuilt from 569 lines. The old version led with "AI-Powered Scholarship
+ * Platform" — that describes the technology, not what the student gets, and
+ * every competitor says the same sentence.
+ *
+ * Order follows what a student needs in order to decide:
+ *   hero → proof → how it works → why we're different → pricing → FAQ
+ */
 export default function Home() {
+  const { t, pick, num, isRTL } = useLanguage();
+  const Arrow = isRTL ? ArrowLeft : ArrowRight;
+
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      {/* NAVIGATION */}
-      <nav className="sticky top-0 z-50 glass-effect border-b border-border/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-bold text-foreground">ScholarshipAI</span>
-          </Link>
-          <div className="flex items-center gap-3">
-            <ThemeToggle />
-            <Link
-              href="/auth/login"
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors hidden sm:inline-block"
-            >
-              Log In
-            </Link>
-            <Link
-              href="/auth/signup"
-              className="bg-primary text-primary-foreground px-5 py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition-all shadow-sm"
-            >
-              Start Free
-            </Link>
-          </div>
-        </div>
-      </nav>
+    <>
+      <Nav />
 
-      {/* HERO SECTION */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-primary/10 rounded-full blur-3xl opacity-40" />
-        
-        <div className="relative max-w-4xl mx-auto text-center pt-20 pb-16 px-4 sm:px-6">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-8">
-            <Zap className="w-4 h-4" />
-            AI-Powered Scholarship Finder
-          </div>
-          
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-foreground leading-[1.1] tracking-tight mb-6">
-            Scholarships That
-            <br />
-            <span className="text-gradient">Actually Match You</span>
-          </h1>
-          
-          <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed mb-10">
-            Stop scrolling through hundreds of random listings. Our AI finds scholarships
-            you qualify for and coaches you through every application.
-          </p>
+      <main>
+        {/* Hero ----------------------------------------------------------
+            Deep teal band, not a white page. Large areas of brand colour are
+            what stop a layout reading as "dry" — accents alone on white can be
+            perfectly balanced and still feel cold.                          */}
+        <section className="brand-band relative overflow-hidden">
+          <div className="page-container relative pb-14 pt-24 sm:pb-20 sm:pt-28">
+            <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
+              <div className="text-center lg:text-start">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white ring-1 ring-inset ring-white/25 backdrop-blur">
+                  <Sparkles className="h-3.5 w-3.5" />
+                  {pick("للطلاب العرب حول العالم", "For Arab students worldwide")}
+                </span>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <Link
-              href="/auth/signup"
-              className="bg-primary text-primary-foreground px-8 py-4 rounded-xl text-lg font-semibold hover:opacity-90 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
-            >
-              Find My Scholarships
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link
-              href="/auth/login"
-              className="bg-card border border-border text-card-foreground px-8 py-4 rounded-xl text-lg font-semibold hover:bg-accent transition-colors flex items-center justify-center gap-2"
-            >
-              See How It Works
-            </Link>
-          </div>
+                <h1 className="font-display mt-6 text-[2rem] font-bold tracking-tight text-white sm:text-5xl lg:text-[3.25rem]">
+                  {t("hero.headline")}
+                </h1>
 
-          <div className="flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
-            <span className="flex items-center gap-2">
-              <Check className="w-4 h-4 text-success" />
-              Free to start
-            </span>
-            <span className="flex items-center gap-2">
-              <Check className="w-4 h-4 text-success" />
-              Results in minutes
-            </span>
-            <span className="flex items-center gap-2">
-              <Check className="w-4 h-4 text-success" />
-              Built by students
-            </span>
-          </div>
-        </div>
-
-        {/* Dashboard Preview */}
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 pb-20">
-          <div className="relative rounded-2xl border border-border bg-card shadow-2xl overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
-            <div className="flex items-center gap-2 px-5 py-3 border-b border-border bg-muted/30">
-              <div className="h-3 w-3 rounded-full bg-danger/60" />
-              <div className="h-3 w-3 rounded-full bg-warning/60" />
-              <div className="h-3 w-3 rounded-full bg-success/60" />
-              <div className="ml-4 flex-1 max-w-sm mx-auto px-4 py-1 rounded-lg bg-background text-xs text-muted-foreground border border-border text-center">
-                scholarshipai.app/dashboard
-              </div>
-            </div>
-            <div className="p-6 sm:p-8">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h3 className="text-lg font-bold text-card-foreground">Welcome back, Ahmed</h3>
-                  <p className="text-sm text-muted-foreground">You have 3 scholarships matching 90%+ your profile</p>
-                </div>
-                <div className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hidden sm:block">
-                  Browse All
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-                <div className="p-4 rounded-xl bg-primary/10 border border-primary/20">
-                  <div className="text-2xl font-bold text-primary">12</div>
-                  <div className="text-xs text-muted-foreground mt-1">Active Matches</div>
-                </div>
-                <div className="p-4 rounded-xl bg-success/10 border border-success/20">
-                  <div className="text-2xl font-bold text-success">4</div>
-                  <div className="text-xs text-muted-foreground mt-1">Docs Reviewed</div>
-                </div>
-                <div className="p-4 rounded-xl bg-warning/10 border border-warning/20">
-                  <div className="text-2xl font-bold text-warning">8.2</div>
-                  <div className="text-xs text-muted-foreground mt-1">Avg Score</div>
-                </div>
-                <div className="p-4 rounded-xl bg-destructive/10 border border-destructive/20">
-                  <div className="text-2xl font-bold text-destructive">3</div>
-                  <div className="text-xs text-muted-foreground mt-1">Due Soon</div>
-                </div>
-              </div>
-
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div className="p-4 rounded-xl border border-border bg-background">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">🇯🇵</span>
-                      <div>
-                        <div className="font-semibold text-card-foreground">MEXT Scholarship</div>
-                        <div className="text-xs text-muted-foreground">Japan · Bachelor · Fully Funded</div>
-                      </div>
-                    </div>
-                    <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-1 rounded-full">92% match</span>
-                  </div>
-                  <div className="h-2 rounded-full bg-muted overflow-hidden">
-                    <div className="h-full rounded-full bg-primary" style={{ width: '92%' }} />
-                  </div>
-                  <div className="flex items-center justify-between mt-3 text-xs text-muted-foreground">
-                    <span>Dec 15, 2026</span>
-                    <span className="font-medium text-warning">45 days left</span>
-                  </div>
-                </div>
-
-                <div className="p-4 rounded-xl border border-border bg-background">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">🇬🇧</span>
-                      <div>
-                        <div className="font-semibold text-card-foreground">Chevening Award</div>
-                        <div className="text-xs text-muted-foreground">UK · Master · Fully Funded</div>
-                      </div>
-                    </div>
-                    <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-1 rounded-full">78% match</span>
-                  </div>
-                  <div className="h-2 rounded-full bg-muted overflow-hidden">
-                    <div className="h-full rounded-full bg-primary" style={{ width: '78%' }} />
-                  </div>
-                  <div className="flex items-center justify-between mt-3 text-xs text-muted-foreground">
-                    <span>Feb 28, 2027</span>
-                    <span className="font-medium text-muted-foreground">120 days left</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* PROBLEM SECTION */}
-      <section className="py-20 px-4 bg-muted/30">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
-            <span className="inline-block px-4 py-1.5 rounded-full bg-destructive/10 text-destructive text-sm font-medium mb-4">The Problem</span>
-            <h2 className="text-4xl font-bold text-foreground mb-4">
-              Finding Scholarships Shouldn&apos;t Be This Hard
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Students across the Middle East waste months searching scattered websites with outdated information.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-card p-8 rounded-2xl border border-border shadow-sm hover:shadow-md transition-shadow">
-              <div className="w-12 h-12 rounded-xl bg-destructive/10 flex items-center justify-center mb-5">
-                <span className="text-2xl">🔍</span>
-              </div>
-              <h3 className="text-xl font-bold text-card-foreground mb-3">Drowning in Data</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                100+ websites, different languages, outdated deadlines. Students spend 3-5 hours just finding relevant scholarships.
-              </p>
-            </div>
-
-            <div className="bg-card p-8 rounded-2xl border border-border shadow-sm hover:shadow-md transition-shadow">
-              <div className="w-12 h-12 rounded-xl bg-warning/10 flex items-center justify-center mb-5">
-                <span className="text-2xl">📝</span>
-              </div>
-              <h3 className="text-xl font-bold text-card-foreground mb-3">Rejected for Weak Documents</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Your CV and personal statement might be getting you rejected — not your grades. Most students don&apos;t know until it&apos;s too late.
-              </p>
-            </div>
-
-            <div className="bg-card p-8 rounded-2xl border border-border shadow-sm hover:shadow-md transition-shadow">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-5">
-                <span className="text-2xl">🎯</span>
-              </div>
-              <h3 className="text-xl font-bold text-card-foreground mb-3">No Personalized Guidance</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Without matching based on YOUR profile, you waste time applying to scholarships you have zero chance of getting.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* SOLUTION SECTION */}
-      <section className="py-20 px-4">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
-            <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">The Solution</span>
-            <h2 className="text-4xl font-bold text-foreground mb-4">
-              Everything You Need, One Platform
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Three powerful features that replace hours of manual searching and guessing.
-            </p>
-          </div>
-
-          {/* Feature 1: Smart Matching */}
-          <div className="grid md:grid-cols-2 gap-12 items-center mb-20">
-            <div>
-              <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-6">
-                <Target className="w-7 h-7 text-primary" />
-              </div>
-              <h3 className="text-3xl font-bold text-foreground mb-4">Smart Matching</h3>
-              <p className="text-lg text-muted-foreground mb-6">
-                Tell us about yourself once. Our AI finds scholarships where you have the highest success probability — not just random listings.
-              </p>
-              <ul className="space-y-3">
-                <li className="flex gap-3 items-start">
-                  <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                  <span className="text-foreground">Ranked by fit percentage, not by who paid</span>
-                </li>
-                <li className="flex gap-3 items-start">
-                  <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                  <span className="text-foreground">Success probability for every match</span>
-                </li>
-                <li className="flex gap-3 items-start">
-                  <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                  <span className="text-foreground">Personalized to your goals and background</span>
-                </li>
-              </ul>
-            </div>
-            <div className="rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 p-6 flex items-center justify-center">
-              <div className="bg-card rounded-xl shadow-lg border border-border w-full max-w-sm p-5 space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="font-bold text-card-foreground">MEXT Scholarship</div>
-                  <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-1 rounded-full">92% fit</span>
-                </div>
-                <div className="text-sm text-muted-foreground">🇯🇵 Japan · Bachelor · Fully Funded</div>
-                <div className="h-2 rounded-full bg-muted overflow-hidden">
-                  <div className="h-full rounded-full bg-primary" style={{ width: '92%' }} />
-                </div>
-                <div className="flex gap-2">
-                  <span className="flex-1 px-3 py-2 rounded-lg bg-muted text-xs text-muted-foreground">45 days left</span>
-                  <span className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold">View →</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Feature 2: AI Review */}
-          <div className="grid md:grid-cols-2 gap-12 items-center mb-20">
-            <div className="rounded-2xl bg-gradient-to-br from-success/10 to-success/5 border border-success/20 p-6 flex items-center justify-center order-2 md:order-1">
-              <div className="bg-card rounded-xl shadow-lg border border-border w-full max-w-sm p-5 space-y-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-full bg-success/10 flex items-center justify-center">
-                    <span className="text-xl font-bold text-success">8.5</span>
-                  </div>
-                  <div>
-                    <div className="font-bold text-card-foreground">Document Review</div>
-                    <div className="text-xs text-muted-foreground">Personal Statement</div>
-                  </div>
-                </div>
-                <div className="space-y-2 pl-4 border-l-2 border-success/30">
-                  <div className="text-sm text-foreground">✓ Strong opening paragraph</div>
-                  <div className="text-sm text-muted-foreground">→ Add specific achievements</div>
-                  <div className="text-sm text-muted-foreground">→ Strengthen conclusion</div>
-                </div>
-                <div className="h-2 rounded-full bg-muted overflow-hidden">
-                  <div className="h-full rounded-full bg-success" style={{ width: '75%' }} />
-                </div>
-                <div className="text-xs text-success font-medium">+75% improvement potential</div>
-              </div>
-            </div>
-            <div className="order-1 md:order-2">
-              <div className="w-14 h-14 rounded-2xl bg-success/10 flex items-center justify-center mb-6">
-                <Brain className="w-7 h-7 text-success" />
-              </div>
-              <h3 className="text-3xl font-bold text-foreground mb-4">AI Document Review</h3>
-              <p className="text-lg text-muted-foreground mb-6">
-                Upload your CV or personal statement. Get professional, actionable feedback in seconds — not weeks.
-              </p>
-              <ul className="space-y-3">
-                <li className="flex gap-3 items-start">
-                  <Check className="w-5 h-5 text-success flex-shrink-0 mt-0.5" />
-                  <span className="text-foreground">Score out of 10 with detailed breakdown</span>
-                </li>
-                <li className="flex gap-3 items-start">
-                  <Check className="w-5 h-5 text-success flex-shrink-0 mt-0.5" />
-                  <span className="text-foreground">Specific improvements, not vague criticism</span>
-                </li>
-                <li className="flex gap-3 items-start">
-                  <Check className="w-5 h-5 text-success flex-shrink-0 mt-0.5" />
-                  <span className="text-foreground">Track your progress across versions</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          {/* Feature 3: Tracking */}
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="w-14 h-14 rounded-2xl bg-warning/10 flex items-center justify-center mb-6">
-                <TrendingUp className="w-7 h-7 text-warning" />
-              </div>
-              <h3 className="text-3xl font-bold text-foreground mb-4">Application Tracking</h3>
-              <p className="text-lg text-muted-foreground mb-6">
-                See exactly what each scholarship needs, track every document, and never miss a deadline again.
-              </p>
-              <ul className="space-y-3">
-                <li className="flex gap-3 items-start">
-                  <Check className="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
-                  <span className="text-foreground">Clear checklist for each application</span>
-                </li>
-                <li className="flex gap-3 items-start">
-                  <Check className="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
-                  <span className="text-foreground">Deadline countdowns with alerts</span>
-                </li>
-                <li className="flex gap-3 items-start">
-                  <Check className="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
-                  <span className="text-foreground">Never miss an opportunity</span>
-                </li>
-              </ul>
-            </div>
-            <div className="rounded-2xl bg-gradient-to-br from-warning/10 to-warning/5 border border-warning/20 p-6 flex items-center justify-center">
-              <div className="bg-card rounded-xl shadow-lg border border-border w-full max-w-sm p-5 space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="font-bold text-card-foreground">MEXT Checklist</div>
-                  <span className="text-xs font-semibold text-warning">3/5 done</span>
-                </div>
-                <div className="h-2 rounded-full bg-muted overflow-hidden">
-                  <div className="h-full rounded-full bg-warning" style={{ width: '60%' }} />
-                </div>
-                <div className="space-y-2">
-                  {['CV uploaded', 'Personal statement reviewed', 'Recommendation letter'].map((item) => (
-                    <div key={item} className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-success" />
-                      <span className="text-sm text-foreground">{item}</span>
-                    </div>
-                  ))}
-                  {['Transcript', 'Language certificate'].map((item) => (
-                    <div key={item} className="flex items-center gap-2">
-                      <div className="w-4 h-4 rounded border border-border" />
-                      <span className="text-sm text-muted-foreground">{item}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* HOW IT WORKS */}
-      <section className="py-20 px-4 bg-muted/30">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
-            <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">How It Works</span>
-            <h2 className="text-4xl font-bold text-foreground mb-4">
-              From Sign Up to Scholarship in 10 Minutes
-            </h2>
-          </div>
-
-          <div className="grid md:grid-cols-4 gap-8">
-            {[
-              { num: '01', title: 'Create Account', desc: 'Sign up with email in 30 seconds. No credit card.' },
-              { num: '02', title: 'Build Your Profile', desc: 'Answer 10 quick questions about your goals and background.' },
-              { num: '03', title: 'Get Matched', desc: 'See your personalized scholarship list ranked by fit.' },
-              { num: '04', title: 'Apply & Win', desc: 'Upload docs, get AI feedback, and submit stronger applications.' },
-            ].map((step) => (
-              <div key={step.num} className="text-center">
-                <div className="w-14 h-14 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center text-lg font-bold mx-auto mb-4">
-                  {step.num}
-                </div>
-                <h3 className="text-lg font-bold text-foreground mb-2">{step.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* SOCIAL PROOF */}
-      <section className="py-20 px-4">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
-            <span className="inline-block px-4 py-1.5 rounded-full bg-success/10 text-success text-sm font-medium mb-4">Validated by Students</span>
-            <h2 className="text-4xl font-bold text-foreground mb-4">
-              Built on Real Research
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              44 students told us what they actually need
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6 mb-12">
-            <div className="bg-card p-8 rounded-2xl border border-border text-center">
-              <div className="text-4xl font-bold text-primary mb-2">91%</div>
-              <p className="text-card-foreground font-semibold">Want AI-powered scholarship search</p>
-              <p className="text-sm text-muted-foreground mt-2">of 44 surveyed students</p>
-            </div>
-            <div className="bg-card p-8 rounded-2xl border border-border text-center">
-              <div className="text-4xl font-bold text-success mb-2">88%</div>
-              <p className="text-card-foreground font-semibold">Need document review feedback</p>
-              <p className="text-sm text-muted-foreground mt-2">They can&apos;t tell if their docs are strong enough</p>
-            </div>
-            <div className="bg-card p-8 rounded-2xl border border-border text-center">
-              <div className="text-4xl font-bold text-warning mb-2">55%</div>
-              <p className="text-card-foreground font-semibold">Ready to pay for this solution</p>
-              <p className="text-sm text-muted-foreground mt-2">They see the value in a tool like this</p>
-            </div>
-          </div>
-
-          <div className="bg-card p-8 rounded-2xl border border-border">
-            <blockquote className="text-xl text-card-foreground italic leading-relaxed">
-              &ldquo;I spent 3 weeks searching for scholarships across different websites. ScholarshipAI found better options in minutes.&rdquo;
-            </blockquote>
-            <p className="text-muted-foreground mt-4 text-sm">— Survey respondent, Grade 11 student</p>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ */}
-      <section className="py-20 px-4 bg-muted/30">
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-foreground mb-4">
-              Frequently Asked Questions
-            </h2>
-          </div>
-
-          <div className="space-y-4">
-            {[
-              {
-                q: 'Is this really free?',
-                a: 'Yes — forever. You get scholarship matching and 1 AI document review per month at no cost. No credit card required to sign up.',
-              },
-              {
-                q: 'Will this help me actually get accepted?',
-                a: 'We can\'t guarantee acceptance, but we help you find scholarships you qualify for AND submit stronger applications. Those two things directly increase your chances.',
-              },
-              {
-                q: 'How fast is setup?',
-                a: 'Sign up (1 min) → Answer questions (5 mins) → Get matches (instant). You\'ll have your first scholarships in under 10 minutes.',
-              },
-              {
-                q: 'What scholarships do you cover?',
-                a: 'Currently: Major government scholarships (MEXT, Chevening, Stipendium Hungaricum, DAAD, and more). We\'re expanding to private scholarships monthly.',
-              },
-              {
-                q: 'Is my data safe?',
-                a: 'Your data is encrypted and stored securely. We never sell your information. It\'s used only to match you with scholarships and improve the platform.',
-              },
-            ].map((faq) => (
-              <details key={faq.q} className="group bg-card p-6 rounded-xl border border-border">
-                <summary className="flex cursor-pointer items-center justify-between font-bold text-card-foreground list-none">
-                  {faq.q}
-                  <span className="ml-4 transition group-open:rotate-45 text-muted-foreground">
-                    <span className="text-2xl leading-none">+</span>
-                  </span>
-                </summary>
-                <p className="mt-4 text-muted-foreground leading-relaxed">
-                  {faq.a}
+                <p className="mt-5 max-w-xl text-base text-white/80 sm:text-lg lg:mx-0">
+                  {t("hero.sub")}
                 </p>
-              </details>
+
+                <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start">
+                  <Link href="/auth/signup" className="w-full sm:w-auto">
+                    <button className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-sm font-semibold text-[rgb(var(--brand-deep))] shadow-lg transition hover:bg-white/90 active:scale-[0.98] sm:w-auto">
+                      {t("hero.cta")}
+                      <Arrow className="h-4 w-4" />
+                    </button>
+                  </Link>
+                  <Link href="/scholarships" className="w-full sm:w-auto">
+                    <button className="inline-flex w-full items-center justify-center rounded-xl border-2 border-white/30 px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-white/10 active:scale-[0.98] sm:w-auto">
+                      {t("hero.ctaSecondary")}
+                    </button>
+                  </Link>
+                </div>
+
+                <p className="mt-4 text-xs text-white/60">{t("hero.noCard")}</p>
+              </div>
+
+              <HeroPreview />
+            </div>
+          </div>
+        </section>
+
+        {/* Proof --------------------------------------------------------- */}
+        <section className="border-b border-border bg-card">
+          <div className="page-container py-10">
+            <dl className="grid grid-cols-3 gap-4 text-center">
+              <Stat value={num(200)} label={t("proof.scholarships")} plus />
+              <Stat value={num(30)} label={t("proof.countries")} plus />
+              <Stat
+                value={pick("مجاناً", "Free")}
+                label={pick("للبحث والمطابقة", "to search and match")}
+              />
+            </dl>
+          </div>
+        </section>
+
+        {/* How it works -------------------------------------------------- */}
+        <section className="page-container py-16 sm:py-20">
+          <h2 className="font-display text-center text-2xl font-bold tracking-tight text-foreground sm:text-4xl">
+            {t("how.title")}
+          </h2>
+
+          <ol className="mt-10 grid gap-6 md:grid-cols-3">
+            {[
+              { icon: Target, n: 1, title: t("how.step1.title"), body: t("how.step1.body") },
+              { icon: ShieldCheck, n: 2, title: t("how.step2.title"), body: t("how.step2.body") },
+              { icon: CalendarClock, n: 3, title: t("how.step3.title"), body: t("how.step3.body") },
+            ].map((step) => {
+              const Icon = step.icon;
+              return (
+                <li key={step.n} className="card-raised p-6">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <span className="text-sm font-semibold text-muted-foreground">
+                      {num(step.n)}
+                    </span>
+                  </div>
+                  <h3 className="mt-4 text-lg font-semibold text-foreground">{step.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{step.body}</p>
+                </li>
+              );
+            })}
+          </ol>
+        </section>
+
+        {/* Differentiator ------------------------------------------------ */}
+        <section className="brand-band-soft border-y border-border">
+          <div className="page-container py-16 sm:py-24">
+            <div className="mx-auto max-w-2xl text-center">
+              <h2 className="font-display text-2xl font-bold tracking-tight text-foreground sm:text-4xl">
+                {pick("لماذا هذه المنصة مختلفة", "Why this isn't just another listings site")}
+              </h2>
+              <p className="mt-3 text-sm text-muted-foreground sm:text-base">
+                {pick(
+                  "مواقع المنح تعطيك قائمة. نحن نعطيك إجابة.",
+                  "Scholarship sites give you a list. We give you an answer."
+                )}
+              </p>
+            </div>
+
+            <div className="mt-10 grid gap-6 md:grid-cols-3">
+              {VALUE_PROPS.map((vp) => (
+                <div key={vp.key} className="card-raised p-6">
+                  <h3 className="text-base font-semibold text-foreground">
+                    {pick(vp.titleAr, vp.titleEn)}
+                  </h3>
+                  <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">
+                    {pick(vp.bodyAr, vp.bodyEn)}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* Concrete beats abstract — show the roadmap, don't describe it */}
+            <div className="card-raised mx-auto mt-12 max-w-2xl p-5 sm:p-7">
+              <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                <CalendarClock className="h-4 w-4 text-primary" />
+                {pick("مثال على خطتك الزمنية", "A sample roadmap")}
+              </div>
+              <ul className="mt-5">
+                {ROADMAP_SAMPLE.map((row, i, arr) => (
+                  <li key={i} className="flex gap-3">
+                    <div className="flex flex-col items-center">
+                      <span
+                        className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${
+                          row.highlight ? "bg-primary" : "bg-border"
+                        }`}
+                      />
+                      {i < arr.length - 1 && <span className="w-px flex-1 bg-border" />}
+                    </div>
+                    <div className="flex-1 pb-5">
+                      <div className="flex flex-wrap items-baseline gap-x-2">
+                        <span className="text-xs font-medium text-muted-foreground">
+                          {pick(row.dAr, row.dEn)}
+                        </span>
+                        <span
+                          className={`text-sm ${
+                            row.highlight ? "font-semibold text-primary" : "text-foreground"
+                          }`}
+                        >
+                          {pick(row.aAr, row.aEn)}
+                        </span>
+                      </div>
+                      {(row.nAr || row.nEn) && (
+                        <p className="mt-0.5 text-xs text-muted-foreground">
+                          {pick(row.nAr, row.nEn)}
+                        </p>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* Pricing ------------------------------------------------------- */}
+        <section id="pricing" className="page-container py-16 sm:py-20">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="font-display text-2xl font-bold tracking-tight text-foreground sm:text-4xl">
+              {t("section.pricing")}
+            </h2>
+            <p className="mt-3 text-sm text-muted-foreground sm:text-base">
+              {t("section.pricingSub")}
+            </p>
+          </div>
+
+          <div className="mx-auto mt-10 grid max-w-4xl gap-5 sm:grid-cols-3">
+            {CREDIT_PACKAGES.map((pkg) => (
+              <div
+                key={pkg.id}
+                className={`relative flex flex-col rounded-xl border bg-card p-6 ${
+                  pkg.popular ? "border-primary shadow-md" : "border-border"
+                }`}
+              >
+                {pkg.popular && (
+                  <span className="absolute -top-2.5 start-6 rounded-full bg-primary px-2.5 py-0.5 text-[11px] font-semibold text-primary-foreground">
+                    {pick("الأكثر اختياراً", "Most popular")}
+                  </span>
+                )}
+                <h3 className="text-sm font-semibold text-foreground">
+                  {pick(pkg.nameAr, pkg.name)}
+                </h3>
+                {/* Currency is always LTR, even inside an RTL layout */}
+                <p dir="ltr" className="mt-3 text-start text-3xl font-bold text-foreground rtl:text-end">
+                  ${pkg.price}
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">≈ {formatEGP(pkg.price)}</p>
+                <p className="mt-3 text-sm text-muted-foreground">
+                  {num(pkg.credits)}{" "}
+                  {pick(
+                    pkg.credits > 2 ? "مراجعات" : "مراجعة",
+                    `review${pkg.credits > 1 ? "s" : ""}`
+                  )}
+                </p>
+                <ul className="mt-4 flex-1 space-y-2">
+                  {(pick(pkg.featuresAr, pkg.features) as readonly string[])
+                    .slice(0, 3)
+                    .map((f) => (
+                      <li key={f} className="flex items-start gap-2 text-xs text-muted-foreground">
+                        <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                </ul>
+              </div>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* FINAL CTA */}
-      <section className="py-20 px-4 bg-primary">
-        <div className="max-w-3xl mx-auto text-center text-primary-foreground">
-          <h2 className="text-4xl sm:text-5xl font-bold mb-4">
-            Ready to Find Your Scholarships?
+          <p className="mt-6 text-center text-xs text-muted-foreground">
+            {pick(
+              `كل حساب جديد يبدأ بـ ${num(FREE_CREDITS_ON_SIGNUP)} مراجعة مجانية.`,
+              `Every new account starts with ${FREE_CREDITS_ON_SIGNUP} free review.`
+            )}
+          </p>
+        </section>
+
+        {/* FAQ ----------------------------------------------------------- */}
+        <section className="border-t border-border bg-card">
+          <div className="page-container py-16 sm:py-20">
+            <h2 className="font-display text-center text-2xl font-bold tracking-tight text-foreground sm:text-4xl">
+              {t("section.faq")}
+            </h2>
+            <div className="mx-auto mt-8 max-w-2xl divide-y divide-border">
+              {FAQS.map((f, i) => (
+                <Faq key={i} q={pick(f.qAr, f.qEn)} a={pick(f.aAr, f.aEn)} />
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Final CTA ----------------------------------------------------- */}
+        <section className="page-container py-16 text-center sm:py-20">
+          <h2 className="font-display mx-auto max-w-xl text-2xl font-bold text-foreground sm:text-3xl">
+            {pick("ابدأ الآن — الأمر يستغرق دقيقتين", "Start now — it takes two minutes")}
           </h2>
-          <p className="text-lg sm:text-xl mb-8 opacity-90">
-            Join students getting matched with opportunities they actually qualify for.
-          </p>
-          <Link
-            href="/auth/signup"
-            className="bg-primary-foreground text-primary px-8 py-4 rounded-xl text-lg font-semibold hover:opacity-90 transition-all inline-flex items-center gap-2 shadow-lg"
-          >
-            Get Started — It&apos;s Free
-            <ArrowRight className="w-5 h-5" />
+          <Link href="/auth/signup" className="mt-7 inline-block">
+            <Button size="lg" className="gap-2">
+              {t("hero.cta")}
+              <Arrow className="h-4 w-4" />
+            </Button>
           </Link>
-          <p className="text-sm mt-6 opacity-75">
-            Free forever · No credit card · Takes 5 minutes
-          </p>
-        </div>
-      </section>
+        </section>
+      </main>
 
-      {/* FOOTER */}
-      <footer className="bg-card border-t border-border py-12 px-4">
-        <div className="max-w-5xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
-                  <Sparkles className="w-4 h-4 text-primary-foreground" />
-                </div>
-                <span className="font-bold text-card-foreground">ScholarshipAI</span>
+      <Footer />
+    </>
+  );
+}
+
+/**
+ * Sample match results. Showing the product's actual output does more work
+ * than any amount of hero copy — a visitor sees a fit score and a deadline
+ * countdown before they've signed up for anything.
+ *
+ * Deliberately real scholarship names, not lorem. If a student recognises
+ * Chevening or DAAD, the whole page becomes credible.
+ */
+function HeroPreview() {
+  const { pick, num } = useLanguage();
+
+  const rows = [
+    { nameAr: "منحة تشيفنينغ البريطانية", nameEn: "Chevening Scholarship", meta: pick("المملكة المتحدة · ماجستير", "United Kingdom · Master's"), score: 92, days: 34 },
+    { nameAr: "منحة DAAD الألمانية", nameEn: "DAAD Scholarship", meta: pick("ألمانيا · ماجستير / دكتوراه", "Germany · Master's / PhD"), score: 78, days: 61 },
+    { nameAr: "المنحة التركية", nameEn: "Türkiye Bursları", meta: pick("تركيا · بكالوريوس", "Turkey · Bachelor's"), score: 64, days: 12 },
+  ];
+
+  return (
+    <div className="rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-5">
+      <div className="flex items-center justify-between pb-3">
+        <span className="text-sm font-medium text-foreground">
+          {pick("أفضل المنح لك", "Your best matches")}
+        </span>
+        <span className="text-xs text-muted-foreground">
+          {pick("محدَّث اليوم", "Updated today")}
+        </span>
+      </div>
+
+      <div className="space-y-2.5">
+        {rows.map((r) => (
+          <div key={r.nameEn} className="rounded-xl border border-border p-3.5">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium text-foreground">
+                  {pick(r.nameAr, r.nameEn)}
+                </p>
+                <p className="mt-0.5 truncate text-xs text-muted-foreground">{r.meta}</p>
               </div>
-              <p className="text-sm text-muted-foreground">AI-powered scholarship finder for students worldwide.</p>
+              <span
+                dir="ltr"
+                style={{ unicodeBidi: "isolate" }}
+                className="shrink-0 text-lg font-semibold text-primary"
+              >
+                {num(r.score)}%
+              </span>
             </div>
-            <div>
-              <h4 className="font-semibold text-card-foreground mb-4">Product</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="/dashboard" className="hover:text-foreground transition-colors">Dashboard</Link></li>
-                <li><Link href="/pricing" className="hover:text-foreground transition-colors">Pricing</Link></li>
-                <li><Link href="/help" className="hover:text-foreground transition-colors">Help Center</Link></li>
-              </ul>
+
+            <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-muted">
+              <div className="h-full rounded-full bg-primary" style={{ width: `${r.score}%` }} />
             </div>
-            <div>
-              <h4 className="font-semibold text-card-foreground mb-4">Company</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="/glossary" className="hover:text-foreground transition-colors">Glossary</Link></li>
-                <li><Link href="/success-stories" className="hover:text-foreground transition-colors">Success Stories</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-card-foreground mb-4">Legal</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link></li>
-                <li><Link href="/terms" className="hover:text-foreground transition-colors">Terms of Service</Link></li>
-              </ul>
-            </div>
+
+            <p className="mt-2.5 flex items-center gap-1.5 text-xs text-muted-foreground">
+              <CalendarClock className="h-3.5 w-3.5 shrink-0" />
+              {pick(
+                `متبقٍ ${num(r.days)} يوماً على الموعد النهائي`,
+                `${r.days} days until the deadline`
+              )}
+            </p>
           </div>
-          <div className="border-t border-border pt-8 text-center text-sm text-muted-foreground">
-            <p>© 2026 ScholarshipAI. Built by students, for students.</p>
-          </div>
-        </div>
-      </footer>
+        ))}
+      </div>
+
+      <p className="pt-3 text-center text-xs text-muted-foreground">
+        {pick("مثال — سجّل لترى نتائجك أنت", "Sample — sign up to see your own")}
+      </p>
     </div>
   );
 }
+
+function Stat({ value, label, plus }: { value: string; label: string; plus?: boolean }) {
+  return (
+    <div>
+      {/* The "+" must follow the digits visually. Rendering {value}{"+"} in an
+          RTL container flips it to "+٢٠٠"; an isolated LTR span keeps "٢٠٠+". */}
+      <dd className="text-2xl font-semibold text-foreground sm:text-3xl">
+        <span dir="ltr" style={{ unicodeBidi: "isolate" }}>
+          {value}
+          {plus && "+"}
+        </span>
+      </dd>
+      <dt className="mt-1 text-xs text-muted-foreground sm:text-sm">{label}</dt>
+    </div>
+  );
+}
+
+function Faq({ q, a }: { q: string; a: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div>
+      <button
+        onClick={() => setOpen(!open)}
+        aria-expanded={open}
+        className="flex w-full items-center justify-between gap-4 py-4 text-start"
+      >
+        <span className="text-sm font-medium text-foreground">{q}</span>
+        <ChevronDown
+          className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${
+            open ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+      {open && <p className="pb-4 text-sm leading-relaxed text-muted-foreground">{a}</p>}
+    </div>
+  );
+}
+
+function Footer() {
+  const { pick } = useLanguage();
+  return (
+    <footer className="border-t border-border">
+      <div className="page-container py-10">
+        <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
+          <div className="text-center sm:text-start">
+            <p className="text-sm font-semibold text-foreground">
+              {pick(BRAND.nameAr, BRAND.name)}
+            </p>
+            <p className="mt-1 max-w-sm text-xs text-muted-foreground">
+              {pick(BRAND.descriptionAr, BRAND.description)}
+            </p>
+          </div>
+          <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-muted-foreground">
+            <Link href="/scholarships" className="hover:text-foreground">
+              {pick("المنح", "Scholarships")}
+            </Link>
+            <Link href="/pricing" className="hover:text-foreground">
+              {pick("الأسعار", "Pricing")}
+            </Link>
+            <Link href="/help" className="hover:text-foreground">
+              {pick("المساعدة", "Help")}
+            </Link>
+            <Link href="/privacy" className="hover:text-foreground">
+              {pick("الخصوصية", "Privacy")}
+            </Link>
+            <Link href="/terms" className="hover:text-foreground">
+              {pick("الشروط", "Terms")}
+            </Link>
+          </nav>
+        </div>
+        <p className="mt-8 text-center text-xs text-muted-foreground">
+          © {new Date().getFullYear()} {pick(BRAND.nameAr, BRAND.name)}
+        </p>
+      </div>
+    </footer>
+  );
+}
+
+interface RoadmapSampleRow {
+  dAr: string; dEn: string;
+  aAr: string; aEn: string;
+  nAr: string; nEn: string;
+  /** Optional: only the final row is emphasised. */
+  highlight?: boolean;
+}
+
+// Typed rather than `as const`: with `as const` TypeScript infers a union of
+// five distinct object types, and `highlight` exists on only one of them, so
+// `row.highlight` fails to compile even though it's valid at runtime.
+const ROADMAP_SAMPLE: readonly RoadmapSampleRow[] = [
+  { dAr: "١٥ نوفمبر", dEn: "15 Nov", aAr: "ابدأ التحضير للآيلتس", aEn: "Start IELTS prep", nAr: "قبل ١٢ أسبوعاً من الموعد", nEn: "12 weeks out" },
+  { dAr: "٢٠ ديسمبر", dEn: "20 Dec", aAr: "أدِّ اختبار الآيلتس", aEn: "Take IELTS", nAr: "احجز قبل ١ ديسمبر", nEn: "book by 1 Dec" },
+  { dAr: "٥ يناير", dEn: "5 Jan", aAr: "اطلب خطابات التوصية", aEn: "Request recommendation letters", nAr: "امنح أساتذتك ٦ أسابيع", nEn: "give referees 6 weeks" },
+  { dAr: "١٥ يناير", dEn: "15 Jan", aAr: "اكتب مسودة خطاب الدوافع", aEn: "Draft your personal statement", nAr: "", nEn: "" },
+  { dAr: "٨ مارس", dEn: "8 Mar", aAr: "قدّم الطلب", aEn: "Submit", nAr: "قبل أسبوع من الموعد النهائي", nEn: "a week before the deadline", highlight: true },
+];
+
+/**
+ * FAQ content.
+ *
+ * Replace these with the real questions you collect from the Arabic scholarship
+ * Facebook groups. Real questions convert better than invented ones, and
+ * they're free keyword research for SEO.
+ */
+const FAQS = [
+  {
+    qAr: "هل المنصة مجانية؟",
+    qEn: "Is it free?",
+    aAr: "البحث عن المنح ونسبة التطابق والخطة الزمنية مجانية بالكامل ودائماً. تدفع فقط إذا أردت مراجعة مفصّلة لمستنداتك، وكل حساب جديد يحصل على مراجعة مجانية أولى.",
+    aEn: "Searching, fit scores and roadmaps are completely free, always. You only pay if you want a detailed review of your documents — and every new account gets one free review.",
+  },
+  {
+    qAr: "هل توجد منح لا تتطلب الآيلتس أو التوفل؟",
+    qEn: "Are there scholarships that don't require IELTS or TOEFL?",
+    aAr: "نعم، وكثيرة. منح حكومية في ألمانيا وتركيا والصين ومصر لا تشترط اختبار إنجليزية، أو تقبل خطاباً من جامعتك بدلاً منه. يمكنك تصفية النتائج لعرض هذه المنح فقط.",
+    aEn: "Yes, plenty. Government scholarships in Germany, Turkey, China and Egypt often don't require an English test, or accept a letter from your university instead. You can filter to show only these.",
+  },
+  {
+    qAr: "كيف تُحسب نسبة التطابق؟",
+    qEn: "How is the fit score calculated?",
+    aAr: "نقارن ملفك — الجنسية والدرجة العلمية والتخصص والمعدل والعمر ومستوى الإنجليزية — بشروط كل منحة، ونوضح لك سبب كل نتيجة. وإذا كانت معلومة غير مذكورة في المصدر، نقول ذلك صراحةً بدلاً من التخمين.",
+    aEn: "We compare your profile — nationality, degree, field, GPA, age, English level — against each scholarship's stated criteria, and show you the reasoning. Where the source doesn't state something, we say so rather than guessing.",
+  },
+  {
+    qAr: "هل تضمنون الحصول على المنحة؟",
+    qEn: "Do you guarantee I'll get a scholarship?",
+    aAr: "لا، ولا يستطيع أحد أن يضمن ذلك بصدق. ما نفعله هو توفير وقتك بعدم إضاعته على منح لست مؤهلاً لها أصلاً، ومساعدتك على تقديم طلب أقوى في المنح المناسبة.",
+    aEn: "No, and nobody honestly can. What we do is save you from wasting time on scholarships you were never eligible for, and help you submit a stronger application to the ones that do fit.",
+  },
+  {
+    qAr: "كيف أدفع من مصر؟",
+    qEn: "How do I pay from Egypt?",
+    aAr: "فودافون كاش أو إنستاباي أو تحويل بنكي. ترسل لنا صورة إيصال التحويل ونضيف رصيدك يدوياً — عادةً خلال ساعات. الدفع بالبطاقة متاح أيضاً في بعض الدول.",
+    aEn: "Vodafone Cash, InstaPay or bank transfer. Send us a screenshot of the transfer and we add your credits manually — usually within a few hours. Card payment is available in some countries too.",
+  },
+  {
+    qAr: "من أين تأتي بيانات المنح؟",
+    qEn: "Where does your scholarship data come from?",
+    aAr: "من الصفحات الرسمية للجهات المانحة، ونضع رابط المصدر مع كل منحة لتتحقق بنفسك. نراجع البيانات دورياً ونعرض تاريخ آخر تحقق. وإن وجدت خطأً، أبلغنا وسنصححه.",
+    aEn: "From the providers' own official pages, and we link the source on every listing so you can check for yourself. We re-verify regularly and show when each was last checked. Found an error? Tell us and we'll fix it.",
+  },
+] as const;

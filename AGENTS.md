@@ -41,14 +41,22 @@ Auth and Database are **different Supabase projects**. Auth users do NOT auto-po
 
 ## Environment (.env)
 
+> **Never paste real secret values into this file.** It is committed to git.
+> See `.env.example` for the full list; values live only in `.env` (gitignored)
+> and in the Vercel project settings.
+
 Key vars (all in `.env` at project root):
 - `DATABASE_URL` — Supabase pooler connection string
 - `NEXT_PUBLIC_SUPABASE_URL` — Auth project URL
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Auth project anon key
 - `SUPABASE_SERVICE_ROLE_KEY` — Auth project service role (admin operations)
-- `RESEND_API_KEY` — `re_J4gz8FNz_BCgKAn2vJ6F95q34D7cAbypC`
-- `AGENTROUTER_API_KEY` — for chat AI
-- Stripe keys — not yet configured
+- `RESEND_API_KEY` — transactional email
+- `RESEND_FROM_EMAIL` — verified sender, e.g. `Scholarship Hub <noreply@yourdomain.com>`
+- `AGENTROUTER_API_KEY` — chat + document review AI
+- `BAZAARLINK_API_KEY` — optional primary AI gateway; skipped if unset
+- `ADMIN_EMAIL` — the only account allowed to reach `/admin/*`
+- `NEXT_PUBLIC_WHATSAPP_NUMBER` — manual-payment contact, digits only, country code first
+- Stripe keys — `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
 
 ## Signup Flow (current)
 
@@ -208,11 +216,19 @@ Expected warnings: `Dynamic server usage` errors for `/api/users`, `/api/admin/p
 
 ## Admin
 
-Delete a user from Supabase Auth (does NOT delete from Prisma DB — separate projects):
-```js
-const url = 'https://kkqhvlizcbxikypsaxff.supabase.co';
-const anonKey = 'sb_publishable__89o5d0QJ9vjfE8aXW-cJQ_y20wiKIn';
-const serviceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...';
-const headers = { apikey: anonKey, Authorization: 'Bearer ' + serviceKey };
+Admin access is gated on `ADMIN_EMAIL` — enforced in both `src/middleware.ts`
+(page routes under `/admin/*`) and each `/api/admin/*` route handler.
+
+Delete a user from Supabase Auth (does NOT delete from Prisma DB — separate projects).
+Reads credentials from `.env`, never hardcode them:
+
+```bash
+node -r dotenv/config -e "
+const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const headers = {
+  apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  Authorization: 'Bearer ' + process.env.SUPABASE_SERVICE_ROLE_KEY,
+};
 // list -> find by email -> DELETE /auth/v1/admin/users/:id
+"
 ```
