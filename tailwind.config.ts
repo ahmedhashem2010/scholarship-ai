@@ -1,5 +1,33 @@
 import type { Config } from "tailwindcss";
 
+/**
+ * Builds a full 50–900 scale plus DEFAULT and foreground from CSS variables.
+ *
+ * WHY THIS EXISTS
+ *
+ * Roughly 106 places in the codebase already used classes like
+ * `bg-primary-50`, `text-success-700` and `border-danger-200`. None of those
+ * stops were defined, so Tailwind emitted nothing for them and the elements
+ * silently inherited whatever was around them — which is why the auth error
+ * boxes looked unstyled and several "coloured" panels were plain white.
+ *
+ * Generating the scale fixes every one of them without touching a component,
+ * and it means the next person who reaches for `-300` gets a real colour
+ * instead of a no-op.
+ */
+const scale = (name: string, withForeground = true) => ({
+  DEFAULT: `rgb(var(--${name}) / <alpha-value>)`,
+  ...(withForeground
+    ? { foreground: `rgb(var(--${name}-foreground) / <alpha-value>)` }
+    : {}),
+  ...Object.fromEntries(
+    [50, 100, 200, 300, 400, 500, 600, 700, 800, 900].map((stop) => [
+      String(stop),
+      `rgb(var(--${name}-${stop}) / <alpha-value>)`,
+    ])
+  ),
+});
+
 const config: Config = {
   darkMode: "class",
   content: [
@@ -38,34 +66,25 @@ const config: Config = {
           DEFAULT: "rgb(var(--popover) / <alpha-value>)",
           foreground: "rgb(var(--popover-foreground) / <alpha-value>)",
         },
-        primary: {
-          DEFAULT: "rgb(var(--primary) / <alpha-value>)",
-          foreground: "rgb(var(--primary-foreground) / <alpha-value>)",
-        },
-        secondary: {
-          DEFAULT: "rgb(var(--secondary) / <alpha-value>)",
-          foreground: "rgb(var(--secondary-foreground) / <alpha-value>)",
-        },
+        primary: scale("primary"),
+        secondary: scale("secondary"),
+        success: scale("success"),
+        warning: scale("warning"),
+        danger: scale("danger"),
+        // "The source didn't say." Its own colour, never amber — amber sits
+        // beside gold, and gold means arrival.
+        unknown: scale("unknown"),
         destructive: {
           DEFAULT: "rgb(var(--destructive) / <alpha-value>)",
           foreground: "rgb(var(--destructive-foreground) / <alpha-value>)",
         },
-        success: {
-          DEFAULT: "rgb(var(--success) / <alpha-value>)",
-          foreground: "rgb(var(--success-foreground) / <alpha-value>)",
-        },
-        warning: {
-          DEFAULT: "rgb(var(--warning) / <alpha-value>)",
-          foreground: "rgb(var(--warning-foreground) / <alpha-value>)",
-        },
-        danger: {
-          DEFAULT: "rgb(var(--danger) / <alpha-value>)",
-          foreground: "rgb(var(--danger-foreground) / <alpha-value>)",
-        },
-        "score-low": "#EF4444",
-        "score-medium": "#F59E0B",
-        "score-high": "#22C55E",
-        "score-excellent": "#10B981",
+        // Match-score bands. Re-pointed at the brand ramps: the old values
+        // were stock Tailwind red/amber/green and were the loudest thing on
+        // the page next to a navy-and-gold interface.
+        "score-low": "rgb(var(--danger-500))",
+        "score-medium": "rgb(var(--warning-500))",
+        "score-high": "rgb(var(--success-500))",
+        "score-excellent": "rgb(var(--secondary-500))",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -73,12 +92,16 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        // "RB" first — it's unicode-range scoped to Arabic, so Latin glyphs skip
-        // it and land on Plus Jakarta Sans. IBM Plex Sans Arabic sits behind it
-        // as the fallback if the self-hosted RB files aren't present.
-        sans: ["RB", "var(--font-arabic)", "var(--font-sans)", "system-ui", "sans-serif"],
-        heading: ["RB", "var(--font-arabic)", "var(--font-sans)", "system-ui", "sans-serif"],
-        arabic: ["RB", "var(--font-arabic)", "system-ui", "sans-serif"],
+        // Arabic first in the stack, Latin behind it. IBM Plex Sans Arabic is
+        // unicode-range scoped, so Latin glyphs fall through to IBM Plex Sans
+        // — one superfamily, two scripts, no mismatch at the boundary.
+        //
+        // The self-hosted "RB" display face is gone. Display faces have no
+        // real Latin glyphs and no presentation forms for shaping, which is
+        // why Arabic rendered unjoined wherever it took over.
+        sans: ["var(--font-arabic)", "var(--font-sans)", "system-ui", "sans-serif"],
+        heading: ["var(--font-arabic)", "var(--font-sans)", "system-ui", "sans-serif"],
+        arabic: ["var(--font-arabic)", "system-ui", "sans-serif"],
         latin: ["var(--font-sans)", "system-ui", "sans-serif"],
       },
       fontSize: {

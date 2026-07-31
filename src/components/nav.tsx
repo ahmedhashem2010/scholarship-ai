@@ -14,21 +14,44 @@ import { BRAND } from "@/lib/brand";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 /** Wordmark. Arabic name in Arabic, Latin name in English — never transliterate. */
+/**
+ * The real mark, finally — an S drawn as a road.
+ *
+ * Sits on a white tile rather than being recoloured. The artwork is navy with
+ * white lane dashes and a gold destination node; recolouring it for a dark
+ * header would mean inventing a second colourway for the dashes and losing the
+ * gold, which is the one colour that never changes. A white tile keeps the
+ * brand exactly as drawn on any background.
+ *
+ * `next/image` is skipped deliberately: this is a small static SVG, and the
+ * optimiser adds a network round trip and a layout-shift risk for no gain.
+ */
 function Logo({ href, onDark }: { href: string; onDark?: boolean }) {
   const { pick } = useLanguage();
   return (
     <Link
       href={href}
-      className={`flex items-center gap-2 font-bold ${onDark ? "text-white" : "text-foreground"}`}
+      className={`flex items-center gap-2.5 font-semibold ${
+        onDark ? "text-white" : "text-foreground"
+      }`}
     >
-      <div
-        className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${
-          onDark ? "bg-white text-[rgb(var(--brand-deep))]" : "bg-primary text-primary-foreground"
+      <span
+        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-[9px] bg-white ${
+          onDark ? "" : "ring-1 ring-border"
         }`}
       >
-        S
-      </div>
-      <span className="text-sm whitespace-nowrap">{pick(BRAND.nameAr, BRAND.name)}</span>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/brand/logo-mark.svg"
+          alt=""
+          width={22}
+          height={22}
+          className="h-[22px] w-[22px]"
+        />
+      </span>
+      <span className="whitespace-nowrap text-[15px] tracking-tight">
+        {pick(BRAND.nameAr, BRAND.name)}
+      </span>
     </Link>
   );
 }

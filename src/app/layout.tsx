@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Plus_Jakarta_Sans, IBM_Plex_Sans_Arabic } from "next/font/google";
+import { IBM_Plex_Sans, IBM_Plex_Sans_Arabic } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
 import { LanguageProvider } from "@/contexts/LanguageContext";
@@ -16,11 +16,17 @@ const ChatWidget = dynamic(() => import("@/components/chat-widget").then((m) => 
   loading: () => null,
 });
 
-// One type system for both scripts. IBM Plex Sans and IBM Plex Sans Arabic were
-// designed together, so Arabic and Latin share stroke weight, x-height and
-// rhythm — the previous Poppins + Inter + Tajawal stack had three families,
-// two of which (Poppins, Inter) competed for the same job.
-const fontSans = Plus_Jakarta_Sans({
+// One type system for both scripts.
+//
+// IBM Plex Sans and IBM Plex Sans Arabic were drawn together, so they share
+// stroke weight, x-height and rhythm. That matters more than it sounds: this
+// is the fourth Arabic font this project has used, and the previous three all
+// failed the same way — an Arabic face and a Latin face picked separately
+// never sit on a line properly, and every fix breaks something else.
+//
+// The comment here already claimed Plex while the code actually loaded Plus
+// Jakarta Sans, which is its own lesson about trusting comments.
+const fontSans = IBM_Plex_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-sans",
@@ -73,6 +79,24 @@ export const metadata: Metadata = {
     canonical: SEO.siteUrl,
     languages: { ar: SEO.siteUrl, en: SEO.siteUrl },
   },
+  // The tab icon is a separate file from the mark, deliberately. At 16px the
+  // lane dashes are under a pixel wide and grey the road into a smudge, so
+  // favicon.svg drops them and enlarges the nodes. Same geometry, different
+  // detail budget — both generated from one source by scripts/build-brand.mjs.
+  icons: {
+    icon: [
+      { url: "/brand/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    apple: [{ url: "/brand/app-icon.svg", type: "image/svg+xml" }],
+  },
+  // Navy in both modes. The browser paints this behind the address bar on
+  // mobile before the page renders, so a mismatched value shows as a flash of
+  // the wrong colour on every navigation.
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#162C4C" },
+    { media: "(prefers-color-scheme: dark)", color: "#0D1A2D" },
+  ],
   keywords: [
     "منح دراسية", "منح ممولة بالكامل", "الدراسة في الخارج", "منح للطلاب العرب",
     "scholarships for Arab students", "fully funded scholarships",

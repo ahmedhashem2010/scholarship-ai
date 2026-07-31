@@ -119,7 +119,7 @@ default. A paper-white ground makes both look chosen.
 --card      #FFFFFF    cards, raised surfaces
 --line      #E8E4DC    borders, dividers
 --muted     #5F6B7F    secondary text          (5.9:1 on paper)
---dim       #8C97A8    placeholders, metadata  (3.4:1 — never body text)
+--dim       #6E788C    placeholders, metadata  (4.6:1 — never body text)
 ```
 
 ### Meaning colours — four, each with exactly one job
@@ -295,10 +295,11 @@ not by adding it.
 
 ---
 
-## Applying this — not yet done
+## Applying this — done
 
-The mark, the assets and this spec exist. The **app has not been migrated.**
-Paste the block below into `src/app/globals.css`, then work down the list.
+The migration ran. `globals.css` now carries full 50–900 ramps for navy, gold
+and the four meaning colours, and `tailwind.config.ts` generates the matching
+scales. Kept here for reference and for anyone re-deriving the tokens.
 
 ```css
 :root {
@@ -363,17 +364,30 @@ Paste the block below into `src/app/globals.css`, then work down the list.
 }
 ```
 
-Then, in order:
+### What the migration actually did
 
-1. Delete every `teal`, `brand-deep`, `brand-mid` and `accent-warm` token and
-   fix what breaks
-2. Add `unknown` to `tailwind.config.ts` beside the other semantic colours
-3. Replace the `S`-in-a-box placeholder in `nav.tsx` with `logo-mark.svg`
-4. Wire `favicon.svg` and the app icons into `layout.tsx`
-5. Load IBM Plex Sans + IBM Plex Sans Arabic; delete Majara and Poppins
-6. Sweep for `danger-50`, `success-200` and friends — **those numeric scales
-   don't exist in the config and never have.** Every one of them renders as
-   nothing, which is why error boxes in the auth flow looked unstyled. Use
-   alpha modifiers instead: `bg-danger/10`, `border-danger/30`.
-7. Regenerate `og.png` with the real mark
-8. Sweep components for off-scale spacing and physical direction properties
+1. ✅ Full 50–900 ramps in `globals.css`, **inverted in dark mode** so
+   `bg-primary-50` means "a faint tint of the brand" in both themes rather
+   than a glaring white panel on a dark page. Gold is the exception — it does
+   not move between modes.
+2. ✅ `tailwind.config.ts` generates every stop from those variables. This
+   alone fixed **106 class usages** (`bg-primary-50`, `text-success-700`,
+   `border-danger-200` …) that had never resolved to anything, which is why
+   the auth error boxes rendered unstyled.
+3. ✅ `--unknown` added as a first-class colour with its own ramp.
+4. ✅ Latin font swapped from Plus Jakarta Sans to IBM Plex Sans. The comment
+   in `layout.tsx` had claimed Plex for weeks while the code loaded Jakarta.
+5. ✅ Majara, Nitro, Zafran and RB `@font-face` blocks deleted. `.font-display`
+   now maps to the brand stack, so the ten headings using it keep working.
+6. ✅ Real logo in `nav.tsx`; `favicon.svg` and app icons wired into metadata,
+   plus a navy `themeColor` so mobile browsers stop flashing the wrong colour.
+7. ✅ Email templates recoloured — they can't use CSS variables, so the hexes
+   are literal and were still teal and blue.
+8. ✅ `.brand-band` rebuilt: it had a teal glow and an amber glow over a teal
+   gradient, three light sources on one surface.
+
+### Still open
+
+- Regenerate `og.png` with the real mark
+- Sweep components for off-scale spacing and physical direction properties
+- Delete the unused font files from `public/fonts/`

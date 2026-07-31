@@ -2,74 +2,261 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ---------------------------------------------------------------------------
+   SmartScholar palette. Derived from the logo: navy #162C4C, gold #C6A14B.
+   BRAND-IDENTITY.md is the source of truth — change it there first.
+
+   TWO THINGS TO UNDERSTAND BEFORE EDITING THIS FILE
+
+   1. The numeric stops (50–900) exist because ~106 places in the codebase
+      already reference classes like `bg-primary-50` and `text-success-700`.
+      Those stops were never defined, so every one of them silently rendered
+      nothing — which is why error boxes in the auth flow looked unstyled.
+      Defining the ramps fixes all of them at once.
+
+   2. **The ramps invert in dark mode.** `--primary-50` is the lightest navy
+      on a light page and the *darkest* navy on a dark one. That sounds odd
+      until you look at how the stops are used: `bg-primary-50` always means
+      "a barely-there tint of the brand colour". Keeping the hex fixed would
+      make every one of those a glaring white panel in dark mode. Inverting
+      keeps the intent and costs nothing.
+
+   Gold is the exception. It does not move between modes — it is the one
+   constant in the identity, and it means arrival.
+--------------------------------------------------------------------------- */
+
 @layer base {
   :root {
-    --background: 240 253 250;
-    --foreground: 19 78 74;
+    /* --- Navy (primary) ------------------------------------------------- */
+    --primary-50: 242 246 250;
+    --primary-100: 229 235 243;
+    --primary-200: 198 210 225;
+    --primary-300: 147 168 196;
+    --primary-400: 92 124 166;
+    --primary-500: 59 106 158;
+    --primary-600: 43 82 127;
+    --primary-700: 31 61 99;
+    --primary-800: 22 44 76;
+    --primary-900: 13 26 45;
+
+    /* --- Gold (secondary) ----------------------------------------------- */
+    --secondary-50: 251 247 236;
+    --secondary-100: 245 237 216;
+    --secondary-200: 237 224 190;
+    --secondary-300: 224 203 148;
+    --secondary-400: 211 182 110;
+    --secondary-500: 198 161 75;
+    --secondary-600: 169 135 58;
+    --secondary-700: 138 110 44;
+    --secondary-800: 107 83 32;
+    --secondary-900: 74 58 18;
+
+    /* --- Eligible (sage) ------------------------------------------------ */
+    --success-50: 234 243 239;
+    --success-100: 210 230 221;
+    --success-200: 169 205 190;
+    --success-300: 122 178 155;
+    --success-400: 78 151 121;
+    --success-500: 46 125 98;
+    --success-600: 37 103 80;
+    --success-700: 30 87 68;
+    --success-800: 22 64 51;
+    --success-900: 14 42 34;
+
+    /* --- Urgent (burnt sienna) ------------------------------------------ */
+    --warning-50: 250 240 234;
+    --warning-100: 245 225 213;
+    --warning-200: 235 195 171;
+    --warning-300: 223 163 127;
+    --warning-400: 208 133 86;
+    --warning-500: 191 107 58;
+    --warning-600: 160 89 48;
+    --warning-700: 138 74 38;
+    --warning-800: 102 55 28;
+    --warning-900: 66 36 18;
+
+    /* --- Blocked (brick) ------------------------------------------------ */
+    --danger-50: 249 237 236;
+    --danger-100: 243 218 216;
+    --danger-200: 229 181 176;
+    --danger-300: 212 141 134;
+    --danger-400: 190 100 91;
+    --danger-500: 168 68 58;
+    --danger-600: 142 56 47;
+    --danger-700: 122 47 40;
+    --danger-800: 90 35 29;
+    --danger-900: 59 23 19;
+
+    /* --- Unknown (slate) -------------------------------------------------
+       Its own colour on purpose. "The source didn't say" is the most
+       important thing this product communicates, and folding it into the
+       warning colour tells students to be alarmed about a fact we simply
+       don't have. Always pair with a DASHED border, never solid.        */
+    --unknown-50: 241 242 245;
+    --unknown-100: 228 230 235;
+    --unknown-200: 201 205 214;
+    --unknown-300: 167 173 187;
+    --unknown-400: 134 141 160;
+    --unknown-500: 107 115 135;
+    --unknown-600: 86 93 110;
+    --unknown-700: 69 75 89;
+    --unknown-800: 51 56 68;
+    --unknown-900: 34 37 45;
+
+    /* --- Semantic aliases ------------------------------------------------ */
+    /* Warm paper, not white. Cold greys fight gold and make navy read as a
+       corporate default. */
+    --background: 250 249 246;
+    --foreground: 22 44 76;
     --card: 255 255 255;
-    --card-foreground: 19 78 74;
+    --card-foreground: 22 44 76;
     --popover: 255 255 255;
-    --popover-foreground: 19 78 74;
-    --primary: 13 148 136;
+    --popover-foreground: 22 44 76;
+
+    --primary: 22 44 76;
     --primary-foreground: 255 255 255;
-    /* Darker teal for TEXT — #0D9488 on a light bg is only ~3.1:1. */
-    --primary-text: 15 110 86;
-    --secondary: 45 212 191;
-    --secondary-foreground: 15 23 42;
-    --muted: 232 241 244;
-    --muted-foreground: 100 116 139;
-    --accent: 204 251 241;
-    --accent-foreground: 19 78 74;
-    --destructive: 220 38 38;
+    /* Links and interactive text. The logo navy is too dark to read as a
+       link; 500 gives 5.2:1 on white and still looks like the brand. */
+    --primary-text: 59 106 158;
+
+    --secondary: 198 161 75;
+    --secondary-foreground: 22 44 76;
+
+    --muted: 242 246 250;
+    --muted-foreground: 95 107 127;
+    --accent: 251 247 236;
+    --accent-foreground: 138 110 44;
+
+    --destructive: 168 68 58;
     --destructive-foreground: 255 255 255;
-    --success: 22 163 74;
+    --success: 46 125 98;
     --success-foreground: 255 255 255;
-    --warning: 217 119 6;
+    --warning: 191 107 58;
     --warning-foreground: 255 255 255;
-    --danger: 220 38 38;
+    --danger: 168 68 58;
     --danger-foreground: 255 255 255;
-    /* Teal-200, not grey. This is the single biggest "not dry" change. */
-    --border: 153 246 228;
-    --input: 153 246 228;
-    --ring: 13 148 136;
-    --brand-deep: 6 78 59;
-    --brand-mid: 13 148 136;
-    --accent-warm: 217 119 6;
-    --accent-warm-soft: 254 243 199;
+    --unknown: 107 115 135;
+    --unknown-foreground: 255 255 255;
+
+    --border: 232 228 220;
+    --input: 232 228 220;
+    --ring: 59 106 158;
     --radius: 0.75rem;
+
+    /* Kept as an alias, not a colour of its own. Five files reference
+       --accent-warm for "this is the notable/rewarding thing"; that meaning is
+       now gold, so it points at the gold ramp instead of a separate amber
+       nobody would remember to keep in sync. */
+    --accent-warm: 138 110 44;
+    --accent-warm-soft: 251 247 236;
   }
 
   .dark {
-    --background: 8 20 19;
-    --foreground: 236 253 245;
-    --card: 15 33 31;
-    --card-foreground: 236 253 245;
-    --popover: 15 33 31;
-    --popover-foreground: 236 253 245;
-    --primary: 45 212 191;
-    --primary-foreground: 4 47 46;
-    --primary-text: 94 234 212;
-    --secondary: 20 184 166;
-    --secondary-foreground: 236 253 245;
-    --muted: 24 48 45;
-    --muted-foreground: 148 180 172;
-    --accent: 19 78 74;
-    --accent-foreground: 204 251 241;
-    --destructive: 248 113 113;
-    --destructive-foreground: 10 10 10;
-    --success: 74 222 128;
-    --success-foreground: 10 10 10;
-    --warning: 251 191 36;
-    --warning-foreground: 10 10 10;
-    --danger: 248 113 113;
-    --danger-foreground: 10 10 10;
-    --border: 22 78 71;
-    --input: 22 78 71;
-    --ring: 45 212 191;
-    --brand-deep: 4 47 46;
-    --brand-mid: 13 148 136;
-    --accent-warm: 251 191 36;
-    --accent-warm-soft: 69 45 8;
+    /* Ramps invert — see the note at the top of this file. */
+    --primary-50: 13 26 45;
+    --primary-100: 22 44 76;
+    --primary-200: 31 61 99;
+    --primary-300: 43 82 127;
+    --primary-400: 59 106 158;
+    --primary-500: 92 124 166;
+    --primary-600: 147 168 196;
+    --primary-700: 198 210 225;
+    --primary-800: 229 235 243;
+    --primary-900: 242 246 250;
+
+    /* Gold does NOT invert. It is the constant in both modes. */
+    --secondary-50: 74 58 18;
+    --secondary-100: 107 83 32;
+    --secondary-200: 237 224 190;
+    --secondary-300: 224 203 148;
+    --secondary-400: 211 182 110;
+    --secondary-500: 198 161 75;
+    --secondary-600: 211 182 110;
+    --secondary-700: 224 203 148;
+    --secondary-800: 237 224 190;
+    --secondary-900: 245 237 216;
+
+    --success-50: 14 42 34;
+    --success-100: 22 64 51;
+    --success-200: 30 87 68;
+    --success-300: 37 103 80;
+    --success-400: 46 125 98;
+    --success-500: 78 151 121;
+    --success-600: 122 178 155;
+    --success-700: 169 205 190;
+    --success-800: 210 230 221;
+    --success-900: 234 243 239;
+
+    --warning-50: 66 36 18;
+    --warning-100: 102 55 28;
+    --warning-200: 138 74 38;
+    --warning-300: 160 89 48;
+    --warning-400: 191 107 58;
+    --warning-500: 208 133 86;
+    --warning-600: 223 163 127;
+    --warning-700: 235 195 171;
+    --warning-800: 245 225 213;
+    --warning-900: 250 240 234;
+
+    --danger-50: 59 23 19;
+    --danger-100: 90 35 29;
+    --danger-200: 122 47 40;
+    --danger-300: 142 56 47;
+    --danger-400: 168 68 58;
+    --danger-500: 190 100 91;
+    --danger-600: 212 141 134;
+    --danger-700: 229 181 176;
+    --danger-800: 243 218 216;
+    --danger-900: 249 237 236;
+
+    --unknown-50: 34 37 45;
+    --unknown-100: 51 56 68;
+    --unknown-200: 69 75 89;
+    --unknown-300: 86 93 110;
+    --unknown-400: 107 115 135;
+    --unknown-500: 134 141 160;
+    --unknown-600: 167 173 187;
+    --unknown-700: 201 205 214;
+    --unknown-800: 228 230 235;
+    --unknown-900: 241 242 245;
+
+    --background: 13 26 45;
+    --foreground: 232 238 246;
+    --card: 20 38 63;
+    --card-foreground: 232 238 246;
+    --popover: 20 38 63;
+    --popover-foreground: 232 238 246;
+
+    /* Gold leads on dark. Navy against a navy page has nothing to say. */
+    --primary: 198 161 75;
+    --primary-foreground: 13 26 45;
+    --primary-text: 224 203 148;
+
+    --secondary: 198 161 75;
+    --secondary-foreground: 13 26 45;
+
+    --muted: 26 45 71;
+    --muted-foreground: 147 168 196;
+    --accent: 31 61 99;
+    --accent-foreground: 237 224 190;
+
+    --destructive: 212 141 134;
+    --destructive-foreground: 13 26 45;
+    --success: 122 178 155;
+    --success-foreground: 13 26 45;
+    --warning: 223 163 127;
+    --warning-foreground: 13 26 45;
+    --danger: 212 141 134;
+    --danger-foreground: 13 26 45;
+    --unknown: 134 141 160;
+    --unknown-foreground: 13 26 45;
+
+    --border: 34 55 79;
+    --input: 34 55 79;
+    --ring: 198 161 75;
+
+    --accent-warm: 224 203 148;
+    --accent-warm-soft: 31 61 99;
   }
 
   * {
@@ -116,7 +303,7 @@
 
 [dir="rtl"] {
   direction: rtl;
-  font-family: var(--font-arabic), Tajawal, system-ui, sans-serif;
+  font-family: var(--font-arabic), var(--font-sans), system-ui, sans-serif;
 }
 
 @layer utilities {
@@ -128,7 +315,7 @@
     background-color: rgb(0 0 0 / 0.5);
   }
   .text-gradient {
-    background: linear-gradient(135deg, rgb(var(--primary)), rgb(var(--success)));
+    background: linear-gradient(135deg, rgb(var(--primary-800)), rgb(var(--secondary-600)));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -136,148 +323,29 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Majara (AA Majara) — DISPLAY face. Headlines only.
+   Display headings.
 
-   Leads the .font-display stack. Nitro sits behind it, so swapping back is
-   just a matter of which file is present.
+   The self-hosted display faces are gone: Majara, Nitro, Zafran and RB. They
+   were the fourth, third, second and first attempt at giving headlines
+   character, and every one of them caused the same two problems.
+
+   Display faces have no presentation forms, so Arabic rendered UNJOINED —
+   individual letters sitting next to each other instead of a connected word.
+   And none of them shipped a real bold, so the browser synthesised one by
+   smearing the outlines, which breaks the joins even further.
+
+   `.font-display` now maps to the brand stack. Headings get their weight from
+   the type scale, not from a different family — which is what "one superfamily"
+   means and why IBM Plex was chosen.
 --------------------------------------------------------------------------- */
-@font-face {
-  font-family: "Majara";
-  src: url("/fonts/Majara-Regular.woff2") format("woff2"),
-       url("/fonts/Majara-Regular.ttf") format("truetype");
-  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088F, U+08A0-08FF,
-                 U+FB50-FDFF, U+FE70-FEFF, U+10E60-10E7F, U+1EC70-1ECBF,
-                 U+1ED00-1ED4F, U+1EE00-1EEFF;
-  /* One weight only — map the whole range to it rather than letting the
-     browser synthesise a bold, which breaks Arabic letter joins. */
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* ---------------------------------------------------------------------------
-   Nitro — DISPLAY face by MTtype Foundry. Headlines only.
-
-   Geometric, squared, high-impact Arabic. Exactly the sort of face that gives
-   a layout personality — and exactly the sort that becomes unreadable at 14px,
-   so it is scoped to .font-display and never touches body text or controls.
-
-   Use the FONTESK release (fontesk.com/nitro-arabic-font): same foundry,
-   explicitly licensed free for commercial use. The "MT Nitro Display" copies
-   on the aggregator sites don't state terms.
---------------------------------------------------------------------------- */
-@font-face {
-  font-family: "Nitro";
-  src: url("/fonts/Nitro-Display.otf") format("opentype");
-  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088F, U+08A0-08FF,
-                 U+FB50-FDFF, U+FE70-FEFF, U+10E60-10E7F, U+1EC70-1ECBF,
-                 U+1ED00-1ED4F, U+1EE00-1EEFF;
-  /* Single weight. Nitro ships styles (Display / Oblique), not a weight axis,
-     so every weight maps to the same file — otherwise the browser fakes a bold
-     by smearing the outlines, which wrecks Arabic letter joins. */
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Nitro";
-  src: url("/fonts/Nitro-Oblique.otf") format("opentype");
-  font-weight: 100 900;
-  font-style: italic;
-  font-display: swap;
-}
-
-/* ---------------------------------------------------------------------------
-   Zafran — DISPLAY face, headlines only.
-
-   Boharat Cairo describe it as "an elegant industrial display typeface...
-   designed for use in headlines and posters". Display faces have tight
-   spacing and high stroke contrast that read as characterful at 40px and as
-   noise at 14px, so this is deliberately NOT applied to body text, buttons,
-   labels or form fields.
-
-   Exposed as .font-display and used on the hero h1 + section h2 only.
---------------------------------------------------------------------------- */
-@font-face {
-  font-family: "Zafran";
-  src: url("/fonts/Zafran-Regular.woff2") format("woff2"),
-       url("/fonts/Zafran-Regular.ttf") format("truetype");
-  font-weight: 400 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Zafran";
-  src: url("/fonts/Zafran-Bold.woff2") format("woff2"),
-       url("/fonts/Zafran-Bold.ttf") format("truetype");
-  font-weight: 700 900;
-  font-style: normal;
-  font-display: swap;
-}
-
 .font-display {
-  font-family: "Majara", "Nitro", "Zafran", "RB", var(--font-arabic), var(--font-sans), system-ui, sans-serif;
-  /* Squared geometric faces read better with a little air at display sizes;
-     negative tracking closes the counters up too much. */
-  letter-spacing: 0;
-  /* Nitro's glyphs sit deeper than the fallback's — at 1.35 the descenders on
-     a second line get clipped by the hero's overflow-hidden. Arabic needs the
-     room regardless; a display face with this much vertical travel needs more. */
-  line-height: 1.6;
-  /* Belt and braces: never let a headline glyph be cropped by an ancestor. */
-  padding-block: 0.08em;
-  /* Majara's space glyph is very narrow — without this, "اعثر على" reads as a
-     single word. Display faces are drawn for short logo-style strings, so they
-     often under-set the word space; a full sentence needs it opened up. */
-  word-spacing: 0.22em;
-}
-
-/* ---------------------------------------------------------------------------
-   RB — Arabic display/UI face. Not on Google Fonts, so it's self-hosted from
-   public/fonts/ (see the README there for where to download it).
-
-   Loaded via @font-face rather than next/font/local on purpose: if the files
-   aren't present the browser simply falls through to the next family in the
-   stack, instead of the build failing.
-
-   `unicode-range` scopes RB to Arabic script only. Latin characters keep using
-   Plus Jakarta Sans, so a mixed string like "منحة DAAD" gets the right face for
-   each script rather than forcing Latin through an Arabic font.
-
-   woff2 is listed first and ttf second — drop a converted woff2 in and it will
-   be preferred automatically with no code change.
---------------------------------------------------------------------------- */
-@font-face {
-  font-family: "RB";
-  src: url("/fonts/RB-Regular.woff2") format("woff2"),
-       url("/fonts/RB-Regular.ttf") format("truetype");
-  font-weight: 400 600;
-  font-style: normal;
-  font-display: swap;
-  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088F, U+08A0-08FF,
-                 U+FB50-FDFF, U+FE70-FEFF, U+10E60-10E7F, U+1EC70-1ECBF,
-                 U+1ED00-1ED4F, U+1EE00-1EEFF;
-}
-
-@font-face {
-  font-family: "RB";
-  src: url("/fonts/RB-Bold.woff2") format("woff2"),
-       url("/fonts/RB-Bold.ttf") format("truetype");
-  font-weight: 700 900;
-  font-style: normal;
-  font-display: swap;
-  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088F, U+08A0-08FF,
-                 U+FB50-FDFF, U+FE70-FEFF, U+10E60-10E7F, U+1EC70-1ECBF,
-                 U+1ED00-1ED4F, U+1EE00-1EEFF;
-}
-
-/* RB has only two weights. Faux-bolding Arabic distorts the letterforms and
-   breaks the joins, so let the two real weights do the work. */
-/* No real bold cut exists for Nitro, and synthesising one distorts Arabic
-   letterforms and breaks the joins between characters. */
-.font-display {
+  font-family: var(--font-arabic), var(--font-sans), system-ui, sans-serif;
+  letter-spacing: -0.01em;
+  /* Arabic carries far more vertical travel than Latin; at Tailwind's bundled
+     display line-heights the descenders get clipped by any ancestor with
+     overflow-hidden. */
+  line-height: 1.35;
+  /* Never let a real bold be faked. Plex has genuine 600 and 700 cuts. */
   font-synthesis-weight: none;
   font-synthesis-style: none;
 }
@@ -318,10 +386,12 @@
    places rather than one long document.
 --------------------------------------------------------------------------- */
 .brand-band {
+  /* Navy ground with a single warm gold bloom. The old version had a teal
+     glow AND an amber glow fighting each other over a teal gradient — three
+     light sources, which is two more than a calm surface can carry. */
   background:
-    radial-gradient(ellipse 60% 80% at 85% 15%, rgb(20 184 166 / 0.55), transparent 60%),
-    radial-gradient(ellipse 50% 70% at 10% 90%, rgb(217 119 6 / 0.28), transparent 60%),
-    linear-gradient(135deg, rgb(var(--brand-deep)) 0%, rgb(var(--brand-mid)) 100%);
+    radial-gradient(ellipse 55% 75% at 82% 12%, rgb(var(--secondary-500) / 0.22), transparent 62%),
+    linear-gradient(135deg, rgb(var(--primary-900)) 0%, rgb(var(--primary-700)) 100%);
 }
 
 .brand-band-soft {
@@ -334,19 +404,23 @@
   background: rgb(var(--card));
   border: 1px solid rgb(var(--border));
   border-radius: 1rem;
-  box-shadow: 0 1px 2px rgb(13 148 136 / 0.06), 0 10px 30px -14px rgb(13 148 136 / 0.22);
+  /* Navy-tinted, never black. Black shadows on warm paper look dirty. */
+  box-shadow: 0 1px 2px rgb(22 44 76 / 0.08), 0 10px 30px -14px rgb(22 44 76 / 0.16);
   transition: box-shadow .2s ease, transform .2s ease;
 }
 .card-raised:hover {
-  box-shadow: 0 1px 2px rgb(13 148 136 / 0.08), 0 20px 44px -18px rgb(13 148 136 / 0.35);
+  box-shadow: 0 1px 2px rgb(22 44 76 / 0.10), 0 20px 44px -18px rgb(22 44 76 / 0.26);
   transform: translateY(-2px);
 }
 .dark .card-raised {
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px -12px rgb(0 0 0 / 0.6);
 }
 
-.text-warm { color: rgb(var(--accent-warm)); }
-.bg-warm-soft { background: rgb(var(--accent-warm-soft)); }
+/* Gold accents. --accent-warm/-soft are gone; these now point at the real
+   gold ramp so there is one source for the colour instead of two. */
+.text-warm { color: rgb(var(--secondary-700)); }
+.dark .text-warm { color: rgb(var(--secondary-300)); }
+.bg-warm-soft { background: rgb(var(--secondary-50)); }
 
 /* ---------------------------------------------------------------------------
    iOS zoom-on-focus
