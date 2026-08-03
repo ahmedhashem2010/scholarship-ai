@@ -1,0 +1,370 @@
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'user_role') THEN
+    CREATE TYPE user_role AS ENUM ('STUDENT', 'PARENT', 'COUNSELOR', 'UNIVERSITY_STAFF', 'PROVIDER_STAFF', 'ADMIN', 'SUPER_ADMIN');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'account_status') THEN
+    CREATE TYPE account_status AS ENUM ('PENDING', 'ACTIVE', 'SUSPENDED', 'DISABLED', 'DELETED');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'gender') THEN
+    CREATE TYPE gender AS ENUM ('MALE', 'FEMALE', 'OTHER', 'PREFER_NOT_TO_SAY');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'education_level') THEN
+    CREATE TYPE education_level AS ENUM ('SECONDARY', 'HIGH_SCHOOL', 'DIPLOMA', 'ASSOCIATE', 'BACHELOR', 'MASTER', 'DOCTORATE', 'OTHER');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'degree_type') THEN
+    CREATE TYPE degree_type AS ENUM ('ASSOCIATE', 'BACHELOR', 'MASTER', 'DOCTORATE', 'DIPLOMA', 'CERTIFICATE', 'SHORT_COURSE', 'EXCHANGE', 'LANGUAGE_COURSE', 'RESEARCH', 'SUMMER_SCHOOL', 'OTHER');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'grade_type') THEN
+    CREATE TYPE grade_type AS ENUM ('GPA_4', 'GPA_5', 'GPA_10', 'PERCENTAGE', 'CLASS_GRADE', 'PASS_FAIL', 'OTHER');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'english_level') THEN
+    CREATE TYPE english_level AS ENUM ('A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'NATIVE', 'NOT_TESTED');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'proficiency_level') THEN
+    CREATE TYPE proficiency_level AS ENUM ('BEGINNER', 'ELEMENTARY', 'INTERMEDIATE', 'UPPER_INTERMEDIATE', 'ADVANCED', 'NATIVE');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'test_type') THEN
+    CREATE TYPE test_type AS ENUM ('IELTS', 'TOEFL', 'DUOLINGO', 'SAT', 'ACT', 'GRE', 'GMAT', 'OTHER');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'provider_type') THEN
+    CREATE TYPE provider_type AS ENUM ('GOVERNMENT', 'UNIVERSITY', 'CORPORATE', 'NON_PROFIT', 'PRIVATE_FOUNDATION', 'INTERNATIONAL_ORGANIZATION', 'PHILANTHROPIC', 'OTHER');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'scholarship_status') THEN
+    CREATE TYPE scholarship_status AS ENUM ('DRAFT', 'PENDING_REVIEW', 'ACTIVE', 'INACTIVE', 'ARCHIVED', 'REJECTED', 'MERGED');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'verification_status') THEN
+    CREATE TYPE verification_status AS ENUM ('UNVERIFIED', 'PENDING', 'VERIFIED', 'REJECTED', 'NEEDS_REVIEW');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'funding_type') THEN
+    CREATE TYPE funding_type AS ENUM ('FULLY_FUNDED', 'PARTIALLY_FUNDED', 'SELF_FUNDED', 'LOAN', 'WORK_STUDY', 'UNKNOWN');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'competition_level') THEN
+    CREATE TYPE competition_level AS ENUM ('LOW', 'MEDIUM', 'HIGH', 'VERY_HIGH');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'cycle_status') THEN
+    CREATE TYPE cycle_status AS ENUM ('UPCOMING', 'OPEN', 'CLOSED', 'COMPLETED', 'CANCELLED', 'POSTPONED');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'benefit_type') THEN
+    CREATE TYPE benefit_type AS ENUM ('TUITION', 'TUITION_DISCOUNT', 'HOUSING', 'MONTHLY_STIPEND', 'YEARLY_STIPEND', 'ONE_TIME_GRANT', 'INSURANCE', 'FLIGHT', 'BOOKS', 'RESEARCH_GRANT', 'TRAVEL_GRANT', 'VISA_SUPPORT', 'SETTLEMENT_ALLOWANCE', 'FAMILY_ALLOWANCE', 'APPLICATION_FEE_WAIVER', 'COMPUTER', 'LANGUAGE_COURSE', 'OTHER');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'requirement_type') THEN
+    CREATE TYPE requirement_type AS ENUM ('NATIONALITY', 'RESIDENCE', 'AGE', 'GPA', 'PERCENTAGE', 'IELTS', 'TOEFL', 'DUOLINGO', 'SAT', 'ACT', 'GRE', 'GMAT', 'GAP_YEARS', 'PORTFOLIO', 'INTERVIEW', 'MEDICAL_EXAM', 'WORK_EXPERIENCE', 'ENROLLMENT_STATUS', 'GENDER', 'DISABILITY', 'FIRST_GENERATION', 'REFUGEE', 'OTHER');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'document_type') THEN
+    CREATE TYPE document_type AS ENUM ('TRANSCRIPT', 'DIPLOMA', 'CERTIFICATE', 'CV', 'RESUME', 'STATEMENT_OF_PURPOSE', 'MOTIVATION_LETTER', 'LETTER_OF_RECOMMENDATION', 'PASSPORT', 'ID_CARD', 'IELTS', 'TOEFL', 'DUOLINGO', 'SAT', 'GRE', 'GMAT', 'PORTFOLIO', 'FINANCIAL_STATEMENT', 'BANK_STATEMENT', 'MEDICAL_CERTIFICATE', 'PHOTO', 'TAX_RETURN', 'WORK_CONTRACT', 'PUBLICATION', 'OTHER');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'media_type') THEN
+    CREATE TYPE media_type AS ENUM ('IMAGE', 'VIDEO', 'DOCUMENT', 'PDF', 'VIRTUAL_TOUR');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'content_status') THEN
+    CREATE TYPE content_status AS ENUM ('DRAFT', 'PUBLISHED', 'SCHEDULED', 'ARCHIVED', 'REJECTED');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'event_type') THEN
+    CREATE TYPE event_type AS ENUM ('WEBINAR', 'WORKSHOP', 'FAIR', 'INFO_SESSION', 'APPLICATION_DEADLINE', 'EXAM', 'INTERVIEW', 'OTHER');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'event_status') THEN
+    CREATE TYPE event_status AS ENUM ('DRAFT', 'OPEN', 'FULL', 'CANCELLED', 'COMPLETED');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'event_attendee_status') THEN
+    CREATE TYPE event_attendee_status AS ENUM ('REGISTERED', 'ATTENDED', 'CANCELLED', 'WAITLISTED', 'NO_SHOW');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'application_status') THEN
+    CREATE TYPE application_status AS ENUM ('DRAFT', 'IN_PROGRESS', 'SUBMITTED', 'UNDER_REVIEW', 'INTERVIEW', 'WAITLISTED', 'ACCEPTED', 'REJECTED', 'WITHDRAWN', 'COMPLETED');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'stage_type') THEN
+    CREATE TYPE stage_type AS ENUM ('ELIGIBILITY', 'DOCUMENTS', 'FORMS', 'TESTS', 'SUBMISSION', 'INTERVIEW', 'DECISION', 'ENROLLMENT');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'stage_status') THEN
+    CREATE TYPE stage_status AS ENUM ('PENDING', 'IN_PROGRESS', 'COMPLETED', 'SKIPPED', 'BLOCKED');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'task_type') THEN
+    CREATE TYPE task_type AS ENUM ('DOCUMENT_UPLOAD', 'FORM', 'TEST_BOOKING', 'PAYMENT', 'INTERVIEW', 'REFERENCE_REQUEST', 'SUBMISSION', 'OTHER');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'task_status') THEN
+    CREATE TYPE task_status AS ENUM ('PENDING', 'IN_PROGRESS', 'COMPLETED', 'OVERDUE', 'CANCELLED');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'application_document_status') THEN
+    CREATE TYPE application_document_status AS ENUM ('REQUIRED', 'UPLOADED', 'SUBMITTED', 'ACCEPTED', 'REJECTED');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'user_document_status') THEN
+    CREATE TYPE user_document_status AS ENUM ('UPLOADED', 'PROCESSING', 'READY', 'REJECTED', 'ARCHIVED');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'relation_type') THEN
+    CREATE TYPE relation_type AS ENUM ('SPONSOR', 'PARENT', 'GUARDIAN', 'TEACHER', 'EMPLOYER', 'MENTOR', 'OTHER');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'letter_status') THEN
+    CREATE TYPE letter_status AS ENUM ('DRAFT', 'REQUESTED', 'REMINDED', 'SUBMITTED', 'RECEIVED', 'DECLINED');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'essay_type') THEN
+    CREATE TYPE essay_type AS ENUM ('STATEMENT_OF_PURPOSE', 'PERSONAL_STATEMENT', 'MOTIVATION_LETTER', 'SCHOLARSHIP_ESSAY', 'PORTFOLIO_STATEMENT', 'OTHER');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'notification_type') THEN
+    CREATE TYPE notification_type AS ENUM ('DEADLINE_REMINDER', 'APPLICATION_UPDATE', 'PAYMENT_UPDATE', 'MATCH_RESULTS', 'DOCUMENT_REVIEW', 'ACCOUNT', 'SYSTEM', 'PROMOTIONAL');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'notification_channel') THEN
+    CREATE TYPE notification_channel AS ENUM ('IN_APP', 'EMAIL', 'PUSH', 'SMS');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'notification_status') THEN
+    CREATE TYPE notification_status AS ENUM ('PENDING', 'SENT', 'DELIVERED', 'READ', 'CLICKED', 'FAILED');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'email_status') THEN
+    CREATE TYPE email_status AS ENUM ('QUEUED', 'SENT', 'DELIVERED', 'OPENED', 'CLICKED', 'BOUNCED', 'FAILED', 'DROPPED');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'ai_provider') THEN
+    CREATE TYPE ai_provider AS ENUM ('GROQ', 'GEMINI', 'OPENAI', 'CLAUDE', 'BAZAARLINK', 'AGENTROUTER', 'OTHER');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'ai_review_type') THEN
+    CREATE TYPE ai_review_type AS ENUM ('CV', 'ESSAY', 'RECOMMENDATION_LETTER', 'STATEMENT_OF_PURPOSE', 'PORTFOLIO', 'OTHER');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'ai_review_status') THEN
+    CREATE TYPE ai_review_status AS ENUM ('QUEUED', 'PROCESSING', 'COMPLETED', 'FAILED', 'CANCELLED');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'ai_report_type') THEN
+    CREATE TYPE ai_report_type AS ENUM ('ACCEPTANCE_PREDICTION', 'PROFILE_REVIEW', 'SCHOLARSHIP_ANALYSIS', 'MATCHING_EXPLANATION', 'TREND_ANALYSIS', 'OTHER');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'chat_role') THEN
+    CREATE TYPE chat_role AS ENUM ('SYSTEM', 'USER', 'ASSISTANT', 'TOOL');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'import_status') THEN
+    CREATE TYPE import_status AS ENUM ('PENDING', 'PROCESSING', 'COMPLETED', 'PARTIAL', 'FAILED', 'CANCELLED');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'import_source_type') THEN
+    CREATE TYPE import_source_type AS ENUM ('MANUAL', 'CSV', 'JSON', 'API', 'SCRAPER', 'AI_EXTRACTION', 'BULK_UPDATE');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'queue_item_status') THEN
+    CREATE TYPE queue_item_status AS ENUM ('PENDING', 'PROCESSING', 'COMPLETED', 'FAILED', 'SKIPPED', 'DUPLICATE');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'change_type') THEN
+    CREATE TYPE change_type AS ENUM ('CREATE', 'UPDATE', 'MERGE', 'DELETE', 'STATUS_CHANGE', 'VERIFICATION_CHANGE');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'duplicate_status') THEN
+    CREATE TYPE duplicate_status AS ENUM ('OPEN', 'FALSE_POSITIVE', 'MERGED', 'KEEP_BOTH', 'RESOLVED');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'verification_priority') THEN
+    CREATE TYPE verification_priority AS ENUM ('LOW', 'NORMAL', 'HIGH', 'URGENT');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'audit_action') THEN
+    CREATE TYPE audit_action AS ENUM ('INSERT', 'UPDATE', 'DELETE', 'SOFT_DELETE', 'RESTORE', 'LOGIN', 'LOGOUT', 'EXPORT', 'IMPORT', 'MASS_UPDATE');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'activity_type') THEN
+    CREATE TYPE activity_type AS ENUM ('PAGE_VIEW', 'SEARCH', 'SAVE', 'UNSAVE', 'APPLY', 'UPLOAD', 'REVIEW', 'LOGIN', 'LOGOUT', 'DOWNLOAD', 'SHARE', 'MATCH', 'OPEN_LINK');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'payment_method') THEN
+    CREATE TYPE payment_method AS ENUM ('STRIPE', 'VODAFONE_CASH', 'INSTAPAY', 'BANK_TRANSFER', 'OTHER');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'payment_status') THEN
+    CREATE TYPE payment_status AS ENUM ('PENDING', 'APPROVED', 'REJECTED', 'REFUNDED', 'FAILED');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'cron_status') THEN
+    CREATE TYPE cron_status AS ENUM ('RUNNING', 'SUCCESS', 'FAILED');
+  END IF;
+END $$;

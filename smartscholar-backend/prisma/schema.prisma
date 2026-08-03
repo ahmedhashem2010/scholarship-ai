@@ -1,0 +1,1903 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum user_role {
+  STUDENT
+  PARENT
+  COUNSELOR
+  UNIVERSITY_STAFF
+  PROVIDER_STAFF
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum account_status {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  DISABLED
+  DELETED
+}
+
+enum provider_type {
+  GOVERNMENT
+  UNIVERSITY
+  CORPORATE
+  NON_PROFIT
+  PRIVATE_FOUNDATION
+  INTERNATIONAL_ORGANIZATION
+  PHILANTHROPIC
+  OTHER
+}
+
+enum scholarship_status {
+  DRAFT
+  PENDING_REVIEW
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+  REJECTED
+  MERGED
+}
+
+enum verification_status {
+  UNVERIFIED
+  PENDING
+  VERIFIED
+  REJECTED
+  NEEDS_REVIEW
+}
+
+enum funding_type {
+  FULLY_FUNDED
+  PARTIALLY_FUNDED
+  SELF_FUNDED
+  LOAN
+  WORK_STUDY
+  UNKNOWN
+}
+
+enum competition_level {
+  LOW
+  MEDIUM
+  HIGH
+  VERY_HIGH
+}
+
+enum cycle_status {
+  UPCOMING
+  OPEN
+  CLOSED
+  COMPLETED
+  CANCELLED
+  POSTPONED
+}
+
+enum content_status {
+  DRAFT
+  PUBLISHED
+  SCHEDULED
+  ARCHIVED
+  REJECTED
+}
+
+enum import_status {
+  PENDING
+  PROCESSING
+  COMPLETED
+  PARTIAL
+  FAILED
+  CANCELLED
+}
+
+enum import_source_type {
+  MANUAL
+  CSV
+  JSON
+  API
+  SCRAPER
+  AI_EXTRACTION
+  BULK_UPDATE
+}
+
+enum queue_item_status {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  SKIPPED
+  DUPLICATE
+}
+
+enum change_type {
+  CREATE
+  UPDATE
+  MERGE
+  DELETE
+  STATUS_CHANGE
+  VERIFICATION_CHANGE
+}
+
+enum duplicate_status {
+  OPEN
+  FALSE_POSITIVE
+  MERGED
+  KEEP_BOTH
+  RESOLVED
+}
+
+enum verification_priority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum ai_provider {
+  GROQ
+  GEMINI
+  OPENAI
+  CLAUDE
+  BAZAARLINK
+  AGENTROUTER
+  OTHER
+}
+
+model Continent {
+  id        String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code      String     @unique @db.VarChar(2)
+  name      String     @db.VarChar(100)
+  nameAr    String?    @map("name_ar") @db.VarChar(100)
+  slug      String     @unique @db.VarChar(120)
+  sortOrder Int        @default(0) @map("sort_order")
+  createdAt DateTime   @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime   @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt DateTime?  @map("deleted_at") @db.Timestamptz
+
+  countries Country[]
+
+  @@map("continents")
+}
+
+model Currency {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code         String   @unique @db.VarChar(3)
+  name         String   @db.VarChar(100)
+  nameAr       String?  @map("name_ar") @db.VarChar(100)
+  symbol       String?  @db.VarChar(10)
+  decimalPlaces Int     @default(2) @map("decimal_places")
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  countries Country[]
+
+  @@map("currencies")
+}
+
+model Language {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code       String   @unique @db.VarChar(10)
+  name       String   @db.VarChar(100)
+  nameAr     String?  @map("name_ar") @db.VarChar(100)
+  nativeName String?  @map("native_name") @db.VarChar(100)
+  isActive   Boolean  @default(true) @map("is_active")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("languages")
+}
+
+model Country {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  continentId String  @map("continent_id") @db.Uuid
+  code       String   @unique @db.VarChar(2)
+  code3      String?  @db.VarChar(3)
+  name       String   @db.VarChar(120)
+  nameAr     String?  @map("name_ar") @db.VarChar(120)
+  slug       String   @unique @db.VarChar(140)
+  phoneCode  String?  @map("phone_code") @db.VarChar(10)
+  currencyId String?  @map("currency_id") @db.Uuid
+  isActive   Boolean  @default(true) @map("is_active")
+  flagUrl    String?  @map("flag_url") @db.VarChar(500)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt  DateTime? @map("deleted_at") @db.Timestamptz
+
+  continent Continent @relation(fields: [continentId], references: [id])
+  currency  Currency? @relation(fields: [currencyId], references: [id])
+
+  universities University[]
+  scholarships Scholarship[]
+
+  @@map("countries")
+}
+
+model DegreeLevel {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String   @db.VarChar(100)
+  nameAr    String?  @map("name_ar") @db.VarChar(100)
+  slug      String   @unique @db.VarChar(120)
+  sortOrder Int      @default(0) @map("sort_order")
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  scholarships Scholarship[]
+
+  @@map("degree_levels")
+}
+
+model StudyField {
+  id        String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  parentId  String?     @map("parent_id") @db.Uuid
+  name      String      @db.VarChar(200)
+  nameAr    String?     @map("name_ar") @db.VarChar(200)
+  slug      String      @unique @db.VarChar(220)
+  sortOrder Int         @default(0) @map("sort_order")
+  isActive  Boolean     @default(true) @map("is_active")
+  createdAt DateTime    @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime    @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+  parent    StudyField? @relation("field_parent", fields: [parentId], references: [id])
+  children  StudyField[] @relation("field_parent")
+  scholarships Scholarship[]
+
+  @@map("study_fields")
+}
+
+model User {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email         String   @db.VarChar(320)
+  phone         String?  @db.VarChar(40)
+  displayName   String   @map("display_name") @db.VarChar(120)
+  role          user_role @default(STUDENT)
+  accountStatus account_status @default(PENDING) @map("account_status")
+  avatarUrl     String?  @map("avatar_url") @db.VarChar(500)
+  countryId     String?  @map("country_id") @db.Uuid
+  cityId        String?  @map("city_id") @db.Uuid
+  timezone      String   @default("UTC") @db.VarChar(64)
+  locale        String   @default("ar") @db.VarChar(10)
+  languageId    String?  @map("language_id") @db.Uuid
+  referralCode  String?  @unique @map("referral_code") @db.VarChar(40)
+  referredBy    String?  @map("referred_by") @db.Uuid
+  emailVerified Boolean  @default(false) @map("email_verified")
+  isTestAccount Boolean  @default(false) @map("is_test_account")
+  lastLoginAt   DateTime? @map("last_login_at") @db.Timestamptz
+  metadata      Json     @default("{}")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt     DateTime? @map("deleted_at") @db.Timestamptz
+
+  @@map("users")
+}
+
+model University {
+  id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name               String   @db.VarChar(200)
+  nameAr             String?  @map("name_ar") @db.VarChar(200)
+  slug               String   @unique @db.VarChar(220)
+  countryId          String   @map("country_id") @db.Uuid
+  cityId             String?  @map("city_id") @db.Uuid
+  website            String?  @db.VarChar(300)
+  description        String?
+  descriptionAr      String?  @map("description_ar")
+  logoUrl            String?  @map("logo_url") @db.VarChar(500)
+  coverUrl           String?  @map("cover_url") @db.VarChar(500)
+  establishedYear    Int?     @map("established_year")
+  rankingNational    Int?     @map("ranking_national")
+  rankingWorld       Int?     @map("ranking_world")
+  isPublic           Boolean? @map("is_public")
+  isFeatured         Boolean  @default(false) @map("is_featured")
+  status             content_status @default(DRAFT)
+  verificationStatus verification_status @default(UNVERIFIED) @map("verification_status")
+  verifiedAt         DateTime? @map("verified_at") @db.Timestamptz
+  verifiedBy         String?  @map("verified_by") @db.Uuid
+  createdAt          DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt          DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt          DateTime? @map("deleted_at") @db.Timestamptz
+
+  country Country @relation(fields: [countryId], references: [id])
+
+  scholarships Scholarship[]
+
+  @@map("universities")
+}
+
+model Provider {
+  id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name               String   @db.VarChar(200)
+  nameAr             String?  @map("name_ar") @db.VarChar(200)
+  slug               String   @unique @db.VarChar(220)
+  providerType       provider_type @default(OTHER) @map("provider_type")
+  countryId          String?  @map("country_id") @db.Uuid
+  website            String?  @db.VarChar(300)
+  logoUrl            String?  @map("logo_url") @db.VarChar(500)
+  description        String?
+  contactEmail       String?  @map("contact_email") @db.VarChar(320)
+  contactPhone       String?  @map("contact_phone") @db.VarChar(40)
+  isVerified         Boolean  @default(false) @map("is_verified")
+  verificationStatus verification_status @default(UNVERIFIED) @map("verification_status")
+  status             content_status @default(DRAFT)
+  createdAt          DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt          DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt  DateTime? @map("deleted_at") @db.Timestamptz
+
+  scholarships Scholarship[]
+
+  @@map("providers")
+}
+
+model Source {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name             String   @db.VarChar(200)
+  baseUrl          String?  @map("base_url") @db.VarChar(500)
+  sourceType       import_source_type @default(SCRAPER) @map("source_type")
+  countryId        String?  @map("country_id") @db.Uuid
+  providerId       String?  @map("provider_id") @db.Uuid
+  crawlerFrequency String?  @map("crawler_frequency") @db.VarChar(30)
+  lastScrapedAt    DateTime? @map("last_scraped_at") @db.Timestamptz
+  isActive         Boolean  @default(true) @map("is_active")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt        DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  batches ImportBatch[]
+  scholarships Scholarship[]
+
+  @@map("sources")
+}
+
+model Scholarship {
+  id                  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slug                String   @unique @db.VarChar(250)
+  title               String   @db.VarChar(300)
+  titleAr             String?  @map("title_ar") @db.VarChar(300)
+  description         String?
+  descriptionAr       String?  @map("description_ar")
+  seoDescription      String?  @map("seo_description") @db.VarChar(500)
+  providerId          String?  @map("provider_id") @db.Uuid
+  countryId           String?  @map("country_id") @db.Uuid
+  universityId        String?  @map("university_id") @db.Uuid
+  degreeLevelId       String?  @map("degree_level_id") @db.Uuid
+  studyFieldId        String?  @map("study_field_id") @db.Uuid
+  durationMonths      Int?     @map("duration_months")
+  durationText        String?  @map("duration_text") @db.VarChar(100)
+  fundingType         funding_type @default(UNKNOWN) @map("funding_type")
+  applicationFee      Decimal? @map("application_fee") @db.Decimal(12, 2)
+  applicationFeeCurrencyId String? @map("application_fee_currency_id") @db.Uuid
+  applicationUrl      String?  @map("application_url") @db.VarChar(500)
+  officialWebsite     String?  @map("official_website") @db.VarChar(500)
+  officialPdfUrl      String?  @map("official_pdf_url") @db.VarChar(500)
+  openingDate         DateTime? @map("opening_date") @db.Date
+  closingDate         DateTime? @map("closing_date") @db.Date
+  interviewDate       DateTime? @map("interview_date") @db.Date
+  resultsDate         DateTime? @map("results_date") @db.Date
+  enrollmentDate      DateTime? @map("enrollment_date") @db.Date
+  nextDeadline        DateTime? @map("next_deadline") @db.Timestamptz
+  minimumAge          Int?     @map("minimum_age")
+  maximumAge          Int?     @map("maximum_age")
+  minimumGpa          Decimal? @map("minimum_gpa") @db.Decimal(4, 2)
+  gpaScale            Decimal  @default("4") @map("gpa_scale") @db.Decimal(3, 1)
+  minimumPercentage   Decimal? @map("minimum_percentage") @db.Decimal(5, 2)
+  maximumGapYears     Int?     @map("maximum_gap_years")
+  isFullyFunded       Boolean  @default(false) @map("is_fully_funded")
+  isFeatured          Boolean  @default(false) @map("is_featured")
+  isActive            Boolean  @default(true) @map("is_active")
+  status              scholarship_status @default(DRAFT)
+  verificationStatus  verification_status @default(UNVERIFIED) @map("verification_status")
+  verifiedAt          DateTime? @map("verified_at") @db.Timestamptz
+  verifiedBy          String?  @map("verified_by") @db.Uuid
+  difficultyScore     Int?     @map("difficulty_score")
+  competitionLevel    competition_level? @map("competition_level")
+  acceptanceRate      Decimal? @map("acceptance_rate") @db.Decimal(5, 2)
+  aiSummary           String?  @map("ai_summary")
+  aiTips              String?  @map("ai_tips")
+  applicationProcess  String?  @map("application_process")
+  selectionProcess    String?  @map("selection_process")
+  viewCount           BigInt   @default(0) @map("view_count")
+  saveCount           BigInt   @default(0) @map("save_count")
+  favoriteCount       BigInt   @default(0) @map("favorite_count")
+  applicationCount    BigInt   @default(0) @map("application_count")
+  reviewCount         BigInt   @default(0) @map("review_count")
+  needsEmbedding      Boolean  @default(true) @map("needs_embedding")
+  sourceUrl           String?  @map("source_url") @db.VarChar(500)
+  sourceId            String?  @map("source_id") @db.Uuid
+  publishedAt         DateTime? @map("published_at") @db.Timestamptz
+  searchVector        Unsupported("tsvector")? @map("search_vector")
+  metadata            Json     @default("{}")
+  createdAt           DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt           DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt           DateTime? @map("deleted_at") @db.Timestamptz
+
+  provider    Provider?          @relation(fields: [providerId], references: [id])
+  country     Country?           @relation(fields: [countryId], references: [id])
+  university  University?        @relation(fields: [universityId], references: [id])
+  degreeLevel DegreeLevel?       @relation(fields: [degreeLevelId], references: [id])
+  studyField  StudyField?        @relation(fields: [studyFieldId], references: [id])
+  source      Source?            @relation(fields: [sourceId], references: [id])
+  cycles      ScholarshipCycle[]
+  versions    ScholarshipVersion[]
+  changeLogs  ScholarshipChangeLog[]
+  queueItems  ImportQueueItem[]
+  verifications VerificationQueue[]
+  duplicatesAsSource   Duplicate[] @relation("duplicate_src")
+  duplicatesAsDuplicate Duplicate[] @relation("duplicate_tgt")
+
+  @@map("scholarships")
+}
+
+model ScholarshipCycle {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  scholarshipId  String   @map("scholarship_id") @db.Uuid
+  cycleLabel     String?  @map("cycle_label") @db.VarChar(100)
+  openingDate    DateTime? @map("opening_date") @db.Date
+  closingDate    DateTime? @map("closing_date") @db.Date
+  interviewDate  DateTime? @map("interview_date") @db.Date
+  resultsDate    DateTime? @map("results_date") @db.Date
+  enrollmentDate DateTime? @map("enrollment_date") @db.Date
+  status         cycle_status @default(UPCOMING)
+  isCurrent      Boolean  @default(false) @map("is_current")
+  sourceUrl      String?  @map("source_url") @db.VarChar(500)
+  notes          String?
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt      DateTime? @map("deleted_at") @db.Timestamptz
+
+  scholarship Scholarship @relation(fields: [scholarshipId], references: [id])
+
+  @@map("scholarship_cycles")
+}
+
+model ImportBatch {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  sourceId        String?  @map("source_id") @db.Uuid
+  sourceType      import_source_type @map("source_type")
+  sourceName      String?  @map("source_name") @db.VarChar(200)
+  sourceUrl       String?  @map("source_url") @db.VarChar(500)
+  status          import_status @default(PENDING)
+  totalItems      Int      @default(0) @map("total_items")
+  succeeded       Int      @default(0)
+  failed          Int      @default(0)
+  skipped         Int      @default(0)
+  duplicatesFound Int      @default(0) @map("duplicates_found")
+  errorSummary    String?  @map("error_summary")
+  createdBy       String?  @map("created_by") @db.Uuid
+  startedAt       DateTime? @map("started_at") @db.Timestamptz
+  finishedAt      DateTime? @map("finished_at") @db.Timestamptz
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  source     Source?           @relation(fields: [sourceId], references: [id])
+  queueItems ImportQueueItem[]
+
+  @@map("import_batches")
+}
+
+model ImportQueueItem {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  batchId       String   @map("batch_id") @db.Uuid
+  sourceUrl     String?  @map("source_url") @db.VarChar(500)
+  rawPayload    Json     @default("{}") @map("raw_payload")
+  extracted     Json     @default("{}")
+  contentHash   String?  @map("content_hash") @db.Char(64)
+  status        queue_item_status @default(PENDING)
+  scholarshipId String?  @map("scholarship_id") @db.Uuid
+  error         String?
+  attempts      Int      @default(0)
+  processedAt   DateTime? @map("processed_at") @db.Timestamptz
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  batch       ImportBatch  @relation(fields: [batchId], references: [id])
+  scholarship Scholarship? @relation(fields: [scholarshipId], references: [id])
+
+  @@map("import_queue_items")
+}
+
+model ScholarshipVersion {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  scholarshipId String   @map("scholarship_id") @db.Uuid
+  version       Int
+  snapshot      Json
+  changeType    change_type @default(UPDATE) @map("change_type")
+  createdBy     String?  @map("created_by") @db.Uuid
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  scholarship Scholarship @relation(fields: [scholarshipId], references: [id])
+
+  @@unique([scholarshipId, version])
+  @@map("scholarship_versions")
+}
+
+model ScholarshipChangeLog {
+  id            String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  scholarshipId String     @map("scholarship_id") @db.Uuid
+  fieldName     String     @map("field_name") @db.VarChar(120)
+  oldValue      Json?      @map("old_value")
+  newValue      Json?      @map("new_value")
+  changeType    change_type @default(UPDATE) @map("change_type")
+  changedBy     String?    @map("changed_by") @db.Uuid
+  createdAt     DateTime   @default(now()) @map("created_at") @db.Timestamptz
+
+  scholarship Scholarship @relation(fields: [scholarshipId], references: [id])
+
+  @@map("scholarship_change_logs")
+}
+
+model Duplicate {
+  id             String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  scholarshipId  String           @map("scholarship_id") @db.Uuid
+  duplicateOfId  String           @map("duplicate_of_id") @db.Uuid
+  similarity     Decimal          @db.Decimal(5, 2)
+  method         String           @db.VarChar(30)
+  status         duplicate_status @default(OPEN)
+  resolvedAt     DateTime?        @map("resolved_at") @db.Timestamptz
+  resolvedBy     String?          @map("resolved_by") @db.Uuid
+  createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  scholarship Scholarship @relation("duplicate_src", fields: [scholarshipId], references: [id])
+  duplicateOf Scholarship @relation("duplicate_tgt", fields: [duplicateOfId], references: [id])
+
+  @@unique([scholarshipId, duplicateOfId])
+  @@map("duplicates")
+}
+
+model VerificationQueue {
+  id            String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  scholarshipId String                @unique @map("scholarship_id") @db.Uuid
+  reason        String?               @db.VarChar(500)
+  priority      verification_priority @default(NORMAL)
+  status        verification_status   @default(PENDING)
+  reviewerId    String?               @map("reviewer_id") @db.Uuid
+  reviewedAt    DateTime?             @map("reviewed_at") @db.Timestamptz
+  reviewNotes   String?               @map("review_notes")
+  createdAt     DateTime              @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime              @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  scholarship Scholarship @relation(fields: [scholarshipId], references: [id])
+
+  @@map("verification_queue")
+}
+
+model AiEmbedding {
+  id          String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  entityType  String      @map("entity_type") @db.VarChar(40)
+  entityId    String      @map("entity_id") @db.Uuid
+  content     String
+  contentHash String      @map("content_hash") @db.Char(64)
+  embedding   Unsupported("vector(1536)")
+  provider    ai_provider @default(OPENAI)
+  model       String      @db.VarChar(100)
+  dimensions  Int         @default(1536)
+  createdAt   DateTime    @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime    @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@unique([entityType, entityId])
+  @@map("ai_embeddings")
+}
+
+
+// =============================================================================
+// AUTO-GENERATED by tools/generate-prisma.mjs — mirrors of SQL tables 003_tables.sql
+// Do not hand-edit. Re-run the generator when 003 changes.
+// =============================================================================
+
+enum gender {
+  MALE
+  FEMALE
+  OTHER
+  PREFER_NOT_TO_SAY
+}
+
+enum education_level {
+  SECONDARY
+  HIGH_SCHOOL
+  DIPLOMA
+  ASSOCIATE
+  BACHELOR
+  MASTER
+  DOCTORATE
+  OTHER
+}
+
+enum degree_type {
+  ASSOCIATE
+  BACHELOR
+  MASTER
+  DOCTORATE
+  DIPLOMA
+  CERTIFICATE
+  SHORT_COURSE
+  EXCHANGE
+  LANGUAGE_COURSE
+  RESEARCH
+  SUMMER_SCHOOL
+  OTHER
+}
+
+enum grade_type {
+  GPA_4
+  GPA_5
+  GPA_10
+  PERCENTAGE
+  CLASS_GRADE
+  PASS_FAIL
+  OTHER
+}
+
+enum english_level {
+  A1
+  A2
+  B1
+  B2
+  C1
+  C2
+  NATIVE
+  NOT_TESTED
+}
+
+enum proficiency_level {
+  BEGINNER
+  ELEMENTARY
+  INTERMEDIATE
+  UPPER_INTERMEDIATE
+  ADVANCED
+  NATIVE
+}
+
+enum test_type {
+  IELTS
+  TOEFL
+  DUOLINGO
+  SAT
+  ACT
+  GRE
+  GMAT
+  OTHER
+}
+
+enum benefit_type {
+  TUITION
+  TUITION_DISCOUNT
+  HOUSING
+  MONTHLY_STIPEND
+  YEARLY_STIPEND
+  ONE_TIME_GRANT
+  INSURANCE
+  FLIGHT
+  BOOKS
+  RESEARCH_GRANT
+  TRAVEL_GRANT
+  VISA_SUPPORT
+  SETTLEMENT_ALLOWANCE
+  FAMILY_ALLOWANCE
+  APPLICATION_FEE_WAIVER
+  COMPUTER
+  LANGUAGE_COURSE
+  OTHER
+}
+
+enum requirement_type {
+  NATIONALITY
+  RESIDENCE
+  AGE
+  GPA
+  PERCENTAGE
+  IELTS
+  TOEFL
+  DUOLINGO
+  SAT
+  ACT
+  GRE
+  GMAT
+  GAP_YEARS
+  PORTFOLIO
+  INTERVIEW
+  MEDICAL_EXAM
+  WORK_EXPERIENCE
+  ENROLLMENT_STATUS
+  GENDER
+  DISABILITY
+  FIRST_GENERATION
+  REFUGEE
+  OTHER
+}
+
+enum document_type {
+  TRANSCRIPT
+  DIPLOMA
+  CERTIFICATE
+  CV
+  RESUME
+  STATEMENT_OF_PURPOSE
+  MOTIVATION_LETTER
+  LETTER_OF_RECOMMENDATION
+  PASSPORT
+  ID_CARD
+  IELTS
+  TOEFL
+  DUOLINGO
+  SAT
+  GRE
+  GMAT
+  PORTFOLIO
+  FINANCIAL_STATEMENT
+  BANK_STATEMENT
+  MEDICAL_CERTIFICATE
+  PHOTO
+  TAX_RETURN
+  WORK_CONTRACT
+  PUBLICATION
+  OTHER
+}
+
+enum media_type {
+  IMAGE
+  VIDEO
+  DOCUMENT
+  PDF
+  VIRTUAL_TOUR
+}
+
+enum event_type {
+  WEBINAR
+  WORKSHOP
+  FAIR
+  INFO_SESSION
+  APPLICATION_DEADLINE
+  EXAM
+  INTERVIEW
+  OTHER
+}
+
+enum event_status {
+  DRAFT
+  OPEN
+  FULL
+  CANCELLED
+  COMPLETED
+}
+
+enum event_attendee_status {
+  REGISTERED
+  ATTENDED
+  CANCELLED
+  WAITLISTED
+  NO_SHOW
+}
+
+enum application_status {
+  DRAFT
+  IN_PROGRESS
+  SUBMITTED
+  UNDER_REVIEW
+  INTERVIEW
+  WAITLISTED
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+  COMPLETED
+}
+
+enum stage_type {
+  ELIGIBILITY
+  DOCUMENTS
+  FORMS
+  TESTS
+  SUBMISSION
+  INTERVIEW
+  DECISION
+  ENROLLMENT
+}
+
+enum stage_status {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  SKIPPED
+  BLOCKED
+}
+
+enum task_type {
+  DOCUMENT_UPLOAD
+  FORM
+  TEST_BOOKING
+  PAYMENT
+  INTERVIEW
+  REFERENCE_REQUEST
+  SUBMISSION
+  OTHER
+}
+
+enum task_status {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  OVERDUE
+  CANCELLED
+}
+
+enum application_document_status {
+  REQUIRED
+  UPLOADED
+  SUBMITTED
+  ACCEPTED
+  REJECTED
+}
+
+enum user_document_status {
+  UPLOADED
+  PROCESSING
+  READY
+  REJECTED
+  ARCHIVED
+}
+
+enum relation_type {
+  SPONSOR
+  PARENT
+  GUARDIAN
+  TEACHER
+  EMPLOYER
+  MENTOR
+  OTHER
+}
+
+enum letter_status {
+  DRAFT
+  REQUESTED
+  REMINDED
+  SUBMITTED
+  RECEIVED
+  DECLINED
+}
+
+enum essay_type {
+  STATEMENT_OF_PURPOSE
+  PERSONAL_STATEMENT
+  MOTIVATION_LETTER
+  SCHOLARSHIP_ESSAY
+  PORTFOLIO_STATEMENT
+  OTHER
+}
+
+enum notification_type {
+  DEADLINE_REMINDER
+  APPLICATION_UPDATE
+  PAYMENT_UPDATE
+  MATCH_RESULTS
+  DOCUMENT_REVIEW
+  ACCOUNT
+  SYSTEM
+  PROMOTIONAL
+}
+
+enum notification_channel {
+  IN_APP
+  EMAIL
+  PUSH
+  SMS
+}
+
+enum notification_status {
+  PENDING
+  SENT
+  DELIVERED
+  READ
+  CLICKED
+  FAILED
+}
+
+enum email_status {
+  QUEUED
+  SENT
+  DELIVERED
+  OPENED
+  CLICKED
+  BOUNCED
+  FAILED
+  DROPPED
+}
+
+enum ai_review_type {
+  CV
+  ESSAY
+  RECOMMENDATION_LETTER
+  STATEMENT_OF_PURPOSE
+  PORTFOLIO
+  OTHER
+}
+
+enum ai_review_status {
+  QUEUED
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum ai_report_type {
+  ACCEPTANCE_PREDICTION
+  PROFILE_REVIEW
+  SCHOLARSHIP_ANALYSIS
+  MATCHING_EXPLANATION
+  TREND_ANALYSIS
+  OTHER
+}
+
+enum chat_role {
+  SYSTEM
+  USER
+  ASSISTANT
+  TOOL
+}
+
+enum audit_action {
+  INSERT
+  UPDATE
+  DELETE
+  SOFT_DELETE
+  RESTORE
+  LOGIN
+  LOGOUT
+  EXPORT
+  IMPORT
+  MASS_UPDATE
+}
+
+enum activity_type {
+  PAGE_VIEW
+  SEARCH
+  SAVE
+  UNSAVE
+  APPLY
+  UPLOAD
+  REVIEW
+  LOGIN
+  LOGOUT
+  DOWNLOAD
+  SHARE
+  MATCH
+  OPEN_LINK
+}
+
+enum payment_method {
+  STRIPE
+  VODAFONE_CASH
+  INSTAPAY
+  BANK_TRANSFER
+  OTHER
+}
+
+enum payment_status {
+  PENDING
+  APPROVED
+  REJECTED
+  REFUNDED
+  FAILED
+}
+
+enum cron_status {
+  RUNNING
+  SUCCESS
+  FAILED
+}
+
+model Cities {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  countryId      String @db.Uuid @map("country_id")
+  name      String @db.VarChar(150)
+  nameAr      String? @db.VarChar(150) @map("name_ar")
+  slug      String @db.VarChar(170)
+  isCapital      Boolean @default(false) @map("is_capital")
+  latitude      Decimal? @db.Decimal(10, 7)
+  longitude      Decimal? @db.Decimal(10, 7)
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+  deletedAt      DateTime? @db.Timestamptz @map("deleted_at")
+
+  @@map("cities")
+}
+
+model Campuses {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  universityId      String @db.Uuid @map("university_id")
+  name      String @db.VarChar(200)
+  nameAr      String? @db.VarChar(200) @map("name_ar")
+  countryId      String? @db.Uuid @map("country_id")
+  cityId      String? @db.Uuid @map("city_id")
+  address      String?
+  latitude      Decimal? @db.Decimal(10, 7)
+  longitude      Decimal? @db.Decimal(10, 7)
+  website      String? @db.VarChar(300)
+  isMain      Boolean @default(false) @map("is_main")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+  deletedAt      DateTime? @db.Timestamptz @map("deleted_at")
+
+  @@map("campuses")
+}
+
+model Departments {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  universityId      String @db.Uuid @map("university_id")
+  name      String @db.VarChar(200)
+  nameAr      String? @db.VarChar(200) @map("name_ar")
+  slug      String @db.VarChar(220)
+  faculty      String? @db.VarChar(200)
+  description      String?
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+  deletedAt      DateTime? @db.Timestamptz @map("deleted_at")
+
+  @@map("departments")
+}
+
+model ScholarshipBenefits {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  scholarshipId      String @db.Uuid @map("scholarship_id")
+  benefitType      benefit_type @map("benefit_type")
+  amount      Decimal? @db.Decimal(12, 2)
+  currencyId      String? @db.Uuid @map("currency_id")
+  description      String? @db.VarChar(500)
+  isEstimated      Boolean @default(false) @map("is_estimated")
+  sortOrder      Int @default(0) @map("sort_order")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+
+  @@map("scholarship_benefits")
+}
+
+model ScholarshipRequirements {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  scholarshipId      String @db.Uuid @map("scholarship_id")
+  requirementType      requirement_type @map("requirement_type")
+  minValue      String? @db.VarChar(100) @map("min_value")
+  maxValue      String? @db.VarChar(100) @map("max_value")
+  unit      String? @db.VarChar(50)
+  description      String? @db.VarChar(500)
+  isHardRequirement      Boolean @default(true) @map("is_hard_requirement")
+  sortOrder      Int @default(0) @map("sort_order")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+
+  @@map("scholarship_requirements")
+}
+
+model ScholarshipTestRequirements {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  scholarshipId      String @db.Uuid @map("scholarship_id")
+  testType      test_type @map("test_type")
+  minimumScore      Decimal? @db.Decimal(6, 2) @map("minimum_score")
+  minimumBand      String? @db.VarChar(20) @map("minimum_band")
+  isMandatory      Boolean @default(true) @map("is_mandatory")
+  notes      String? @db.VarChar(300)
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+
+  @@unique([scholarshipId, testType])
+
+  @@map("scholarship_test_requirements")
+}
+
+model ScholarshipDocuments {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  scholarshipId      String @db.Uuid @map("scholarship_id")
+  documentType      document_type @map("document_type")
+  name      String? @db.VarChar(200)
+  nameAr      String? @db.VarChar(200) @map("name_ar")
+  description      String? @db.VarChar(500)
+  isRequired      Boolean @default(true) @map("is_required")
+  sortOrder      Int @default(0) @map("sort_order")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+
+  @@map("scholarship_documents")
+}
+
+model ScholarshipDegrees {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  scholarshipId      String @db.Uuid @map("scholarship_id")
+  degreeLevelId      String @db.Uuid @map("degree_level_id")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+
+  @@unique([scholarshipId, degreeLevelId])
+
+  @@map("scholarship_degrees")
+}
+
+model ScholarshipFields {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  scholarshipId      String @db.Uuid @map("scholarship_id")
+  studyFieldId      String @db.Uuid @map("study_field_id")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+
+  @@unique([scholarshipId, studyFieldId])
+
+  @@map("scholarship_fields")
+}
+
+model ScholarshipEligibleCountries {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  scholarshipId      String @db.Uuid @map("scholarship_id")
+  countryId      String @db.Uuid @map("country_id")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+
+  @@unique([scholarshipId, countryId])
+
+  @@map("scholarship_eligible_countries")
+}
+
+model ScholarshipLanguages {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  scholarshipId      String @db.Uuid @map("scholarship_id")
+  languageId      String @db.Uuid @map("language_id")
+  isRequired      Boolean @default(false) @map("is_required")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+
+  @@unique([scholarshipId, languageId])
+
+  @@map("scholarship_languages")
+}
+
+model ScholarshipSimilarities {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  scholarshipId      String @db.Uuid @map("scholarship_id")
+  similarScholarshipId      String @db.Uuid @map("similar_scholarship_id")
+  similarityScore      Decimal @db.Decimal(5, 2) @map("similarity_score")
+  method      String @db.VarChar(30)
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+
+  @@unique([scholarshipId, similarScholarshipId])
+
+  @@map("scholarship_similarities")
+}
+
+model ScholarshipReviews {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  scholarshipId      String @db.Uuid @map("scholarship_id")
+  userId      String @db.Uuid @map("user_id")
+  rating      Int @db.SmallInt
+  title      String? @db.VarChar(300)
+  body      String?
+  isVerified      Boolean @default(false) @map("is_verified")
+  isFeatured      Boolean @default(false) @map("is_featured")
+  status      content_status @default(DRAFT)
+  helpfulCount      Int @default(0) @map("helpful_count")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+  deletedAt      DateTime? @db.Timestamptz @map("deleted_at")
+
+  @@map("scholarship_reviews")
+}
+
+model ScholarshipFaqs {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  scholarshipId      String @db.Uuid @map("scholarship_id")
+  question      String @db.VarChar(500)
+  questionAr      String? @db.VarChar(500) @map("question_ar")
+  answer      String
+  answerAr      String? @map("answer_ar")
+  sortOrder      Int @default(0) @map("sort_order")
+  isPublished      Boolean @default(true) @map("is_published")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+
+  @@map("scholarship_faqs")
+}
+
+model ScholarshipGallery {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  scholarshipId      String @db.Uuid @map("scholarship_id")
+  mediaType      media_type @default(IMAGE) @map("media_type")
+  url      String @db.VarChar(500)
+  alt      String? @db.VarChar(300)
+  altAr      String? @db.VarChar(300) @map("alt_ar")
+  sortOrder      Int @default(0) @map("sort_order")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+
+  @@map("scholarship_gallery")
+}
+
+model ScholarshipNews {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  scholarshipId      String @db.Uuid @map("scholarship_id")
+  title      String @db.VarChar(300)
+  titleAr      String? @db.VarChar(300) @map("title_ar")
+  url      String? @db.VarChar(500)
+  excerpt      String? @db.VarChar(500)
+  source      String? @db.VarChar(200)
+  publishedAt      DateTime? @db.Timestamptz @map("published_at")
+  isPublished      Boolean @default(true) @map("is_published")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+
+  @@map("scholarship_news")
+}
+
+model Blogs {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  authorId      String? @db.Uuid @map("author_id")
+  slug      String @db.VarChar(250)
+  title      String @db.VarChar(300)
+  titleAr      String? @db.VarChar(300) @map("title_ar")
+  excerpt      String? @db.VarChar(500)
+  content      String?
+  contentAr      String? @map("content_ar")
+  coverUrl      String? @db.VarChar(500) @map("cover_url")
+  status      content_status @default(DRAFT)
+  seoTitle      String? @db.VarChar(200) @map("seo_title")
+  seoDescription      String? @db.VarChar(500) @map("seo_description")
+  tags      String[] @default([])
+  viewCount      BigInt @default(0) @map("view_count")
+  publishedAt      DateTime? @db.Timestamptz @map("published_at")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+  deletedAt      DateTime? @db.Timestamptz @map("deleted_at")
+
+  @@map("blogs")
+}
+
+model Events {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  slug      String @db.VarChar(250)
+  title      String @db.VarChar(300)
+  titleAr      String? @db.VarChar(300) @map("title_ar")
+  description      String?
+  eventType      event_type @default(OTHER) @map("event_type")
+  isOnline      Boolean @default(false) @map("is_online")
+  countryId      String? @db.Uuid @map("country_id")
+  cityId      String? @db.Uuid @map("city_id")
+  universityId      String? @db.Uuid @map("university_id")
+  venue      String? @db.VarChar(300)
+  startAt      DateTime @db.Timestamptz @map("start_at")
+  endAt      DateTime? @db.Timestamptz @map("end_at")
+  registrationUrl      String? @db.VarChar(500) @map("registration_url")
+  capacity      Int?
+  attendeeCount      Int @default(0) @map("attendee_count")
+  status      event_status @default(OPEN)
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+  deletedAt      DateTime? @db.Timestamptz @map("deleted_at")
+
+  @@map("events")
+}
+
+model EventAttendees {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  eventId      String @db.Uuid @map("event_id")
+  userId      String @db.Uuid @map("user_id")
+  status      event_attendee_status @default(REGISTERED)
+  registeredAt      DateTime @db.Timestamptz @default(now()) @map("registered_at")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+
+  @@unique([eventId, userId])
+
+  @@map("event_attendees")
+}
+
+model UserProfiles {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  userId      String @db.Uuid @map("user_id")
+  bio      String?
+  gender      gender?
+  dateOfBirth      DateTime? @db.Date @map("date_of_birth")
+  nationalityCountryId      String? @db.Uuid @map("nationality_country_id")
+  residenceCountryId      String? @db.Uuid @map("residence_country_id")
+  educationLevel      education_level? @map("education_level")
+  currentDegreeId      String? @db.Uuid @map("current_degree_id")
+  majorFieldId      String? @db.Uuid @map("major_field_id")
+  universityId      String? @db.Uuid @map("university_id")
+  gpa      Decimal? @db.Decimal(4, 2)
+  gpaScale      Decimal @db.Decimal(3, 1) @default("4") @map("gpa_scale")
+  gradeType      grade_type @default(GPA_4) @map("grade_type")
+  englishLevel      english_level? @map("english_level")
+  targetDegreeId      String? @db.Uuid @map("target_degree_id")
+  targetCountryId      String? @db.Uuid @map("target_country_id")
+  preferredMajors      String[] @map("preferred_majors")
+  annualBudget      Decimal? @db.Decimal(12, 2) @map("annual_budget")
+  budgetCurrencyId      String? @db.Uuid @map("budget_currency_id")
+  isActivelySearching      Boolean @default(true) @map("is_actively_searching")
+  isPublic      Boolean @default(false) @map("is_public")
+  about      String?
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+
+  @@map("user_profiles")
+}
+
+model UserEducation {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  userId      String @db.Uuid @map("user_id")
+  institution      String @db.VarChar(200)
+  degreeType      degree_type @map("degree_type")
+  degreeLevelId      String? @db.Uuid @map("degree_level_id")
+  fieldId      String? @db.Uuid @map("field_id")
+  countryId      String? @db.Uuid @map("country_id")
+  cityId      String? @db.Uuid @map("city_id")
+  gradeType      grade_type? @map("grade_type")
+  gpa      Decimal? @db.Decimal(4, 2)
+  percentage      Decimal? @db.Decimal(5, 2)
+  startDate      DateTime? @db.Date @map("start_date")
+  endDate      DateTime? @db.Date @map("end_date")
+  isCurrent      Boolean @default(false) @map("is_current")
+  description      String?
+  isVerified      Boolean @default(false) @map("is_verified")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+
+  @@map("user_education")
+}
+
+model UserAchievements {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  userId      String @db.Uuid @map("user_id")
+  title      String @db.VarChar(200)
+  description      String?
+  category      String? @db.VarChar(80)
+  issuer      String? @db.VarChar(200)
+  dateAwarded      DateTime? @db.Date @map("date_awarded")
+  url      String? @db.VarChar(500)
+  isPublic      Boolean @default(true) @map("is_public")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+
+  @@map("user_achievements")
+}
+
+model UserWorkExperience {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  userId      String @db.Uuid @map("user_id")
+  company      String @db.VarChar(200)
+  role      String @db.VarChar(200)
+  description      String?
+  countryId      String? @db.Uuid @map("country_id")
+  cityId      String? @db.Uuid @map("city_id")
+  startDate      DateTime @db.Date @map("start_date")
+  endDate      DateTime? @db.Date @map("end_date")
+  isCurrent      Boolean @default(false) @map("is_current")
+  isPublic      Boolean @default(true) @map("is_public")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+
+  @@map("user_work_experience")
+}
+
+model UserVolunteerExperience {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  userId      String @db.Uuid @map("user_id")
+  organization      String @db.VarChar(200)
+  role      String? @db.VarChar(200)
+  description      String?
+  countryId      String? @db.Uuid @map("country_id")
+  startDate      DateTime @db.Date @map("start_date")
+  endDate      DateTime? @db.Date @map("end_date")
+  isCurrent      Boolean @default(false) @map("is_current")
+  isPublic      Boolean @default(true) @map("is_public")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+
+  @@map("user_volunteer_experience")
+}
+
+model UserResearchExperience {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  userId      String @db.Uuid @map("user_id")
+  title      String @db.VarChar(200)
+  description      String?
+  institution      String? @db.VarChar(200)
+  fieldId      String? @db.Uuid @map("field_id")
+  startDate      DateTime? @db.Date @map("start_date")
+  endDate      DateTime? @db.Date @map("end_date")
+  publicationsUrl      String? @db.VarChar(500) @map("publications_url")
+  isPublic      Boolean @default(true) @map("is_public")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+
+  @@map("user_research_experience")
+}
+
+model UserLanguages {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  userId      String @db.Uuid @map("user_id")
+  languageId      String @db.Uuid @map("language_id")
+  proficiencyLevel      proficiency_level @default(INTERMEDIATE) @map("proficiency_level")
+  cefrLevel      english_level? @map("cefr_level")
+  isPublic      Boolean @default(true) @map("is_public")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+
+  @@unique([userId, languageId])
+
+  @@map("user_languages")
+}
+
+model UserTestScores {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  userId      String @db.Uuid @map("user_id")
+  testType      test_type @map("test_type")
+  score      Decimal? @db.Decimal(6, 2)
+  band      String? @db.VarChar(20)
+  testDate      DateTime? @db.Date @map("test_date")
+  certificateUrl      String? @db.VarChar(500) @map("certificate_url")
+  isVerified      Boolean @default(false) @map("is_verified")
+  verifiedAt      DateTime? @db.Timestamptz @map("verified_at")
+  notes      String? @db.VarChar(300)
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+
+  @@unique([userId, testType, testDate])
+
+  @@map("user_test_scores")
+}
+
+model UserFinance {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  userId      String @db.Uuid @map("user_id")
+  annualIncome      Decimal? @db.Decimal(12, 2) @map("annual_income")
+  currencyId      String? @db.Uuid @map("currency_id")
+  savings      Decimal? @db.Decimal(12, 2)
+  monthlyBudget      Decimal? @db.Decimal(12, 2) @map("monthly_budget")
+  dependents      Int @db.SmallInt @default(0)
+  needsFullFunding      Boolean @default(false) @map("needs_full_funding")
+  willingToConsiderLoans      Boolean @default(false) @map("willing_to_consider_loans")
+  hasSponsor      Boolean @default(false) @map("has_sponsor")
+  notes      String?
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+
+  @@map("user_finance")
+}
+
+model UserPreferences {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  userId      String @db.Uuid @map("user_id")
+  targetCountryIds      String[] @db.Uuid @default([]) @map("target_country_ids")
+  targetDegreeIds      String[] @db.Uuid @default([]) @map("target_degree_ids")
+  targetFieldIds      String[] @db.Uuid @default([]) @map("target_field_ids")
+  minimumFundingPercent      Decimal @db.Decimal(5, 2) @default("100") @map("minimum_funding_percent")
+  openToRelocation      Boolean @default(true) @map("open_to_relocation")
+  openToOnline      Boolean @default(false) @map("open_to_online")
+  willingToConsiderLoans      Boolean @default(false) @map("willing_to_consider_loans")
+  isPublic      Boolean @default(false) @map("is_public")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+
+  @@map("user_preferences")
+}
+
+model UserSettings {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  userId      String @db.Uuid @map("user_id")
+  language      String @db.VarChar(10) @default("ar")
+  theme      String @db.VarChar(20) @default("light")
+  timezone      String @db.VarChar(64) @default("UTC")
+  emailNotifications      Boolean @default(true) @map("email_notifications")
+  pushNotifications      Boolean @default(true) @map("push_notifications")
+  smsNotifications      Boolean @default(false) @map("sms_notifications")
+  marketingOptIn      Boolean @default(false) @map("marketing_opt_in")
+  reminderOffsetDays      Int @default(7) @map("reminder_offset_days")
+  twoFactorEnabled      Boolean @default(false) @map("two_factor_enabled")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+
+  @@map("user_settings")
+}
+
+model UserDocuments {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  userId      String @db.Uuid @map("user_id")
+  name      String @db.VarChar(200)
+  documentType      document_type @map("document_type")
+  fileUrl      String @db.VarChar(500) @map("file_url")
+  fileType      String? @db.VarChar(20) @map("file_type")
+  mimeType      String? @db.VarChar(100) @map("mime_type")
+  sizeBytes      BigInt? @map("size_bytes")
+  version      Int @default(1)
+  parentDocumentId      String? @db.Uuid @map("parent_document_id")
+  status      user_document_status @default(UPLOADED)
+  isPrivate      Boolean @default(true) @map("is_private")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+  deletedAt      DateTime? @db.Timestamptz @map("deleted_at")
+
+  @@map("user_documents")
+}
+
+model UserRecommendationLetters {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  userId      String @db.Uuid @map("user_id")
+  writerName      String @db.VarChar(200) @map("writer_name")
+  writerEmail      String? @db.VarChar(320) @map("writer_email")
+  writerTitle      String? @db.VarChar(200) @map("writer_title")
+  institution      String? @db.VarChar(200)
+  relationship      relation_type?
+  letterUrl      String? @db.VarChar(500) @map("letter_url")
+  status      letter_status @default(DRAFT)
+  requestedAt      DateTime? @db.Timestamptz @map("requested_at")
+  remindedAt      DateTime? @db.Timestamptz @map("reminded_at")
+  submittedAt      DateTime? @db.Timestamptz @map("submitted_at")
+  notes      String?
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+
+  @@map("user_recommendation_letters")
+}
+
+model UserEssays {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  userId      String @db.Uuid @map("user_id")
+  title      String @db.VarChar(300)
+  essayType      essay_type @default(SCHOLARSHIP_ESSAY) @map("essay_type")
+  prompt      String?
+  content      String?
+  wordCount      Int? @map("word_count")
+  isDraft      Boolean @default(true) @map("is_draft")
+  version      Int @default(1)
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+  deletedAt      DateTime? @db.Timestamptz @map("deleted_at")
+
+  @@map("user_essays")
+}
+
+model Applications {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  userId      String @db.Uuid @map("user_id")
+  scholarshipId      String @db.Uuid @map("scholarship_id")
+  cycleId      String? @db.Uuid @map("cycle_id")
+  status      application_status @default(DRAFT)
+  progress      Decimal @db.Decimal(5, 2) @default("0")
+  applicationUrl      String? @db.VarChar(500) @map("application_url")
+  submittedAt      DateTime? @db.Timestamptz @map("submitted_at")
+  withdrawnAt      DateTime? @db.Timestamptz @map("withdrawn_at")
+  notes      String?
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+  deletedAt      DateTime? @db.Timestamptz @map("deleted_at")
+
+  @@map("applications")
+}
+
+model ApplicationStages {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  applicationId      String @db.Uuid @map("application_id")
+  stageType      stage_type @map("stage_type")
+  name      String @db.VarChar(150)
+  nameAr      String? @db.VarChar(150) @map("name_ar")
+  sortOrder      Int @default(0) @map("sort_order")
+  status      stage_status @default(PENDING)
+  dueDate      DateTime? @db.Date @map("due_date")
+  completedAt      DateTime? @db.Timestamptz @map("completed_at")
+  notes      String?
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+
+  @@unique([applicationId, stageType])
+
+  @@map("application_stages")
+}
+
+model ApplicationTasks {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  applicationId      String @db.Uuid @map("application_id")
+  stageId      String? @db.Uuid @map("stage_id")
+  taskType      task_type @default(OTHER) @map("task_type")
+  title      String @db.VarChar(250)
+  description      String?
+  status      task_status @default(PENDING)
+  dueDate      DateTime? @db.Date @map("due_date")
+  reminderSentAt      DateTime? @db.Timestamptz @map("reminder_sent_at")
+  completedAt      DateTime? @db.Timestamptz @map("completed_at")
+  notes      String?
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+
+  @@map("application_tasks")
+}
+
+model ApplicationDocuments {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  applicationId      String @db.Uuid @map("application_id")
+  stageId      String? @db.Uuid @map("stage_id")
+  userDocumentId      String? @db.Uuid @map("user_document_id")
+  scholarshipDocumentId      String? @db.Uuid @map("scholarship_document_id")
+  documentType      document_type @map("document_type")
+  name      String? @db.VarChar(200)
+  fileUrl      String? @db.VarChar(500) @map("file_url")
+  status      application_document_status @default(REQUIRED)
+  submittedAt      DateTime? @db.Timestamptz @map("submitted_at")
+  reviewedAt      DateTime? @db.Timestamptz @map("reviewed_at")
+  feedback      String?
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+
+  @@map("application_documents")
+}
+
+model SavedScholarships {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  userId      String @db.Uuid @map("user_id")
+  scholarshipId      String @db.Uuid @map("scholarship_id")
+  notes      String?
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+
+  @@unique([userId, scholarshipId])
+
+  @@map("saved_scholarships")
+}
+
+model Favorites {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  userId      String @db.Uuid @map("user_id")
+  scholarshipId      String @db.Uuid @map("scholarship_id")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+
+  @@unique([userId, scholarshipId])
+
+  @@map("favorites")
+}
+
+model AiChats {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  userId      String @db.Uuid @map("user_id")
+  title      String? @db.VarChar(200)
+  context      Json @default("{}")
+  provider      ai_provider?
+  model      String? @db.VarChar(100)
+  messageCount      Int @default(0) @map("message_count")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+
+  @@map("ai_chats")
+}
+
+model AiChatMessages {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  chatId      String @db.Uuid @map("chat_id")
+  role      chat_role
+  content      String
+  tokensIn      Int? @map("tokens_in")
+  tokensOut      Int? @map("tokens_out")
+  provider      ai_provider?
+  model      String? @db.VarChar(100)
+  latencyMs      Int? @map("latency_ms")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+
+  @@map("ai_chat_messages")
+}
+
+model AiReviews {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  userId      String @db.Uuid @map("user_id")
+  userDocumentId      String? @db.Uuid @map("user_document_id")
+  applicationDocumentId      String? @db.Uuid @map("application_document_id")
+  reviewType      ai_review_type @map("review_type")
+  content      String?
+  score      Decimal? @db.Decimal(3, 1)
+  strengths      Json @default("[]")
+  weaknesses      Json @default("[]")
+  suggestions      Json @default("[]")
+  status      ai_review_status @default(QUEUED)
+  provider      ai_provider?
+  model      String? @db.VarChar(100)
+  creditsUsed      Int @default(1) @map("credits_used")
+  error      String?
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+
+  @@map("ai_reviews")
+}
+
+model AiReports {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  userId      String @db.Uuid @map("user_id")
+  reportType      ai_report_type @map("report_type")
+  title      String? @db.VarChar(300)
+  summary      String?
+  content      Json @default("{}")
+  status      ai_review_status @default(QUEUED)
+  provider      ai_provider?
+  model      String? @db.VarChar(100)
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+
+  @@map("ai_reports")
+}
+
+model AcceptancePredictions {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  userId      String @db.Uuid @map("user_id")
+  scholarshipId      String @db.Uuid @map("scholarship_id")
+  probability      Decimal @db.Decimal(5, 2)
+  fitScore      Decimal @db.Decimal(5, 2) @map("fit_score")
+  factors      Json @default("{}")
+  modelVersion      String @db.VarChar(50) @map("model_version")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+
+  @@unique([userId, scholarshipId])
+
+  @@map("acceptance_predictions")
+}
+
+model AiMatchingJobs {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  userId      String @db.Uuid @map("user_id")
+  status      ai_review_status @default(QUEUED)
+  scoreThreshold      Decimal @db.Decimal(5, 2) @default("60") @map("score_threshold")
+  matchedCount      Int? @map("matched_count")
+  result      Json?
+  provider      ai_provider?
+  model      String? @db.VarChar(100)
+  error      String?
+  startedAt      DateTime? @db.Timestamptz @map("started_at")
+  finishedAt      DateTime? @db.Timestamptz @map("finished_at")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+
+  @@map("ai_matching_jobs")
+}
+
+model SearchHistory {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  userId      String @db.Uuid @map("user_id")
+  query      String?
+  filters      Json @default("{}")
+  resultsCount      Int? @map("results_count")
+  clickedScholarshipId      String? @db.Uuid @map("clicked_scholarship_id")
+  clickedAt      DateTime? @db.Timestamptz @map("clicked_at")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+
+  @@map("search_history")
+}
+
+model Notifications {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  userId      String @db.Uuid @map("user_id")
+  type      notification_type
+  channel      notification_channel @default(IN_APP)
+  title      String @db.VarChar(300)
+  body      String?
+  link      String? @db.VarChar(500)
+  data      Json @default("{}")
+  status      notification_status @default(PENDING)
+  sentAt      DateTime? @db.Timestamptz @map("sent_at")
+  readAt      DateTime? @db.Timestamptz @map("read_at")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+
+  @@map("notifications")
+}
+
+model Emails {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  userId      String? @db.Uuid @map("user_id")
+  toAddress      String @db.VarChar(320) @map("to_address")
+  fromAddress      String @db.VarChar(320) @map("from_address")
+  subject      String @db.VarChar(500)
+  template      String? @db.VarChar(100)
+  bodyHtml      String? @map("body_html")
+  bodyText      String? @map("body_text")
+  status      email_status @default(QUEUED)
+  provider      String? @db.VarChar(30)
+  messageId      String? @db.VarChar(200) @map("message_id")
+  error      String?
+  sentAt      DateTime? @db.Timestamptz @map("sent_at")
+  deliveredAt      DateTime? @db.Timestamptz @map("delivered_at")
+  openedAt      DateTime? @db.Timestamptz @map("opened_at")
+  clickedAt      DateTime? @db.Timestamptz @map("clicked_at")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+
+  @@map("emails")
+}
+
+model Payments {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  userId      String @db.Uuid @map("user_id")
+  amount      Decimal @db.Decimal(12, 2)
+  currencyId      String? @db.Uuid @map("currency_id")
+  method      payment_method
+  providerReference      String? @db.VarChar(200) @map("provider_reference")
+  status      payment_status @default(PENDING)
+  credits      Int @default(0)
+  description      String? @db.VarChar(300)
+  reviewedBy      String? @db.Uuid @map("reviewed_by")
+  reviewedAt      DateTime? @db.Timestamptz @map("reviewed_at")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+
+  @@map("payments")
+}
+
+model AuditLogs {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  userId      String? @db.Uuid @map("user_id")
+  entityType      String @db.VarChar(80) @map("entity_type")
+  entityId      String @db.Uuid @map("entity_id")
+  action      audit_action
+  oldData      Json? @map("old_data")
+  newData      Json? @map("new_data")
+  ipAddress      String? @db.Inet @map("ip_address")
+  userAgent      String? @db.VarChar(500) @map("user_agent")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+
+  @@map("audit_logs")
+}
+
+model ActivityLogs {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  userId      String? @db.Uuid @map("user_id")
+  activityType      activity_type @map("activity_type")
+  entityType      String? @db.VarChar(80) @map("entity_type")
+  entityId      String? @db.Uuid @map("entity_id")
+  metadata      Json @default("{}")
+  ipAddress      String? @db.Inet @map("ip_address")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+
+  @@map("activity_logs")
+}
+
+model AnalyticsEvents {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  userId      String? @db.Uuid @map("user_id")
+  eventName      String @db.VarChar(120) @map("event_name")
+  eventData      Json @default("{}") @map("event_data")
+  url      String? @db.VarChar(500)
+  referrer      String? @db.VarChar(500)
+  sessionId      String? @db.VarChar(100) @map("session_id")
+  device      String? @db.VarChar(50)
+  browser      String? @db.VarChar(50)
+  os      String? @db.VarChar(50)
+  countryCode      String? @db.VarChar(2) @map("country_code")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+
+  @@map("analytics_events")
+}
+
+model DailyMetrics {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  metricDate      DateTime @db.Date @map("metric_date")
+  newUsers      Int @default(0) @map("new_users")
+  activeUsers      Int @default(0) @map("active_users")
+  scholarshipsAdded      Int @default(0) @map("scholarships_added")
+  applicationsCreated      Int @default(0) @map("applications_created")
+  applicationsSubmitted      Int @default(0) @map("applications_submitted")
+  matchesGenerated      Int @default(0) @map("matches_generated")
+  aiReviewsCompleted      Int @default(0) @map("ai_reviews_completed")
+  searches      Int @default(0)
+  savedCount      Int @default(0) @map("saved_count")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+
+  @@map("daily_metrics")
+}
+
+model CronRuns {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  jobName      String @db.VarChar(120) @map("job_name")
+  status      cron_status?
+  itemsProcessed      Int @default(0) @map("items_processed")
+  error      String?
+  startedAt      DateTime? @db.Timestamptz @map("started_at")
+  finishedAt      DateTime? @db.Timestamptz @map("finished_at")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+
+  @@map("cron_runs")
+}
+
+model AppSettings {
+  id      String @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+  key      String @db.VarChar(120)
+  value      Json
+  description      String? @db.VarChar(300)
+  updatedBy      String? @db.Uuid @map("updated_by")
+  createdAt      DateTime @db.Timestamptz @default(now()) @map("created_at")
+  updatedAt      DateTime @db.Timestamptz @default(now()) @map("updated_at")
+
+  @@map("app_settings")
+}

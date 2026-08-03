@@ -1,0 +1,26 @@
+{
+  "name": "smartscholar-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SmartScholar backend - PostgreSQL schema (SQL-owned), Prisma mirror, operational scripts and docs",
+  "scripts": {
+    "seed": "tsx scripts/seed.ts",
+    "import:scholarships": "tsx scripts/importScholarships.ts",
+    "sync:deadlines": "tsx scripts/syncDeadlines.ts",
+    "embeddings": "tsx scripts/generateEmbeddings.ts",
+    "detect:duplicates": "tsx scripts/detectDuplicates.ts",
+    "update:scholarships": "tsx scripts/updateScholarships.ts",
+    "verify:scholarships": "tsx scripts/verifyScholarships.ts",
+    "db:generate": "prisma generate",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "prisma": "^6.1.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}
