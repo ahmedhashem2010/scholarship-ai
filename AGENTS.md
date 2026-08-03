@@ -1,12 +1,17 @@
-# AGENTS.md — Scholarship Hub
+# AGENTS.md — SmartScholar
 
-AI-powered platform helping Arab/Middle Eastern students find and apply for international scholarships. Built with Next.js 14 App Router, Supabase Auth + PostgreSQL, Prisma ORM, Stripe, Resend.
+AI-powered platform helping Arab/Middle Eastern students find and apply for international scholarships. Live at **smartscholar.org**. Built with Next.js 14 App Router, Supabase Auth + PostgreSQL, Prisma ORM, Stripe, Zoho SMTP (nodemailer).
+
+> Renamed from "Scholarship Hub" on 27 July 2026. The product name, domain and
+> email infra changed — **never hardcode the old name or Resend**. Brand
+> constants live in `src/lib/brand.ts` (see Brand section).
 
 ## Quick Start
 
 ```bash
 npm run dev          # localhost:3000
 npm run build        # production build (must pass before deploy)
+npm run typecheck    # npx tsc --noEmit
 npm run db:generate  # after schema changes
 npm run db:seed      # 234 scholarships (39 curated + 195 scraped from for9a.com)
 npm run db:studio    # Prisma Studio
@@ -26,18 +31,34 @@ Database connects through Supavisor pooler (not direct):
 aws-1-ap-northeast-1.pooler.supabase.com:6543?pgbouncer=true&sslmode=no-verify
 ```
 
-Auth and Database are **different Supabase projects**. Auth users do NOT auto-populate the Prisma `User` table — that's handled by the profile API route.
+`prisma db push` / `prisma migrate` need `DIRECT_URL` (session pooler, port 5432,
+no `pgbouncer` flag) — the transaction pooler cannot run DDL and hangs silently.
+
+Auth and Database are **different Supabase projects**. Auth users do NOT
+auto-populate the Prisma `User` table — that's handled by the profile API route.
 
 ## Architecture
 
+- **Brand:** SmartScholar · smartscholar.org · navy (#162C4C) + gold palette, full CSS-variable ramps in `tailwind.config.ts` / `globals.css` that invert in dark mode
 - **Auth:** Supabase Auth (project kkqh...) — cookies managed by `@supabase/ssr`
 - **Database:** PostgreSQL via pooler + Prisma ORM (`prisma/schema.prisma`)
-- **Emails:** Resend (sandbox: only sends to `ahmedprogrammer2010@gmail.com` until domain verified)
+- **Emails:** Zoho Mail over SMTP via nodemailer (`src/lib/email.ts`) — mailbox `care@smartscholar.org`. Resend is gone.
+- **AI:** Multi-provider fallback chain — **Groq (primary) → Gemini → BazaarLink → AgentRouter** — in `src/lib/ai-review.ts` (see AI Providers)
 - **Payments:** Stripe Checkout (cards) + manual Egyptian methods (Vodafone Cash, InstaPay, Bank Transfer)
 - **Matching:** Custom algorithm in `src/lib/scholarship-matcher.ts` (fit score 0-100)
-- **AI Chat:** AgentRouter (`claude-haiku`) for scholarship coaching
-- **RTL:** Arabic support via Tajawal font + nav toggle
+- **AI Chat:** Same provider chain as above, in a client-side chat widget
+- **RTL:** Arabic-first (default `lang="ar" dir="rtl"`), IBM Plex Sans + IBM Plex Sans Arabic, language toggle persisted as `smartscholar.lang` in localStorage
 - **Deploy target:** Vercel
+
+## Brand
+
+`src/lib/brand.ts` is the single source of truth for the product name, Arabic
+wordmark, taglines, descriptions and domain. **Never hardcode the product name
+in a component or template — import it.** A rename should be one edit there.
+`src/lib/email-templates.ts` cannot import TS constants into its HTML strings
+(they're server-side, so it reads `process.env` / literal strings instead).
+
+Support mail: `support@smartscholar.org`. Brand spec lives in `BRAND-IDENTITY.md`.
 
 ## Environment (.env)
 
@@ -46,41 +67,61 @@ Auth and Database are **different Supabase projects**. Auth users do NOT auto-po
 > and in the Vercel project settings.
 
 Key vars (all in `.env` at project root):
-- `DATABASE_URL` — Supabase pooler connection string
-- `NEXT_PUBLIC_SUPABASE_URL` — Auth project URL
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Auth project anon key
+- `DATABASE_URL` — Supabase pooler connection string (transaction, 6543)
+- `DIRECT_URL` — Supabase session pooler (5432, no pgbouncer) for migrations
+- `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Auth project
 - `SUPABASE_SERVICE_ROLE_KEY` — Auth project service role (admin operations)
-- `RESEND_API_KEY` — transactional email
-- `RESEND_FROM_EMAIL` — verified sender, e.g. `Scholarship Hub <noreply@yourdomain.com>`
-- `AGENTROUTER_API_KEY` — chat + document review AI
-- `BAZAARLINK_API_KEY` — optional primary AI gateway; skipped if unset
+- `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASSWORD` — Zoho SMTP (`smtp.zoho.com:465`, app password, not login password)
+- `EMAIL_FROM` / `EMAIL_REPLY_TO` — must be the authenticated Zoho mailbox
+- `GROQ_API_KEY` — primary AI provider (free tier, no credit card)
+- `GEMINI_API_KEY` / `BAZAARLINK_API_KEY` / `AGENTROUTER_API_KEY` — optional AI fallbacks
 - `ADMIN_EMAIL` — the only account allowed to reach `/admin/*`
-- `NEXT_PUBLIC_WHATSAPP_NUMBER` — manual-payment contact, digits only, country code first
-- Stripe keys — `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
+- `NEXT_PUBLIC_SITE_URL` — canonical public URL, used for email links/OG/Stripe redirects
+- `NEXT_PUBLIC_WHATSAPP_NUMBER` / `NEXT_PUBLIC_VODAFONE_CASH_NUMBER` / `NEXT_PUBLIC_INSTAPAY_HANDLE` — manual-payment contacts
+- Stripe keys — `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
+- `CRON_SECRET` — shared secret guarding `/api/cron/reminders`
+- `NEXT_PUBLIC_GA_ID` — optional GA4
 
-## Signup Flow (current)
+## Signup Flow (current — real email verification)
 
-1. User submits `/api/auth/signup` with email, password, name
-2. API creates user in Supabase Auth with `email_confirm: true` (auto-confirmed)
-3. API sends branded welcome email via Resend (`welcomeHtml` template) with login link
-4. User logs in → login page calls `router.push("/onboarding")`
-5. Middleware also redirects authenticated users on `/auth/*` to `/onboarding`
-6. Onboarding page checks for existing profile → if none, shows form → if exists, redirects to `/dashboard`
-7. Onboarding submits `POST /api/user/profile` which first upserts a `User` record, then upserts `UserProfile`
-8. After profile saved → redirects to `/dashboard`
+1. User submits `POST /api/auth/signup` with email, password, name (optionally referralCode)
+2. Route calls `supabase.auth.admin.generateLink({ type: "signup" })` — creates the user **unconfirmed** and returns a `hashed_token`
+3. The `action_link` Supabase returns is **not used**: it hands the session back in the URL *fragment*, which never reaches the server. Instead the route builds its own link: `{NEXT_PUBLIC_SITE_URL}/auth/confirm?token_hash=…&type=email&next=/onboarding`
+4. The confirmation email is sent via Zoho SMTP (`confirmSignupHtml` — Arabic-first). If SMTP fails, the account exists but the request returns 502 `email_failed` (with the raw reason exposed outside production)
+5. Student clicks the link → `src/app/auth/confirm/route.ts` exchanges `token_hash` server-side via `verifyOtp` → they land signed in at `/onboarding`
+6. Expired/used links redirect to `/auth/login?error=link_expired|link_invalid`; the login page and `/auth/verify` offer a resend via `POST /api/auth/resend-verification`
+7. Middleware blocks unverified users from `/dashboard`, `/onboarding`, `/admin` → redirects to `/auth/verify` (belt-and-braces; doesn't depend on the Supabase "Confirm email" dashboard toggle)
+8. Onboarding checks for an existing profile → if none, shows the form → if one exists, redirects to `/dashboard`
+9. Onboarding submits `POST /api/user/profile`, which upserts a `User` record then upserts `UserProfile`, then redirects to `/dashboard`
 
-### Why no email confirmation?
+### Why real verification instead of auto-confirm?
 
-The original `generateLink` + `exchangeCodeForSession` PKCE flow was unreliable — Supabase's hosted redirect depends on dashboard config (SITE_URL, allowed redirect URLs). Auto-confirm + direct login is simpler and works offline. The `welcomeHtml` template replaces the confirmation email.
+Auto-confirm (`createUser({ email_confirm: true })`) let anyone register any
+address and the reminder cron emailed addresses never proven to exist. On a
+product whose core promise is "we email you before each step", that is a
+silently broken account. Verification also survives a missing SITE_URL config,
+which the old PKCE `generateLink` + `exchangeCodeForSession` flow did not.
 
 ## Auth & Middleware
 
-`src/middleware.ts`:
-- Blocks unauthenticated access to `/dashboard/*` and `/onboarding` → redirects to `/auth/login`
-- Redirects authenticated users on `/auth/*` → redirects to `/onboarding`
-- Uses `@supabase/ssr` `createServerClient` with cookie management
+`src/middleware.ts` (matcher: `/`, `/dashboard/:path*`, `/auth/:path*`, `/onboarding`, `/admin/:path*`):
+- `alwaysPublic` (no auth check): `/auth/callback`, `/auth/confirm`, `/auth/verify`
+- Signed-in users on `/` → redirect to `/dashboard` (escape hatch: `?home=1`)
+- Blocks unauthenticated access to `/dashboard/*`, `/onboarding`, `/admin/*` → redirects to `/auth/login` with `redirectTo` preserving intent
+- Blocks **unverified** users from the same routes → `/auth/verify`
+- `/admin/*` gated on `ADMIN_EMAIL` (middleware + every `/api/admin/*` handler)
+- Signed-in users on `/auth/*` → `/dashboard`
+- Uses `supabase.auth.getUser()` (server-revalidated JWT) — never `getSession()` for authorization decisions
 
-Callback route at `src/app/auth/callback/route.ts` — handles PKCE code exchange (kept for OAuth flows, not used by signup).
+Callback route at `src/app/auth/callback/route.ts` — PKCE code exchange (OAuth flows; signup does not use it).
+
+## AI Providers
+
+`src/lib/ai-review.ts` tries providers in order: **Groq → Gemini → BazaarLink →
+AgentRouter**, falling through on key-missing or HTTP errors; `scripts/test-ai.mjs`
+verifies the chain. The chat widget uses the same stack. Logging is gated behind
+`AI_DEBUG` — response bodies can contain fragments of student documents, so it
+stays **off in production**.
 
 ## Prisma Schema (9 models)
 
@@ -127,33 +168,34 @@ All `age` fields were renamed to `dateOfBirth` (stored as `DateTime` in DB, `str
 
 | File | Purpose |
 |------|---------|
+| `src/lib/brand.ts` | Brand constants (name, Arabic wordmark, domain, taglines) — import, don't hardcode |
 | `prisma/schema.prisma` | Active PostgreSQL schema (9 models) |
 | `prisma/seed.ts` | Seeds 234 scholarships |
-| `src/middleware.ts` | Auth guard + login redirect |
-| `src/app/api/auth/signup/route.ts` | Custom signup (auto-confirm + welcome email) |
-| `src/app/api/user/profile/route.ts` | Profile CRUD (creates User + UserProfile) |
-| `src/app/auth/callback/route.ts` | OAuth callback (kept for future) |
-| `src/app/auth/verify/page.tsx` | Post-signup "check your email" page |
+| `src/middleware.ts` | Auth guard + unverified-user redirect + admin gating |
+| `src/app/api/auth/signup/route.ts` | Signup — `generateLink` + custom confirm URL (real verification) |
+| `src/app/api/auth/resend-verification/route.ts` | Re-emails a fresh confirmation link |
+| `src/app/auth/confirm/route.ts` | Server-side token exchange via `verifyOtp` → session |
+| `src/app/auth/verify/page.tsx` | "Check your email" page with resend button |
+| `src/lib/email.ts` | Zoho SMTP client (nodemailer, pooled) |
+| `src/lib/email-templates.ts` | HTML templates (confirm, reset password, credits, reminders) |
+| `src/lib/ai-review.ts` | AI provider chain (Groq → Gemini → BazaarLink → AgentRouter) |
 | `src/app/onboarding/page.tsx` | 5-step onboarding wizard |
 | `src/app/dashboard/page.tsx` | Dashboard (redirects to onboarding if no profile) |
 | `src/lib/scholarship-matcher.ts` | Matching algorithm |
-| `src/lib/email.ts` | Resend email client |
-| `src/lib/email-templates.ts` | HTML templates (welcome, confirm, reset password) |
 
-## User Email for Testing
+## Email — Testing & Gotchas
 
-`ahmedprogrammer2010@gmail.com` — the only address the Resend sandbox can deliver to. Delete from Supabase Auth between test runs via:
-```
-node -e "... fetch(url + '/auth/v1/admin/users', { headers }) ..."
-```
-(script uses service role key to list users and delete by email)
+- Verify the whole chain with: `node scripts/test-email.mjs you@gmail.com`
+- Zoho: host is region-specific (`smtp.zoho.com` / `.eu` / `.in`); with 2FA on you must use an **app password**; the From address must be the authenticated mailbox; some free tiers have SMTP disabled in the admin console
+- There is **no Resend sandbox** anymore — no single test-only inbox. Send to any address you control
+- `scripts/test-ai.mjs` verifies the AI chain; `scripts/delete-user.mjs` deletes a user from Supabase Auth (reads `.env`, never hardcode keys)
 
 ## Performance Optimizations (applied May 2026)
 
 | Optimization | File | Impact |
 |-------------|------|--------|
 | Image formats + compression | `next.config.mjs` | AVIF/WebP image output, gzip compression, SWC minifier |
-| Reduced Poppins font weights | `src/app/layout.tsx` | Dropped 400 weight, only loads 500/600/700 |
+| IBM Plex Sans + Arabic weights | `src/app/layout.tsx` | Paired Latin/Arabic face, only 400-700 weights loaded |
 | `memo()` on cards | `src/app/dashboard/page.tsx` | `ScholarshipCard` won't re-render on unrelated state changes |
 | `dynamic()` imports | `src/app/dashboard/reviews/[id]/page.tsx` | `PDFViewer` + `ReviewDisplay` lazy-loaded with skeleton fallbacks |
 | Pagination on documents API | `src/app/api/documents/route.ts` | `page`/`pageSize` query params with `skip`/`take` |
@@ -204,7 +246,7 @@ credits(×1)
 npm run build
 ```
 
-Expected warnings: `Dynamic server usage` errors for `/api/users`, `/api/admin/payments`, `/api/scholarships/match` — these use `request.cookies` and are expected. Prerender errors for pages using auth/cookies are also normal. **Zero TypeScript errors** is the pass/fail criterion.
+Expected warnings: `Dynamic server usage` errors for `/api/users`, `/api/admin/payments`, `/api/scholarships/match` — these use `request.cookies` and are expected (several routes carry `export const dynamic = "force-dynamic"` to keep the output clean). Prerender errors for pages using auth/cookies are also normal. **Zero TypeScript errors** is the pass/fail criterion.
 
 ## Code Quality
 
@@ -213,22 +255,15 @@ Expected warnings: `Dynamic server usage` errors for `/api/users`, `/api/admin/p
 - Shared data goes in React Context, not duplicated `useEffect` fetches
 - Card/list components should use `memo()` to prevent unnecessary re-renders
 - Heavy component imports (PDF viewer, review display) use `next/dynamic` with SSR disabled
+- `console.warn/error/info` are allowed (ESLint config); server logging is deliberate
 
 ## Admin
 
 Admin access is gated on `ADMIN_EMAIL` — enforced in both `src/middleware.ts`
 (page routes under `/admin/*`) and each `/api/admin/*` route handler.
 
-Delete a user from Supabase Auth (does NOT delete from Prisma DB — separate projects).
-Reads credentials from `.env`, never hardcode them:
-
-```bash
-node -r dotenv/config -e "
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const headers = {
-  apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-  Authorization: 'Bearer ' + process.env.SUPABASE_SERVICE_ROLE_KEY,
-};
-// list -> find by email -> DELETE /auth/v1/admin/users/:id
-"
+Delete a user from Supabase Auth (does NOT delete from Prisma DB — separate projects):
 ```
+node scripts/delete-user.mjs <email>
+```
+The script reads credentials from `.env`, never hardcode them.

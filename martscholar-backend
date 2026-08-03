@@ -1,0 +1,58 @@
+[33mcommit d50a3b8f872aed247e4460db045d51ed5df64560[m
+Author: Ahmed Hashem <ahmedprogrammer2010@gmail.com>
+Date:   Wed Jul 29 10:38:43 2026 +0300
+
+    Zoho SMTP email, real signup verification, SmartScholar identity
+    
+    Email
+    - Replace Resend with Zoho Mail over SMTP (nodemailer, pooled connection)
+    - scripts/test-email.mjs rewritten as a dependency-free SMTP client
+    
+    Auth
+    - Signup now issues a real verification link instead of auto-confirming
+      every address. generateLink + a server-side /auth/confirm that exchanges
+      the token hash, so students land signed in rather than being sent to log
+      in again.
+    - Resend-verification endpoint with a cooldown, wired into login and verify
+    - Middleware: send signed-in users to the dashboard, block unverified
+      accounts, and fix a branch that was unreachable behind an early return
+    
+    Brand
+    - New logo (S drawn as a road) with generated favicon, app icons, mono and
+      lockup, all derived from one source SVG by scripts/build-brand.mjs
+    - BRAND-IDENTITY.md and a 10-page brand guidelines PDF
+    - Launch film re-rendered: the road draws itself in the logo reveal
+    
+    Fixes
+    - Auth error boxes used danger-50/success-200, which do not exist in the
+      Tailwind config and rendered as nothing
+    - Frame renderer writes atomically; a truncated PNG had silently produced
+      a 7-second video that reported itself as 59 seconds
+
+[33mcommit 959d331a4e799223e8056c6360e769aa0108475f[m
+Author: Darkfinity <ahmedhashem2010@users.noreply.github.com>
+Date:   Thu Jul 9 19:16:06 2026 +0300
+
+    Fix unique constraint error on email in prisma.user.upsert during AI review
+
+[33mcommit 822e6de27e6ad0166d342c9ad62ef9da75e60eab[m
+Author: Darkfinity <ahmedhashem2010@users.noreply.github.com>
+Date:   Wed Jun 3 18:08:25 2026 +0300
+
+    Add referral code system with 'scholarships' promo code (15 credits, 32 uses)
+    
+    - Add ReferralCode model to Prisma schema
+    - Seed 'scholarships' code (15 credits, 32 redemptions)
+    - Add referral code input field to signup form
+    - Store referral code in Supabase Auth user_metadata on signup
+    - Auto-redeem referral code in profile API after User creation
+    - Award 15 credits + create Payment record on successful redemption
+    - Update email confirmation template with modern polished design
+    - Switch signup flow to email verification (generateLink) instead of auto-confirm
+    - Handle 'Email not confirmed' error on login page
+
+[33mcommit 8fabba65723cddbfd51b0f2accc9cd3a74194a56[m
+Author: Darkfinity <ahmedhashem2010@users.noreply.github.com>
+Date:   Fri May 29 05:55:50 2026 +0300
+
+    ScholarshipAI - Ready for deployment
