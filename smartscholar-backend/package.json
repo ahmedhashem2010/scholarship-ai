@@ -12,10 +12,21 @@
     "update:scholarships": "tsx scripts/updateScholarships.ts",
     "verify:scholarships": "tsx scripts/verifyScholarships.ts",
     "db:generate": "prisma generate",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "acquire": "tsx src/acquisition/cli.ts",
+    "acquire:daad": "tsx src/acquisition/cli.ts --providers daad",
+    "acquire:erasmus": "tsx src/acquisition/cli.ts --providers erasmus",
+    "acquire:chevening": "tsx src/acquisition/cli.ts --providers chevening",
+    "acquire:fulbright": "tsx src/acquisition/cli.ts --providers fulbright",
+    "acquire:mext": "tsx src/acquisition/cli.ts --providers mext",
+    "acquire:stipendium-hungaricum": "tsx src/acquisition/cli.ts --providers stipendium-hungaricum",
+    "acquire:csc": "tsx src/acquisition/cli.ts --providers csc",
+    "test": "tsx src/acquisition/run-tests.ts"
   },
   "dependencies": {
-    "@prisma/client": "^6.1.0"
+    "@prisma/client": "^6.1.0",
+    "cheerio": "^1.2.0",
+    "pdf-parse": "^2.4.5"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
