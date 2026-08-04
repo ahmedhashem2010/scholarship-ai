@@ -9,6 +9,7 @@ import {
   slugify,
   sha256,
   canonicalJson,
+  jsonSafe,
   tokenSet,
   jaccard,
   parseArgs,
@@ -232,10 +233,11 @@ async function resolveUniversity(prisma: Awaited<ReturnType<typeof getPrisma>>, 
 
 async function resolveDegreeLevel(prisma: Awaited<ReturnType<typeof getPrisma>>, name: string | undefined): Promise<string | null> {
   if (!name || String(name).trim() === '') return null;
-  const slug = slugify(String(name));
+  const raw = String(name).trim();
+  const slug = raw === 'master' ? 'master-s-degree' : raw === 'doctorate' ? 'doctorate-phd' : slugify(raw);
   const bySlug = await prisma.degreeLevel.findUnique({ where: { slug } });
   if (bySlug) return bySlug.id;
-  const byName = await prisma.degreeLevel.findFirst({ where: { name: { equals: String(name), mode: 'insensitive' } } });
+  const byName = await prisma.degreeLevel.findFirst({ where: { name: { equals: raw, mode: 'insensitive' } } });
   return byName ? byName.id : null;
 }
 
@@ -382,7 +384,7 @@ async function main(): Promise<void> {
         data: {
           scholarshipId: scholarship.id,
           version: nextVersion,
-          snapshot: scholarship as unknown as Prisma.InputJsonValue,
+          snapshot: jsonSafe(scholarship) as Prisma.InputJsonValue,
           changeType,
         },
       });

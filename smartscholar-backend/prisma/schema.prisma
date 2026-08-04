@@ -363,6 +363,7 @@ model Scholarship {
   providerId          String?  @map("provider_id") @db.Uuid
   countryId           String?  @map("country_id") @db.Uuid
   universityId        String?  @map("university_id") @db.Uuid
+  campusId            String?  @map("campus_id") @db.Uuid
   degreeLevelId       String?  @map("degree_level_id") @db.Uuid
   studyFieldId        String?  @map("study_field_id") @db.Uuid
   durationMonths      Int?     @map("duration_months")

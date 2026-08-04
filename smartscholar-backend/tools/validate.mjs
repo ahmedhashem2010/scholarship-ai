@@ -108,11 +108,12 @@ for (const t of tableNames) {
   const m = tablesSql.match(new RegExp(`CREATE TABLE\\s+${t}\\s*\\(([\\s\\S]*?)\\n\\);`));
   if (!m) continue;
   tableDefs.set(t, m[1]);
-  // UNIQUE (...) column constraints within this table's body
+  // UNIQUE (...) column constraints within this table's body.
+  // A composite UNIQUE's leading column covers FK lookups, so add t:lead.
   const uniq = [...m[1].matchAll(/UNIQUE\s*\(([^)]+)\)/g)].map((x) => x[1].split(',').map((c) => c.trim()));
   for (const cols of uniq) {
     inlineUnique.add(t + ':' + cols.join(','));
-    if (cols.length === 1) inlineUnique.add(t + ':' + cols[0]);
+    inlineUnique.add(t + ':' + cols[0]);
   }
   const single = [...m[1].matchAll(/\b(\w+)\s+\S+.*\bUNIQUE\b/g)].map((x) => x[1]);
   for (const c of single) inlineUnique.add(t + ':' + c);
@@ -125,10 +126,11 @@ for (const [t, body] of tableDefs) {
   if (m) pkCols.set(t, ['id']);
 }
 
-// FK columns in 003 (REFERENCES ...)
+// FK columns in 003 (REFERENCES ...) — match uuid columns with optional
+// modifiers between type and REFERENCES (e.g. `uuid NOT NULL UNIQUE REFERENCES`)
 const fkCols = {};
 for (const [t, body] of tableDefs) {
-  const fks = [...body.matchAll(/^\s{2}(\w+)\s+uuid\s+REFERENCES\s+(\w+)/gm)];
+  const fks = [...body.matchAll(/^\s{2}(\w+)\s+uuid(?:\s+\w+)*\s+REFERENCES\s+(\w+)/gm)];
   fkCols[t] = fks.map((x) => ({ col: x[1], ref: x[2] }));
 }
 

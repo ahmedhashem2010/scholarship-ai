@@ -616,7 +616,7 @@ async function seedScholarships(
   for (const s of SCHOLARSHIPS) {
     const closing = new Date(now.getTime() + s.closingInDays * 86400000);
     const opening = new Date(now.getTime() - 10 * 86400000);
-    const degreeSlug = s.degree === 'master' ? 'masters-degree' : s.degree === 'doctorate' ? 'doctorate-phd' : slugify(s.degree);
+    const degreeSlug = s.degree === 'master' ? 'master-s-degree' : s.degree === 'doctorate' ? 'doctorate-phd' : slugify(s.degree);
     const data = {
       title: s.title,
       titleAr: s.titleAr,

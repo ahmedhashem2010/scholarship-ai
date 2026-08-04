@@ -13,6 +13,7 @@ import {
   parseNum,
   isUuid,
   fmt,
+  jsonSafe,
 } from './lib';
 
 const FIELD_MAP: Record<string, string> = {
@@ -203,7 +204,7 @@ async function main(): Promise<void> {
         data: {
           scholarshipId: updated.id,
           version: (versionAgg._max.version ?? 0) + 1,
-          snapshot: updated as unknown as Prisma.InputJsonValue,
+          snapshot: jsonSafe(updated) as Prisma.InputJsonValue,
           changeType: 'UPDATE',
         },
       });

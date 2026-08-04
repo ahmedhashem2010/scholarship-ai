@@ -106,6 +106,23 @@ export function flagBoolean(flags: Map<string, string>, name: string, fallback =
   return !['0', 'false', 'no', 'off'].includes(raw.toLowerCase());
 }
 
+export function jsonSafe(value: unknown): unknown {
+  if (value === null || value === undefined) return null;
+  if (value instanceof Date) return value.toISOString();
+  if (typeof value === 'bigint') return value.toString();
+  if (typeof value === 'number') return Number.isFinite(value) ? value : String(value);
+  if (Array.isArray(value)) return value.map(jsonSafe);
+  if (typeof value === 'object') {
+    if (typeof (value as { toJSON?: unknown }).toJSON === 'function') {
+      return jsonSafe((value as { toJSON: () => unknown }).toJSON());
+    }
+    const out: Record<string, unknown> = {};
+    for (const [key, val] of Object.entries(value)) out[key] = jsonSafe(val);
+    return out;
+  }
+  return value;
+}
+
 export function canonicalJson(value: unknown): string {
   if (value === null || typeof value !== 'object') return JSON.stringify(value);
   if (Array.isArray(value)) return `[${value.map((v) => canonicalJson(v)).join(',')}]`;

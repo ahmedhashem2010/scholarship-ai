@@ -111,9 +111,20 @@ CREATE INDEX IF NOT EXISTS idx_activity_logs_entity_type_entity_id ON activity_l
 -- FK-supporting indexes (validator-required single-column coverage)
 CREATE INDEX IF NOT EXISTS idx_countries_currency_id ON countries (currency_id);
 CREATE INDEX IF NOT EXISTS idx_study_fields_parent_id ON study_fields (parent_id);
+CREATE INDEX IF NOT EXISTS idx_universities_country_id ON universities (country_id);
 CREATE INDEX IF NOT EXISTS idx_universities_city_id ON universities (city_id);
 CREATE INDEX IF NOT EXISTS idx_universities_verified_by ON universities (verified_by);
+CREATE INDEX IF NOT EXISTS idx_departments_university_id ON departments (university_id);
 CREATE INDEX IF NOT EXISTS idx_providers_country_id ON providers (country_id);
+CREATE INDEX IF NOT EXISTS idx_scholarship_degrees_degree_level_id ON scholarship_degrees (degree_level_id);
+CREATE INDEX IF NOT EXISTS idx_scholarship_fields_study_field_id ON scholarship_fields (study_field_id);
+CREATE INDEX IF NOT EXISTS idx_scholarship_eligible_countries_country_id ON scholarship_eligible_countries (country_id);
+CREATE INDEX IF NOT EXISTS idx_scholarship_languages_language_id ON scholarship_languages (language_id);
+CREATE INDEX IF NOT EXISTS idx_scholarship_similarities_similar_scholarship_id ON scholarship_similarities (similar_scholarship_id);
+CREATE INDEX IF NOT EXISTS idx_scholarship_change_logs_scholarship_id ON scholarship_change_logs (scholarship_id);
+CREATE INDEX IF NOT EXISTS idx_event_attendees_user_id ON event_attendees (user_id);
+CREATE INDEX IF NOT EXISTS idx_user_languages_language_id ON user_languages (language_id);
+CREATE INDEX IF NOT EXISTS idx_duplicates_duplicate_of_id ON duplicates (duplicate_of_id);
 CREATE INDEX IF NOT EXISTS idx_user_profiles_target_country_id ON user_profiles (target_country_id);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_user_id ON audit_logs (user_id);
 CREATE INDEX IF NOT EXISTS idx_activity_logs_user_id ON activity_logs (user_id);
