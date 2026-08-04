@@ -73,8 +73,7 @@ function toEnumType(value: string, map: Record<string, string>): string | null {
   const key = value.toLowerCase().trim();
   if (map[key]) return map[key];
   for (const [k, v] of Object.entries(map)) {
-    if (k === v.toLowerCase()) return v;
-    if (key.includes(k)) return v;
+    if (key.includes(k.toLowerCase())) return v;
   }
   return null;
 }

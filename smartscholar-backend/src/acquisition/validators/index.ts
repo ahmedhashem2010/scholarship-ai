@@ -10,7 +10,7 @@ export interface ValidationResult {
 export function isScholarshipTitle(title: string): boolean {
   const s = title.toLowerCase();
   if (s.length < 8) return false;
-  const strong = /(scholarship|grant|fellowship|bourse|stipend|bursary|funding|award|fullbright|mext|daad|erasmus|chevening|student exchange|master.?s programme|joint master)/;
+  const strong = /(scholarship|grant|fellowship|bourse|stipend|bursary|funding|award|fulbright|mext|daad|erasmus|chevening|student exchange|master.?s programme|joint master)/;
   if (strong.test(s)) return true;
   const weak = /(program|programme|course|candidates|applicants|apply|application)/;
   return weak.test(s) && /(master|phd|doctorate|bachelor|undergraduate|graduate|study|university)/.test(s);
@@ -21,7 +21,11 @@ export function isExcludedUrl(url: string, title?: string): boolean {
   const u = url.toLowerCase();
   if (/\.(pdf|zip|docx?|xlsx?|png|jpg|jpeg|gif|webp|mp4)(\?|$)/.test(u)) return true;
   const bad = ['/news/', '/events/', '/about', '/contact', '/login', '/register', '/privacy', '/terms', '/careers', '/jobs', '/press/', '/media/', '/faq', '/help'];
-  if (bad.some((b) => u.includes(b))) return true;
+  // URL path alone is a weak signal: a curated page like /about/fulbright-program
+  // is a real scholarship page, so only exclude these paths when the title does
+  // not read as a scholarship.
+  const looksScholarly = !!title && isScholarshipTitle(title);
+  if (bad.some((b) => u.includes(b)) && !looksScholarly) return true;
   if (title) {
     const t = title.toLowerCase();
     const newsy = /\b(news|event|webinar|press release|blog|video|podcast|faq|contact|about|careers|team)\b/;

@@ -417,7 +417,14 @@ async function writeScholarship(
     }),
   );
 
-  await prisma.$transaction(related);
+  try {
+    await prisma.$transaction(related);
+  } catch (err) {
+    // The scholarship row is created before its related data; if any related
+    // insert fails, remove it so we never leave orphaned records behind.
+    await prisma.scholarship.delete({ where: { id: scholarship.id } }).catch(() => {});
+    throw err;
+  }
 
   return { scholarshipId: scholarship.id, action: 'CREATED' };
 }
