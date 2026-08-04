@@ -3,6 +3,9 @@ import { erasmusAdapter } from './erasmus';
 import { mextAdapter } from './mext';
 import { fulbrightAdapter } from './fulbright';
 import { stipendiumHungaricumAdapter } from './stipendium-hungaricum';
+import { daadAdapter } from './daad';
+import { cscAdapter } from './csc';
+import { cheveningAdapter } from './chevening';
 
 /**
  * Registered scholarship providers for the acquisition engine.
@@ -13,6 +16,9 @@ export const PROVIDERS: ProviderAdapter[] = [
   mextAdapter,
   fulbrightAdapter,
   stipendiumHungaricumAdapter,
+  daadAdapter,
+  cscAdapter,
+  cheveningAdapter,
 ];
 
 export function getProviders(): ProviderAdapter[] {

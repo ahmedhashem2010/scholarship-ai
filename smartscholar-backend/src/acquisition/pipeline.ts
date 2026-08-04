@@ -23,6 +23,9 @@ export async function extractFromUrl(
 ): Promise<ReturnType<ProviderAdapter['extract']> | null> {
   const url = d.sourceUrl || d.url;
   try {
+    if (adapter.curated) {
+      return await adapter.extract(d.url, '', { now: opts.now, metadata: d.metadata });
+    }
     const res = await fetchText(url, { timeoutMs: 30_000 });
     if (res.status !== 200) {
       logger.warn('pipeline', `non-200 (${res.status}) for ${url}`);

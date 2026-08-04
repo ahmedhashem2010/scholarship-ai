@@ -23,6 +23,12 @@ export interface ProviderAdapter {
   readonly website: string;
   /** Default cap on items imported for this provider (0 = unlimited). */
   readonly defaultMax?: number;
+  /**
+   * Curated providers extract without fetching the source page (used when the
+   * official site blocks automated fetches or the content is hand-curated).
+   * The extract() call receives empty HTML.
+   */
+  readonly curated?: boolean;
   /** Discovery: return candidate scholarship page URLs. */
   discover(): Promise<DiscoveredPage[]>;
   /** Extract a single scholarship from a fetched page. */
