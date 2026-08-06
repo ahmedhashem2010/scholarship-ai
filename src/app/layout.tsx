@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { IBM_Plex_Sans, IBM_Plex_Sans_Arabic } from "next/font/google";
+import { Inter_Tight, Cairo } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
 import { LanguageProvider } from "@/contexts/LanguageContext";
@@ -18,23 +18,21 @@ const ChatWidget = dynamic(() => import("@/components/chat-widget").then((m) => 
 
 // One type system for both scripts.
 //
-// IBM Plex Sans and IBM Plex Sans Arabic were drawn together, so they share
-// stroke weight, x-height and rhythm. That matters more than it sounds: this
-// is the fourth Arabic font this project has used, and the previous three all
-// failed the same way — an Arabic face and a Latin face picked separately
-// never sit on a line properly, and every fix breaks something else.
-//
-// The comment here already claimed Plex while the code actually loaded Plus
-// Jakarta Sans, which is its own lesson about trusting comments.
-const fontSans = IBM_Plex_Sans({
+// Inter Tight (Latin) + Cairo (Arabic) are the v4 brand pairing. Both are
+// geometric grotesques drawn with the same skeleton: Cairo was literally built
+// on Inter's Latin groundwork, so the two sit on a line together instead of
+// fighting. Both ship real 700–900 cuts, which is what lets the landing
+// headlines be enormous and bold without the browser smearing a fake bold
+// over Arabic joins (the exact failure of every display face tried before).
+const fontSans = Inter_Tight({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700", "800", "900"],
   variable: "--font-sans",
   display: "swap",
 });
-const fontArabic = IBM_Plex_Sans_Arabic({
+const fontArabic = Cairo({
   subsets: ["arabic"],
-  weight: ["400", "500", "600"],
+  weight: ["400", "500", "600", "700", "800", "900"],
   variable: "--font-arabic",
   display: "swap",
 });

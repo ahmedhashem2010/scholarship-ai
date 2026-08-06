@@ -16,11 +16,14 @@ export function Reveal({
   children,
   className,
   delay = 0,
+  from = "up",
 }: {
   children: ReactNode;
   className?: string;
   /** Transition delay in ms — use ~80–120ms increments to stagger a grid. */
   delay?: number;
+  /** Entry direction for the reveal. */
+  from?: "up" | "left" | "right";
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [state, setState] = useState<"idle" | "pending" | "visible">("idle");
@@ -56,7 +59,7 @@ export function Reveal({
     <div
       ref={ref}
       data-pending={state === "pending" ? "true" : undefined}
-      className={cn("reveal", state === "visible" && "is-visible", className)}
+      className={cn("reveal", from !== "up" && `from-${from}`, state === "visible" && "is-visible", className)}
       style={state === "pending" ? { transitionDelay: `${delay}ms` } : undefined}
     >
       {children}

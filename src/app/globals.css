@@ -272,7 +272,7 @@
 
 @layer components {
   .page-container {
-    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+    @apply mx-auto w-full max-w-7xl px-5 sm:px-6 lg:px-8;
   }
   .section-title {
     @apply text-h3 text-foreground;
@@ -355,27 +355,19 @@
 /* ---------------------------------------------------------------------------
    Display headings.
 
-   The self-hosted display faces are gone: Majara, Nitro, Zafran and RB. They
-   were the fourth, third, second and first attempt at giving headlines
-   character, and every one of them caused the same two problems.
-
-   Display faces have no presentation forms, so Arabic rendered UNJOINED —
-   individual letters sitting next to each other instead of a connected word.
-   And none of them shipped a real bold, so the browser synthesised one by
-   smearing the outlines, which breaks the joins even further.
-
-   `.font-display` now maps to the brand stack. Headings get their weight from
-   the type scale, not from a different family — which is what "one superfamily"
-   means and why IBM Plex was chosen.
+   `.font-display` maps to the brand stack — Cairo for Arabic, Inter Tight for
+   Latin (v4). Both carry genuine 700–900 cuts, so the massive landing
+   headlines render with real weight and Arabic stays fully joined.
+   Latin gets a tight, confident tracking; Arabic ignores letter-spacing, so
+   the value is safe to set for both. Line-height stays generous because
+   Arabic has far more vertical travel than Latin.
 --------------------------------------------------------------------------- */
 .font-display {
   font-family: var(--font-arabic), var(--font-sans), system-ui, sans-serif;
-  letter-spacing: -0.01em;
-  /* Arabic carries far more vertical travel than Latin; at Tailwind's bundled
-     display line-heights the descenders get clipped by any ancestor with
-     overflow-hidden. */
+  letter-spacing: -0.02em;
   line-height: 1.35;
-  /* Never let a real bold be faked. Plex has genuine 600 and 700 cuts. */
+  /* Never let a real bold be faked. Inter Tight and Cairo both ship the
+     weights; synthesis would smear Arabic joins. */
   font-synthesis-weight: none;
   font-synthesis-style: none;
 }
@@ -570,9 +562,187 @@ body {
     transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, transform;
 }
+.reveal[data-pending="true"].from-left { transform: translateX(-36px); }
+.reveal[data-pending="true"].from-right { transform: translateX(36px); }
 .reveal[data-pending="true"].is-visible {
   opacity: 1;
   transform: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Landing (v4) — motion utilities.
+
+   The v4 redesign's animation layer: floating 3D objects, twinkling gold
+   sparkles, an infinite marquee for the universities strip, a sweeping shine
+   on the primary CTA, drifting background glows and the spotlight that follows
+   the cursor across feature cards. Everything here animates transform or
+   opacity only, so it stays on the compositor, and the reduced-motion block
+   at the bottom of this file kills every one of them.
+--------------------------------------------------------------------------- */
+@keyframes obj-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+@keyframes obj-float-soft {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-6px) rotate(var(--tilt, 2deg)); }
+}
+@keyframes obj-twinkle {
+  0%, 100% { opacity: 0.1; transform: scale(0.6); }
+  50% { opacity: 1; transform: scale(1); }
+}
+@keyframes obj-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes obj-shine {
+  from { transform: translateX(-220%) skewX(-18deg); }
+  to { transform: translateX(260%) skewX(-18deg); }
+}
+@keyframes obj-glow-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.65; }
+  50% { transform: translate3d(42px, -26px, 0) scale(1.14); opacity: 1; }
+}
+
+.obj-float { animation: obj-float var(--float-dur, 6s) ease-in-out infinite; }
+.obj-float-soft { animation: obj-float-soft var(--float-dur, 5.5s) ease-in-out infinite; }
+.obj-twinkle { animation: obj-twinkle var(--twinkle-dur, 3.2s) ease-in-out infinite; }
+.obj-glow-drift { animation: obj-glow-drift 15s ease-in-out infinite; }
+
+/* Magnetic CTA wrapper — a short spring so the child trails the cursor
+   instead of snapping to it. Reduced-motion disables it in the component. */
+.magnetic { transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
+
+/* Glowing light that travels across the gold CTA on hover. Rendered as a
+   span inside the button; the button itself must be position:relative. */
+.btn-shine-overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  inset-inline-start: 0;
+  width: 45%;
+  border-radius: 9999px;
+  background: linear-gradient(100deg, transparent, rgb(255 255 255 / 0.5), transparent);
+  transform: translateX(-220%) skewX(-18deg);
+  pointer-events: none;
+}
+.group:hover .btn-shine-overlay { animation: obj-shine 0.85s cubic-bezier(0.4, 0, 0.2, 1); }
+
+/* Infinite marquee — the universities strip. The track holds two copies of
+   the content and slides half its width, looping seamlessly. Pauses on
+   hover. Forced `dir="ltr"` by the component so RTL can't reverse the seam. */
+.marquee-mask {
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+.marquee-track {
+  animation: obj-marquee var(--marquee-dur, 38s) linear infinite;
+  will-change: transform;
+}
+.marquee-track:hover { animation-play-state: paused; }
+
+/* ---------------------------------------------------------------------------
+   Landing (v4.1) — micro-motion.
+
+   A second, quieter motion layer on top of the v4 set: a staggered entrance
+   for the hero, a bouncing "scroll to explore" hint, gold underlines that
+   draw in under section titles, and the match-score bars that grow when their
+   card reveals. All animate transform/opacity only and every animation is
+   killed by the reduced-motion block at the bottom of this file.
+--------------------------------------------------------------------------- */
+@keyframes landing-hero-in {
+  from { opacity: 0; transform: translateY(26px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.landing-hero-in {
+  /* `both` keeps each element at its start state during its stagger delay. */
+  animation: landing-hero-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes landing-scroll-hint {
+  0%, 100% { transform: translateY(0); opacity: 0.55; }
+  50% { transform: translateY(6px); opacity: 1; }
+}
+.landing-scroll-hint {
+  animation: landing-scroll-hint 2.2s ease-in-out infinite;
+}
+
+/* Gold underline under section titles. Visible by default (no-JS safe) and
+   only tucked away while its Reveal parent is waiting to come into view. */
+.section-underline {
+  transform: scaleX(1);
+  transform-origin: left;
+  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+[dir="rtl"] .section-underline { transform-origin: right; }
+.reveal[data-pending="true"] .section-underline { transform: scaleX(0); }
+.reveal[data-pending="true"].is-visible .section-underline { transform: scaleX(1); }
+
+/* Match-score bars inside feature cards. Same reveal-tied pattern. */
+.progress-grow {
+  transform: scaleX(1);
+  transform-origin: left;
+  transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+[dir="rtl"] .progress-grow { transform-origin: right; }
+.reveal[data-pending="true"] .progress-grow { transform: scaleX(0); }
+.reveal[data-pending="true"].is-visible .progress-grow { transform: scaleX(1); }
+
+/* Animated underline for landing nav links — grows from the start edge. */
+.nav-underline {
+  position: relative;
+}
+.nav-underline::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 2px;
+  border-radius: 9999px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+[dir="rtl"] .nav-underline::after { transform-origin: right; }
+.nav-underline:hover::after,
+.nav-underline:focus-visible::after,
+.nav-underline[data-active="true"]::after {
+  transform: scaleX(1);
+}
+
+/* Fixed deep-navy panel with a single gold bloom — the "brand panel". Same
+   light discipline as .hero-band, but on a card-sized surface. */
+.brand-panel {
+  background:
+    radial-gradient(ellipse 70% 65% at 88% 0%, rgb(198 161 75 / 0.20), transparent 58%),
+    radial-gradient(ellipse 55% 60% at 4% 100%, rgb(59 106 158 / 0.28), transparent 60%),
+    linear-gradient(150deg, #0b1f3a 0%, #12294b 55%, #1b3a5f 100%);
+  color: #ffffff;
+}
+
+/* ---------------------------------------------------------------------------
+   Mobile hardening.
+--------------------------------------------------------------------------- */
+/* Kill the grey tap-flash on iOS/Android while keeping real focus-visible
+   rings for keyboard users — the ring is drawn on :focus-visible, so hiding
+   the tap highlight never removes keyboard affordance. */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* iOS Safari auto-inflates text when the page is rotated to landscape. This
+   is a bug, not a feature, and it breaks carefully tuned mobile layouts. */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Anchor links (#features, #how-it-works) must not land underneath the fixed
+   header. Applied to all section anchors so it works on every page. */
+section[id],
+[id] {
+  scroll-margin-top: 5rem;
 }
 
 /* ---------------------------------------------------------------------------

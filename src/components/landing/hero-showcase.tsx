@@ -40,8 +40,22 @@ export function HeroShowcase() {
 
   return (
     <div className="relative mx-auto w-full max-w-md lg:max-w-none">
+      {/* Gold bloom behind the window ------------------------------------- */}
+      <div
+        aria-hidden="true"
+        className="obj-glow-drift pointer-events-none absolute -inset-8 -z-10 rounded-full bg-[radial-gradient(circle,rgb(198_161_75/0.22),transparent_65%)] blur-2xl"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -inset-4 -z-10 rounded-[2rem] border border-white/10 bg-white/[0.03]"
+      />
+
       {/* Main dashboard window ------------------------------------------- */}
-      <div className="app-frame relative overflow-hidden rounded-2xl border shadow-[0_32px_80px_-28px_rgb(4_12_26/0.75)]">
+      <div className="app-frame relative overflow-hidden rounded-2xl border border-[#e6e0d3] shadow-[0_32px_80px_-28px_rgb(4_12_26/0.8)] ring-1 ring-white/10">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#d5b45c]/70 to-transparent"
+        />
         {/* Window chrome */}
         <div className="app-frame-line flex items-center justify-between gap-3 border-b px-4 py-3 sm:px-5">
           <div className="flex items-center gap-1.5" aria-hidden="true">

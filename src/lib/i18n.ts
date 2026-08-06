@@ -29,6 +29,7 @@ export const t: Dict = {
   "nav.signup": { ar: "ابدأ مجاناً", en: "Get started" },
   "nav.features": { ar: "المميزات", en: "Features" },
   "nav.how": { ar: "كيف يعمل", en: "How it works" },
+  "nav.menu": { ar: "القائمة", en: "Menu" },
   "nav.logout": { ar: "تسجيل الخروج", en: "Log out" },
   "nav.profile": { ar: "ملفي الشخصي", en: "Profile" },
   "nav.credits": { ar: "الرصيد", en: "Credits" },
@@ -51,6 +52,7 @@ export const t: Dict = {
   "hero.trust1": { ar: "مجاني للبدء", en: "Free to start" },
   "hero.trust2": { ar: "بيانات متحقق منها", en: "Verified data" },
   "hero.trust3": { ar: "بدون بطاقة ائتمان", en: "No credit card" },
+  "hero.scroll": { ar: "اكتشف المزيد", en: "Explore more" },
 
   // --- Landing: social proof -----------------------------------------------
   "proof.scholarships": { ar: "منحة دراسية", en: "scholarships" },
@@ -177,6 +179,62 @@ export const t: Dict = {
     en: "Free to start · No credit card · No spam",
   },
 
+  // --- Landing: trust strip ---------------------------------------------------
+  "trust.title": {
+    ar: "محبوب لدى الطلاب الطموحين في كل العالم العربي",
+    en: "Loved by ambitious students across the Arab world",
+  },
+  "trust.rating": {
+    ar: "متوسط تقييم ٤٫٩ من ٥ · أكثر من ٢٬٠٠٠ طالب",
+    en: "4.9/5 average · 2,000+ students",
+  },
+  "trust.from": { ar: "طلاب من", en: "Students from" },
+  "trust.more": { ar: "+٢٠ دولة", en: "+20 more countries" },
+
+  // --- Landing: application timeline ------------------------------------------
+  "time.overline": { ar: "الخطة الزمنية", en: "Your roadmap" },
+  "time.title": {
+    ar: "كل موعد نهائي، محسوب بالعكس حتى اليوم",
+    en: "Every deadline, worked back to today",
+  },
+  "time.sub": {
+    ar: "موعد واحد لا يكفي. نحوّله إلى خطة مواعيد محددة: متى تحجز الاختبار، متى تطلب التوصيات، ومتى تبدأ الكتابة.",
+    en: "One date isn't a plan. We turn it into dated milestones: when to book the test, ask for letters, and start writing.",
+  },
+  "time.m1": { ar: "احجز الآيلتس", en: "Book IELTS" },
+  "time.m2": { ar: "اطلب التوصيات", en: "Ask for letters" },
+  "time.m3": { ar: "اكتب الخطاب", en: "Draft statement" },
+  "time.m4": { ar: "مراجعة أخيرة", en: "Final review" },
+  "time.submit": { ar: "قدّم الطلب", en: "Submit" },
+  "time.deadline": { ar: "الموعد النهائي", en: "Deadline" },
+  "time.before": { ar: "يوم قبل الموعد", en: "days before" },
+  "time.f1": {
+    ar: "تُنشأ تلقائياً من كل موعد نهائي في قائمتك",
+    en: "Auto-generated from every deadline on your list",
+  },
+  "time.f2": { ar: "تذكير بالبريد عند كل خطوة", en: "Email reminders at every step" },
+  "time.f3": {
+    ar: "تتكيف مع مستنداتك ومواعيدك الحقيقية",
+    en: "Adapts to your real documents and dates",
+  },
+  "time.cta": { ar: "أنشئ خطتك", en: "Build your roadmap" },
+
+  // --- Landing: student success ------------------------------------------------
+  "succ.overline": { ar: "قصص نجاح", en: "Student success" },
+  "succ.title": { ar: "نتائج حقيقية، بأرقام حقيقية", en: "Real students, real results" },
+  "succ.sub": {
+    ar: "هذه ليست وعوداً — هذه ما يفعله المنتج فعلاً.",
+    en: "These aren't promises. This is what the product actually does.",
+  },
+
+  // --- Landing: universities ----------------------------------------------------
+  "uni.overline": { ar: "أين يدرسون الآن", en: "Where they study now" },
+  "uni.title": { ar: "جامعات غيّرت حياتهم", en: "Universities that changed their lives" },
+  "uni.sub": {
+    ar: "من أكسفورد إلى ETH زيورخ — يدرس طلابنا في أكثر من ٤٠ جامعة عالمية مرموقة.",
+    en: "From Oxford to ETH Zürich — our students study at 40+ world-class universities.",
+  },
+
   // --- Landing: footer ---------------------------------------------------------
   "foot.about": {
     ar: "نطابق الطلاب العرب مع المنح التي تنطبق عليهم شروطها فعلاً، ونرافقهم حتى التقديم.",
@@ -275,6 +333,7 @@ export const t: Dict = {
   "common.free": { ar: "مجاناً", en: "Free" },
   "common.close": { ar: "إغلاق", en: "Close" },
   "common.search": { ar: "ابحث", en: "Search" },
+  "common.backToTop": { ar: "العودة للأعلى", en: "Back to top" },
 };
 
 /** Looks up a key. Returns the key itself if missing, so gaps are visible. */
