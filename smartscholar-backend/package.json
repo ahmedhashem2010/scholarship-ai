@@ -21,6 +21,8 @@
     "acquire:mext": "tsx src/acquisition/cli.ts --providers mext",
     "acquire:stipendium-hungaricum": "tsx src/acquisition/cli.ts --providers stipendium-hungaricum",
     "acquire:csc": "tsx src/acquisition/cli.ts --providers csc",
+    "deep-extract": "tsx src/deep-extract/cli.ts",
+    "deep-extract:dry": "tsx src/deep-extract/cli.ts --dry-run --limit 3 --no-pdf",
     "test": "tsx src/acquisition/run-tests.ts"
   },
   "dependencies": {

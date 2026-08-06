@@ -1,0 +1,252 @@
+{
+  "generatedAt": "2026-08-04T23:53:36.046Z",
+  "parserVersion": "1.0.0",
+  "dryRun": false,
+  "total": 10,
+  "processed": 0,
+  "skipped": 4,
+  "failed": 6,
+  "avgCompleteness": 0.68,
+  "pdfsAnalyzed": 0,
+  "pagesCrawled": 0,
+  "missingClosingDeadline": 1,
+  "missingEligibility": 4,
+  "missingFunding": 0,
+  "missingDocuments": 0,
+  "missingContact": 4,
+  "overallQualityScore": 47,
+  "bottom20": [
+    {
+      "slug": "chinese-government-scholarship-doctoral-programme-chinese-government-scholarship-csc",
+      "provider": "Chinese Government Scholarship (China Scholarship Council)",
+      "completeness": 0
+    },
+    {
+      "slug": "chinese-government-scholarship-master-s-programme-chinese-government-scholarship-csc",
+      "provider": "Chinese Government Scholarship (China Scholarship Council)",
+      "completeness": 0
+    },
+    {
+      "slug": "chinese-government-scholarship-undergraduate-programme-chinese-government-scholarship-csc",
+      "provider": "Chinese Government Scholarship (China Scholarship Council)",
+      "completeness": 0
+    },
+    {
+      "slug": "daad-epos-development-related-postgraduate-courses-daad",
+      "provider": "DAAD (German Academic Exchange Service)",
+      "completeness": 0
+    },
+    {
+      "slug": "daad-research-grants-doctoral-programmes-in-germany-daad",
+      "provider": "DAAD (German Academic Exchange Service)",
+      "completeness": 0
+    },
+    {
+      "slug": "daad-study-scholarships-master-s-for-all-disciplines-daad",
+      "provider": "DAAD (German Academic Exchange Service)",
+      "completeness": 0
+    }
+  ],
+  "perScholarship": [
+    {
+      "scholarshipSlug": "bio-and-pharmaceutical-materials-science-erasmus",
+      "provider": "Erasmus+",
+      "status": "skipped",
+      "changedFields": [],
+      "pagesCrawled": 0,
+      "pdfsAnalyzed": 0,
+      "errors": [
+        "already processed (--resume)"
+      ],
+      "confidence": 0.9,
+      "durationMs": 1361,
+      "completeness": 0.71,
+      "missing": [
+        "city",
+        "minimumAge",
+        "maximumAge",
+        "minimumGpa",
+        "minimumPercentage",
+        "officialPdfUrl",
+        "eligibleCountries",
+        "degreeLevels",
+        "contact"
+      ]
+    },
+    {
+      "scholarshipSlug": "chevening-scholarship-chevening-uk-government",
+      "provider": "Chevening Scholarships (UK Government)",
+      "status": "skipped",
+      "changedFields": [],
+      "pagesCrawled": 0,
+      "pdfsAnalyzed": 0,
+      "errors": [
+        "already processed (--resume)"
+      ],
+      "confidence": 0.9,
+      "durationMs": 705,
+      "completeness": 0.61,
+      "missing": [
+        "city",
+        "university",
+        "minimumAge",
+        "maximumAge",
+        "minimumGpa",
+        "minimumPercentage",
+        "officialPdfUrl",
+        "eligibleCountries",
+        "degreeLevels",
+        "studyFields",
+        "testRequirements",
+        "contact"
+      ]
+    },
+    {
+      "scholarshipSlug": "chinese-government-scholarship-doctoral-programme-chinese-government-scholarship-csc",
+      "provider": "Chinese Government Scholarship (China Scholarship Council)",
+      "status": "failed",
+      "changedFields": [],
+      "pagesCrawled": 0,
+      "pdfsAnalyzed": 0,
+      "errors": [
+        "http://www.campuschina.org/ (HTTP 412)",
+        "no source content"
+      ],
+      "confidence": 0,
+      "durationMs": 5084,
+      "completeness": 0,
+      "missing": []
+    },
+    {
+      "scholarshipSlug": "chinese-government-scholarship-master-s-programme-chinese-government-scholarship-csc",
+      "provider": "Chinese Government Scholarship (China Scholarship Council)",
+      "status": "failed",
+      "changedFields": [],
+      "pagesCrawled": 0,
+      "pdfsAnalyzed": 0,
+      "errors": [
+        "http://www.campuschina.org/ (HTTP 412)",
+        "no source content"
+      ],
+      "confidence": 0,
+      "durationMs": 3794,
+      "completeness": 0,
+      "missing": []
+    },
+    {
+      "scholarshipSlug": "chinese-government-scholarship-undergraduate-programme-chinese-government-scholarship-csc",
+      "provider": "Chinese Government Scholarship (China Scholarship Council)",
+      "status": "failed",
+      "changedFields": [],
+      "pagesCrawled": 0,
+      "pdfsAnalyzed": 0,
+      "errors": [
+        "http://www.campuschina.org/ (HTTP 412)",
+        "no source content"
+      ],
+      "confidence": 0,
+      "durationMs": 2745,
+      "completeness": 0,
+      "missing": []
+    },
+    {
+      "scholarshipSlug": "choreomundus-erasmus-mundus-master-in-dance-and-movement-as-practical-knowledge-and-heritage-erasmus",
+      "provider": "Erasmus+",
+      "status": "skipped",
+      "changedFields": [],
+      "pagesCrawled": 0,
+      "pdfsAnalyzed": 0,
+      "errors": [
+        "already processed (--resume)"
+      ],
+      "confidence": 0.9,
+      "durationMs": 639,
+      "completeness": 0.71,
+      "missing": [
+        "openingDate",
+        "closingDate",
+        "minimumAge",
+        "maximumAge",
+        "minimumGpa",
+        "minimumPercentage",
+        "eligibleCountries",
+        "degreeLevels",
+        "contact"
+      ]
+    },
+    {
+      "scholarshipSlug": "daad-epos-development-related-postgraduate-courses-daad",
+      "provider": "DAAD (German Academic Exchange Service)",
+      "status": "failed",
+      "changedFields": [],
+      "pagesCrawled": 0,
+      "pdfsAnalyzed": 0,
+      "errors": [
+        "https://www2.daad.de/deutschland/stipendium/datenbank/en/21148-scholarship-database/?detail=50076777 (HTTP 403)",
+        "no source content"
+      ],
+      "confidence": 0,
+      "durationMs": 1289,
+      "completeness": 0,
+      "missing": []
+    },
+    {
+      "scholarshipSlug": "daad-research-grants-doctoral-programmes-in-germany-daad",
+      "provider": "DAAD (German Academic Exchange Service)",
+      "status": "failed",
+      "changedFields": [],
+      "pagesCrawled": 0,
+      "pdfsAnalyzed": 0,
+      "errors": [
+        "https://www.daad.de/en/studying-in-germany/scholarships/daad-scholarships/ (HTTP 403)",
+        "no source content"
+      ],
+      "confidence": 0,
+      "durationMs": 1323,
+      "completeness": 0,
+      "missing": []
+    },
+    {
+      "scholarshipSlug": "daad-study-scholarships-master-s-for-all-disciplines-daad",
+      "provider": "DAAD (German Academic Exchange Service)",
+      "status": "failed",
+      "changedFields": [],
+      "pagesCrawled": 0,
+      "pdfsAnalyzed": 0,
+      "errors": [
+        "https://www.daad.de/en/studying-in-germany/scholarships/daad-scholarships/ (HTTP 403)",
+        "no source content"
+      ],
+      "confidence": 0,
+      "durationMs": 1237,
+      "completeness": 0,
+      "missing": []
+    },
+    {
+      "scholarshipSlug": "data-science-of-human-multimodal-communication-european-and-international-joint-masters-degree-erasmus",
+      "provider": "Erasmus+",
+      "status": "skipped",
+      "changedFields": [],
+      "pagesCrawled": 0,
+      "pdfsAnalyzed": 0,
+      "errors": [
+        "already processed (--resume)"
+      ],
+      "confidence": 0.9,
+      "durationMs": 561,
+      "completeness": 0.68,
+      "missing": [
+        "openingDate",
+        "minimumAge",
+        "maximumAge",
+        "minimumGpa",
+        "minimumPercentage",
+        "officialPdfUrl",
+        "eligibleCountries",
+        "degreeLevels",
+        "testRequirements",
+        "contact"
+      ]
+    }
+  ]
+}
