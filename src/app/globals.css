@@ -301,6 +301,36 @@
 .animate-check-mark { animation: check-mark 0.3s ease-out forwards; }
 .animate-slide-down { animation: slide-down 0.3s ease-out forwards; }
 
+/* Landing-page motion (v2). Deliberately NOT the Tailwind `animate-*` names —
+   those are defined in tailwind.config.ts and used by auth/onboarding/dashboard
+   components; overriding them globally would change those pages. These are
+   scoped to the landing build. All are killed by the reduced-motion block. */
+@keyframes landing-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes landing-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-9px); }
+}
+@keyframes landing-progress-fill {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* Opacity-only so it never fights a transform utility (e.g. -translate-y-1/2). */
+.landing-fade-in { animation: landing-fade-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.landing-float { animation: landing-float 5.5s ease-in-out infinite; }
+.landing-progress-fill {
+  animation-name: landing-progress-fill;
+  animation-duration: 1.2s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: left;
+}
+[dir="rtl"] .landing-progress-fill {
+  transform-origin: right;
+}
+
 [dir="rtl"] {
   direction: rtl;
   font-family: var(--font-arabic), var(--font-sans), system-ui, sans-serif;
@@ -446,4 +476,123 @@
    common source of horizontal overflow on narrow screens. */
 body {
   overflow-wrap: break-word;
+}
+
+/* ---------------------------------------------------------------------------
+   Landing page (v2) — hero band.
+
+   The landing hero is a fixed brand scene: deep navy, gold arrival, a white
+   app frame. It deliberately does NOT follow the mode-inverting ramps — the
+   page behind the hero can switch themes, but the hero reads the same in both
+   because it is a photograph of the product, not a themed surface.
+   Literal brand hexes live here (see BRAND-IDENTITY.md §2).
+--------------------------------------------------------------------------- */
+.hero-band {
+  background:
+    radial-gradient(ellipse 55% 65% at 80% 6%, rgb(198 161 75 / 0.20), transparent 58%),
+    radial-gradient(ellipse 50% 60% at 8% 100%, rgb(59 106 158 / 0.30), transparent 62%),
+    linear-gradient(160deg, #0b1f3a 0%, #12294b 48%, #1b3a5f 100%);
+}
+
+.hero-grid {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.045) 1px, transparent 1px);
+  background-size: 54px 54px;
+  -webkit-mask-image: radial-gradient(ellipse 85% 75% at 50% 0%, black 35%, transparent 78%);
+  mask-image: radial-gradient(ellipse 85% 75% at 50% 0%, black 35%, transparent 78%);
+}
+
+/* Gold text on navy — the light stops of the gold ramp, kept literal because
+   the hero does not flip in dark mode. */
+.text-gold-on-navy {
+  background: linear-gradient(120deg, #f0e2bd 0%, #d5b45c 55%, #c6a14b 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* Dark glass cards that float over the hero mockup. Mode-independent: they sit
+   on a fixed navy scene, so they are always deep navy glass with white text. */
+.glass-dark {
+  background: rgb(11 31 58 / 0.72);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  backdrop-filter: blur(18px) saturate(160%);
+  border: 1px solid rgb(255 255 255 / 0.14);
+  color: #ffffff;
+  box-shadow: 0 20px 40px -16px rgb(5 15 30 / 0.6);
+}
+
+/* ---------------------------------------------------------------------------
+   App-frame — the product screenshot in the hero.
+
+   A screenshot is content, not theme. In both modes it renders as a white app
+   window with navy text so it reads as "the actual product". These classes use
+   literal brand hexes (BRAND-IDENTITY.md §2); nothing here inverts.
+--------------------------------------------------------------------------- */
+.app-frame {
+  background: #ffffff;
+  color: #162c4c;
+}
+.app-frame-muted { color: #5f6b7f; }
+.app-frame-line { border-color: #e8e4dc; }
+.app-frame-track { background: #f2f6fa; }
+.app-frame-ai { background: #f4f7fb; }
+.app-frame-gold { color: #8a6e2c; }
+.app-frame-gold-soft { background: #fbf7ec; }
+.app-frame-gold-ring { border-color: #d5b45c; }
+.app-frame-gold-fill {
+  background: linear-gradient(90deg, #d5b45c 0%, #c6a14b 100%);
+}
+.app-frame-success { color: #2e7d62; }
+.app-frame-success-soft { background: #eaf3ef; }
+.app-frame-row { border-color: #e8e4dc; }
+.app-frame-row:hover { border-color: #d5b45c; background: #fbf7ec; }
+
+/* ---------------------------------------------------------------------------
+   Scroll reveal.
+
+   `.reveal` is a no-op by default (content visible in the initial SSR HTML and
+   without JS). Once the element is confirmed below the fold it is marked
+   `data-pending` — hidden, ready to animate — and the IntersectionObserver
+   adds `.is-visible` to bring it in. Hiding never animates; only the reveal
+   toward visible does, so nothing visibly fades away after load.
+--------------------------------------------------------------------------- */
+.reveal {
+  opacity: 1;
+}
+.reveal[data-pending="true"] {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.reveal[data-pending="true"].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Motion defaults.
+--------------------------------------------------------------------------- */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .reveal[data-pending="true"] {
+    opacity: 1;
+    transform: none;
+  }
 }

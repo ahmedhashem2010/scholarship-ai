@@ -83,9 +83,20 @@ export function Nav() {
   const { credits } = useCredits();
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [profileOpen, setProfileOpen] = useState(false);
+  // On the landing page the nav starts transparent over the navy hero and
+  // turns into frosted glass once the visitor scrolls past the top.
+  const [scrolled, setScrolled] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
   const isLanding = pathname === "/";
+
+  useEffect(() => {
+    if (!isLanding) return;
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [isLanding]);
 
   useEffect(() => {
     const supabase = createClient();
@@ -109,45 +120,65 @@ export function Nav() {
   }
 
   // --- Signed out -----------------------------------------------------------
-  // On the landing page the nav sits ON the hero band rather than above it —
-  // a white strip butted against a dark gradient reads as a seam.
+  // On the landing page the nav floats over the hero band: transparent white
+  // text at the top, frosted glass with navy text once scrolled. Anywhere else
+  // it is a plain sticky glass bar.
   if (!user) {
+    const onHero = isLanding && !scrolled;
+    const headerClass = isLanding
+      ? `fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
+          onHero
+            ? "border-b border-transparent bg-transparent text-white"
+            : "border-b border-border bg-background/80 text-foreground shadow-[0_8px_32px_-16px_rgb(22_44_76/0.18)] backdrop-blur-xl"
+        }`
+      : "sticky top-0 z-30 border-b border-border bg-background/90 text-foreground backdrop-blur-md";
+
     return (
-      <header
-        role="banner"
-        aria-label="Main navigation"
-        className={
-          isLanding
-            ? "absolute inset-x-0 top-0 z-30 bg-transparent text-white"
-            : "sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur-md"
-        }
-      >
+      <header role="banner" aria-label="Main navigation" className={headerClass}>
         <div className="page-container flex h-16 items-center justify-between">
-          <Logo href="/" onDark={isLanding} />
+          <Logo href="/" onDark={onHero} />
+
+          {isLanding && (
+            <nav aria-label="Landing" className="hidden items-center gap-0.5 lg:flex">
+              {[
+                { href: "#features", label: t("nav.features") },
+                { href: "#how-it-works", label: t("nav.how") },
+                { href: "/scholarships", label: t("nav.scholarships") },
+                { href: "/pricing", label: t("nav.pricing") },
+              ].map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+                    onHero
+                      ? "text-white/80 hover:bg-white/10 hover:text-white"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+          )}
+
           <div className="flex items-center gap-1.5">
             {!isLanding && <ThemeToggle />}
-            <LanguageToggle onDark={isLanding} />
-            <Link href="/auth/login">
-              <button
-                className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                  isLanding
-                    ? "text-white/85 hover:bg-white/10 hover:text-white"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                }`}
-              >
-                {t("nav.login")}
-              </button>
+            <LanguageToggle onDark={onHero} />
+            <Link
+              href="/auth/login"
+              className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                onHero
+                  ? "text-white/85 hover:bg-white/10 hover:text-white"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              }`}
+            >
+              {t("nav.login")}
             </Link>
-            <Link href="/auth/signup">
-              <button
-                className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${
-                  isLanding
-                    ? "bg-white text-[rgb(var(--brand-deep))] hover:bg-white/90"
-                    : "bg-primary text-primary-foreground hover:opacity-90"
-                }`}
-              >
-                {t("nav.signup")}
-              </button>
+            <Link
+              href="/auth/signup"
+              className="rounded-lg bg-secondary px-4 py-2 text-sm font-semibold text-secondary-foreground shadow-sm transition-all hover:bg-secondary-600 hover:shadow-md active:scale-[0.98]"
+            >
+              {t("nav.signup")}
             </Link>
           </div>
         </div>

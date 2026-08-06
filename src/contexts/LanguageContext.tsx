@@ -23,12 +23,10 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  // Arabic is the default — this is an Arabic-first product for Arab students.
-  //
-  // Previously this defaulted to English AND wasn't persisted anywhere, so a
-  // user who switched to Arabic was silently flipped back to English on the
-  // very next page load. "Arabic support" was effectively a decorative toggle.
-  const [language, setLanguageState] = useState<Language>("ar");
+  // English is the default on first visit. A returning user's saved choice is
+  // restored from localStorage after mount (below), so anyone who picked Arabic
+  // keeps it — but new visitors always start in English.
+  const [language, setLanguageState] = useState<Language>("en");
 
   // Restore the saved choice after mount. The server and the first client
   // render must produce identical markup, so storage can't be read during

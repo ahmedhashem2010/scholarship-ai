@@ -112,8 +112,8 @@ export default function RootLayout({
 }) {
   return (
     <html
-      lang="ar"
-      dir="rtl"
+      lang="en"
+      dir="ltr"
       suppressHydrationWarning
       className={cn("font-sans", fontSans.variable, fontArabic.variable)}
     >
