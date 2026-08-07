@@ -33,6 +33,9 @@ export const t: Dict = {
   "nav.logout": { ar: "تسجيل الخروج", en: "Log out" },
   "nav.profile": { ar: "ملفي الشخصي", en: "Profile" },
   "nav.credits": { ar: "الرصيد", en: "Credits" },
+  "nav.applications": { ar: "طلباتي", en: "My applications" },
+  "nav.settings": { ar: "الإعدادات", en: "Settings" },
+  "nav.aiAssistant": { ar: "المساعد الذكي", en: "AI Assistant" },
 
   // --- Landing: hero --------------------------------------------------------
   "hero.headline": {

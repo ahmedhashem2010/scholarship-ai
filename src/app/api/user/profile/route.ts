@@ -11,15 +11,26 @@ export async function GET() {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
     }
 
-    let profile = null
-    try {
-      profile = await prisma.userProfile.findUnique({ where: { userId: user.id } })
-    } catch {}
+    // No try/catch around the Prisma call on purpose. A DB failure must surface
+    // as an error (500), NOT as an empty profile — otherwise the dashboard
+    // treats a slow/failed lookup as "this student has no profile" and bounces
+    // them into onboarding, which then bounces them back, and so on.
+    const profile = await prisma.userProfile.findUnique({ where: { userId: user.id } })
+
+    // Signup stores the name under `user_metadata.name`; some legacy accounts
+    // used `full_name`. Check both before giving up on the fallback.
+    const metaName =
+      typeof user.user_metadata?.full_name === "string" && user.user_metadata.full_name
+        ? user.user_metadata.full_name
+        : typeof user.user_metadata?.name === "string"
+          ? user.user_metadata.name
+          : ""
 
     return NextResponse.json({
       success: true,
+      exists: !!profile,
       data: {
-        displayName: profile?.displayName || user.user_metadata?.full_name || "",
+        displayName: profile?.displayName || metaName || "",
         email: user.email || "",
         dateOfBirth: profile?.dateOfBirth?.toISOString().split("T")[0] || "",
         country: profile?.country || "",
@@ -36,7 +47,8 @@ export async function GET() {
       },
     })
   } catch (error) {
-    return NextResponse.json({ success: false, error: "Internal error" }, { status: 500 })
+    console.error("[profile] GET error:", error)
+    return NextResponse.json({ success: false, error: "Failed to load profile" }, { status: 500 })
   }
 }
 

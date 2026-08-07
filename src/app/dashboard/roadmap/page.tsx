@@ -5,7 +5,6 @@ export const dynamic = "force-dynamic";
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { AlertTriangle, CalendarClock, CheckCircle2, Circle, MapPin } from "lucide-react";
-import { Nav } from "@/components/nav";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 /**
@@ -106,9 +105,8 @@ export default function RoadmapPage() {
 
   if (milestones.length === 0) {
     return (
-      <>
-        <Nav />
-        <main className="page-container py-16 text-center">
+      <main className="py-4">
+        <div className="mx-auto max-w-3xl rounded-3xl border border-border bg-card px-6 py-14 text-center sm:px-12">
           <CalendarClock className="mx-auto h-10 w-10 text-muted-foreground" />
           <h1 className="font-display mt-4 text-xl font-bold text-foreground">
             {pick("لا توجد خطط محفوظة بعد", "No saved plans yet")}
@@ -124,15 +122,14 @@ export default function RoadmapPage() {
               {pick("تصفّح المنح", "Browse scholarships")}
             </button>
           </Link>
-        </main>
-      </>
+        </div>
+      </main>
     );
   }
 
   return (
-    <>
-      <Nav />
-      <main className="page-container py-6 sm:py-8">
+    <main className="py-4">
+      <div className="mx-auto max-w-5xl">
         <header>
           <h1 className="font-display text-2xl font-bold text-foreground sm:text-3xl">
             {pick("خطتي", "My plan")}
@@ -262,16 +259,15 @@ export default function RoadmapPage() {
             );
           })}
         </ol>
-      </main>
-    </>
+      </div>
+    </main>
   );
 }
 
 function RoadmapSkeleton() {
   return (
-    <>
-      <Nav />
-      <main className="page-container animate-pulse py-8">
+    <main className="animate-pulse py-4">
+      <div className="mx-auto max-w-5xl">
         <div className="h-8 w-40 rounded bg-muted" />
         <div className="mt-3 h-4 w-64 rounded bg-muted" />
         <div className="mt-8 space-y-2">
@@ -279,7 +275,7 @@ function RoadmapSkeleton() {
             <div key={i} className="h-20 rounded-2xl bg-muted" />
           ))}
         </div>
-      </main>
-    </>
+      </div>
+    </main>
   );
 }

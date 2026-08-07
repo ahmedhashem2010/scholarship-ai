@@ -3,6 +3,9 @@
 import { useState, useRef, useEffect } from "react";
 import { MessageCircle, X, Send, Sparkles, Bot, User as UserIcon } from "lucide-react";
 
+/** Fired by the dashboard shell's "AI Assistant" buttons to open the widget. */
+export const OPEN_CHAT_EVENT = "smartscholar:open-chat";
+
 interface ChatMessage {
   role: "user" | "assistant";
   content: string;
@@ -23,6 +26,34 @@ export function ChatWidget() {
   const [showPrompts, setShowPrompts] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const [docked, setDocked] = useState(false);
+
+  useEffect(() => {
+    const onOpen = () => setOpen(true);
+    window.addEventListener(OPEN_CHAT_EVENT, onOpen);
+    return () => window.removeEventListener(OPEN_CHAT_EVENT, onOpen);
+  }, []);
+
+  useEffect(() => {
+    const updateDock = () => {
+      setDocked(
+        window.matchMedia("(max-width: 1023px)").matches &&
+          document.body.dataset.dashboard === "true"
+      );
+    };
+    updateDock();
+    const mq = window.matchMedia("(max-width: 1023px)");
+    mq.addEventListener?.("change", updateDock);
+    window.addEventListener("resize", updateDock);
+    const observer = new MutationObserver(updateDock);
+    observer.observe(document.body, { attributes: true, attributeFilter: ["data-dashboard"] });
+    return () => {
+      mq.removeEventListener?.("change", updateDock);
+      window.removeEventListener("resize", updateDock);
+      observer.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
     if (open && inputRef.current) {
@@ -73,7 +104,8 @@ export function ChatWidget() {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-4 end-4 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary-700 transition-all hover:scale-105 active:scale-95"
+        className="fixed end-4 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary-700 transition-all hover:scale-105 active:scale-95"
+        style={{ bottom: docked ? "calc(88px + env(safe-area-inset-bottom, 0px))" : "1rem" }}
         aria-label="Open AI chat"
       >
         <MessageCircle className="h-5 w-5" />
@@ -82,7 +114,10 @@ export function ChatWidget() {
   }
 
   return (
-    <div className="fixed bottom-4 end-4 z-50 flex w-80 sm:w-96 flex-col rounded-xl border bg-card shadow-2xl animate-fade-in-up overflow-hidden dark:bg-gray-800 dark:border-gray-700">
+    <div
+      className="fixed end-4 z-50 flex w-80 sm:w-96 flex-col rounded-xl border bg-card shadow-2xl animate-fade-in-up overflow-hidden dark:bg-gray-800 dark:border-gray-700"
+      style={{ bottom: docked ? "calc(88px + env(safe-area-inset-bottom, 0px))" : "1rem" }}
+    >
       <div className="flex items-center justify-between bg-gradient-to-r from-primary to-primary-700 px-4 py-3 text-white">
         <div className="flex items-center gap-2">
           <Bot className="h-5 w-5" />

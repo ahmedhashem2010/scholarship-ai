@@ -9,10 +9,8 @@ import {
   ArrowUpRight, Award, CheckCircle2, ExternalLink, FileText, Lightbulb,
   Sparkles, TrendingUp, Upload, Zap, AlertCircle,
 } from "lucide-react";
-import { Nav } from "@/components/nav";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ConfettiTrigger } from "@/components/scholarship/confetti-trigger";
-
 /**
  * Review results.
  *
@@ -130,7 +128,6 @@ export default function ReviewResultsPage() {
   if (error || !payload?.document) {
     return (
       <>
-        <Nav />
         <main className="page-container py-20 text-center">
           <AlertCircle className="mx-auto h-8 w-8 text-muted-foreground" />
           <p className="mt-3 text-base font-medium text-foreground">
@@ -155,7 +152,6 @@ export default function ReviewResultsPage() {
   if (!review) {
     return (
       <>
-        <Nav />
         <main className="page-container py-6 sm:py-8">
           <DocHeader doc={doc} typeLabel={typeLabel} />
           <div className="card-raised mt-8 p-8 text-center">
@@ -187,7 +183,6 @@ export default function ReviewResultsPage() {
   return (
     <>
       <ConfettiTrigger trigger={confetti} />
-      <Nav />
       <main className="page-container py-6 sm:py-8">
         <DocHeader doc={doc} typeLabel={typeLabel} />
 
@@ -526,7 +521,6 @@ function Section({
 function ReviewSkeleton() {
   return (
     <>
-      <Nav />
       <main className="page-container animate-pulse py-8">
         <div className="h-4 w-32 rounded bg-muted" />
         <div className="mt-4 h-8 w-2/3 rounded bg-muted" />
