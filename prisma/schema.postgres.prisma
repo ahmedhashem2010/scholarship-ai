@@ -24,6 +24,7 @@ model User {
   profile       UserProfile?
   documents     Document[]
   reviews       Review[]
+  dailyUsage    ReviewDailyUsage[]
   applications  Application[]
   roadmapMilestones RoadmapMilestone[]
   createdAt     DateTime     @default(now())
@@ -210,6 +211,27 @@ model Review {
 
   @@index([documentId])
   @@index([userId])
+}
+
+/// How many AI document reviews a user has used on a given calendar day.
+///
+/// The free model caps reviews at DAILY_REVIEW_LIMIT per user per UTC day. The
+/// count is reserved (incremented) before the AI call and released again if the
+/// call fails, so a failed review never eats a user's slot. `day` is a plain
+/// "YYYY-MM-DD" string keyed to UTC (see src/lib/review-quota.ts), and the
+/// unique constraint makes the reserve an atomic upsert — two concurrent
+/// requests can't both slip past the cap.
+model ReviewDailyUsage {
+  id        String   @id @default(cuid())
+  userId    String
+  day       String
+  count     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, day])
+  @@index([userId, day])
 }
 
 /// A saved roadmap milestone.

@@ -6,6 +6,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { UploadDropzone } from "@/components/documents/upload-dropzone";
+import { ReviewQuota } from "@/components/documents/review-quota";
 import { DocumentSkeleton } from "@/components/ui/skeleton";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { ProgressBar } from "@/components/ui/progress-bar";
@@ -78,8 +79,25 @@ export default function DocumentsPage() {
   const [showUpload, setShowUpload] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [reviewingId, setReviewingId] = useState<string | null>(null);
+  const [quota, setQuota] = useState<{ used: number; limit: number } | null>(null);
+  const [quotaFailed, setQuotaFailed] = useState(false);
   const router = useRouter();
   const { addToast } = useToast();
+
+  const fetchQuota = useCallback(async () => {
+    try {
+      const res = await fetch("/api/user/review-quota");
+      const json = await res.json();
+      if (json.success && json.data) {
+        setQuota({ used: json.data.used, limit: json.data.limit });
+        setQuotaFailed(false);
+      } else {
+        setQuotaFailed(true);
+      }
+    } catch {
+      setQuotaFailed(true);
+    }
+  }, []);
 
   const fetchDocuments = useCallback(async () => {
     try {
@@ -113,7 +131,10 @@ export default function DocumentsPage() {
     }
   }, [router]);
 
-  useEffect(() => { fetchDocuments(); }, [fetchDocuments]);
+  useEffect(() => {
+    fetchDocuments();
+    fetchQuota();
+  }, [fetchDocuments, fetchQuota]);
 
   async function handleDelete(id: string) {
     if (!confirm("Delete this document?")) return;
@@ -143,6 +164,7 @@ export default function DocumentsPage() {
         setError("Review failed. Server returned an unexpected response.");
         addToast("error", "Review failed. Server error.");
         setReviewingId(null);
+        fetchQuota();
         return;
       }
       const json = await res.json();
@@ -162,6 +184,7 @@ export default function DocumentsPage() {
       addToast("error", "Review failed. Please try again.");
     } finally {
       setReviewingId(null);
+      fetchQuota();
     }
   }
 
@@ -188,7 +211,12 @@ export default function DocumentsPage() {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {quotaFailed ? null : quota ? (
+            <ReviewQuota used={quota.used} limit={quota.limit} />
+          ) : (
+            <div className="h-7 w-48 animate-pulse rounded-full bg-muted" aria-hidden />
+          )}
           <Link href="/dashboard">
             <Button variant="ghost" size="sm">
               <ArrowRight className="h-3.5 w-3.5 rotate-180" />

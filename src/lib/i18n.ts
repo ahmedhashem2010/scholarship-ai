@@ -290,6 +290,12 @@ export const t: Dict = {
   "dash.documents": { ar: "مستنداتك", en: "Your documents" },
   "dash.viewAll": { ar: "عرض الكل", en: "View all" },
 
+  // --- Documents: AI review quota -------------------------------------------
+  "quota.remaining": {
+    ar: "متبقي {remaining} من {limit} مراجعات مجانية اليوم",
+    en: "{remaining} of {limit} free reviews remaining today",
+  },
+
   // --- Empty states ---------------------------------------------------------
   "empty.noMatches.title": { ar: "لا توجد نتائج بعد", en: "No matches yet" },
   "empty.noMatches.body": {
