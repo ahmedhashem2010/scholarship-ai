@@ -6,7 +6,7 @@ import "./_env.mjs";
  *   node scripts/test-ai.mjs
  *
  * Run this FIRST, before translate-names or a real document review. Both of
- * those cost you time (and a credit) to discover the same failure.
+ * those cost you time to discover the same failure.
  *
  * Reads nothing from the database and writes nothing anywhere.
  */

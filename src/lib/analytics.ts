@@ -18,6 +18,4 @@ export const ConversionEvents = {
   onboardingComplete: () => trackEvent("onboarding_complete"),
   firstDocumentUpload: () => trackEvent("first_document_upload"),
   firstReview: () => trackEvent("first_review"),
-  paymentStarted: (value: number) => trackEvent("payment_started", { value }),
-  paymentComplete: (value: number) => trackEvent("payment_complete", { value }),
 } as const;

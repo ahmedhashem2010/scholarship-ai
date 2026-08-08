@@ -22,7 +22,6 @@ const navItems = [
   { href: "/dashboard/documents", label: "Documents", icon: FileText },
   { href: "/scholarships", label: "Browse Scholarships", icon: Search },
   { href: "/dashboard/compare", label: "Compare Tool", icon: GitCompareArrows },
-  { href: "/pricing", label: "Get Credits", icon: Award },
   { href: "/help", label: "Help & FAQ", icon: HelpCircle },
   { href: "/success-stories", label: "Success Stories", icon: Award },
   { href: "/glossary", label: "Glossary", icon: BookOpen },
@@ -37,7 +36,7 @@ export function Sidebar() {
     return pathname.startsWith(href);
   };
 
-  const isDashboard = pathname.startsWith("/dashboard") || pathname.startsWith("/scholarships") || pathname.startsWith("/pricing");
+  const isDashboard = pathname.startsWith("/dashboard") || pathname.startsWith("/scholarships");
   if (!isDashboard) return null;
 
   return (

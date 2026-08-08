@@ -23,7 +23,6 @@ export const t: Dict = {
   "nav.dashboard": { ar: "لوحتي", en: "Dashboard" },
   "nav.documents": { ar: "مستنداتي", en: "Documents" },
   "nav.roadmap": { ar: "خطتي", en: "My plan" },
-  "nav.pricing": { ar: "الأسعار", en: "Pricing" },
   "nav.help": { ar: "المساعدة", en: "Help" },
   "nav.login": { ar: "تسجيل الدخول", en: "Log in" },
   "nav.signup": { ar: "ابدأ مجاناً", en: "Get started" },
@@ -32,10 +31,8 @@ export const t: Dict = {
   "nav.menu": { ar: "القائمة", en: "Menu" },
   "nav.logout": { ar: "تسجيل الخروج", en: "Log out" },
   "nav.profile": { ar: "ملفي الشخصي", en: "Profile" },
-  "nav.credits": { ar: "الرصيد", en: "Credits" },
   "nav.applications": { ar: "طلباتي", en: "My applications" },
   "nav.settings": { ar: "الإعدادات", en: "Settings" },
-  "nav.aiAssistant": { ar: "المساعد الذكي", en: "AI Assistant" },
 
   // --- Landing: hero --------------------------------------------------------
   "hero.headline": {
@@ -103,11 +100,6 @@ export const t: Dict = {
   "section.featuredSub": {
     ar: "عيّنة من قاعدة بياناتنا — سجّل لترى ما يناسبك أنت",
     en: "A sample from our database — sign up to see what fits you",
-  },
-  "section.pricing": { ar: "الأسعار", en: "Pricing" },
-  "section.pricingSub": {
-    ar: "البحث عن المنح والخطة الزمنية مجاناً دائماً. ادفع فقط مقابل مراجعة مستنداتك.",
-    en: "Matching and roadmaps are always free. You only pay for document reviews.",
   },
   "section.faq": { ar: "أسئلة شائعة", en: "Common questions" },
 
@@ -250,7 +242,6 @@ export const t: Dict = {
   "foot.social": { ar: "تابعنا", en: "Follow us" },
   "foot.rights": { ar: "جميع الحقوق محفوظة", en: "All rights reserved" },
   "foot.resource.browse": { ar: "تصفّح المنح", en: "Browse scholarships" },
-  "foot.resource.pricing": { ar: "الأسعار", en: "Pricing" },
   "foot.resource.help": { ar: "مركز المساعدة", en: "Help center" },
   "foot.resource.glossary": { ar: "مصطلحات المنح", en: "Scholarship glossary" },
   "foot.sch.chevening": { ar: "منحة تشيفنينغ", en: "Chevening" },
@@ -260,7 +251,6 @@ export const t: Dict = {
   "foot.tool.matching": { ar: "المطابقة الذكية", en: "AI matching" },
   "foot.tool.review": { ar: "مراجعة المستندات", en: "Document review" },
   "foot.tool.roadmap": { ar: "الخطة الزمنية", en: "Application roadmap" },
-  "foot.tool.chat": { ar: "المساعد الذكي", en: "AI chat assistant" },
   "foot.social.x": { ar: "منصة إكس", en: "X (Twitter)" },
   "foot.social.instagram": { ar: "إنستغرام", en: "Instagram" },
   "foot.social.linkedin": { ar: "لينكد إن", en: "LinkedIn" },

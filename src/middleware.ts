@@ -47,7 +47,6 @@ export async function middleware(request: NextRequest) {
   const isDashboard = pathname.startsWith("/dashboard");
   const isAuth = pathname.startsWith("/auth");
   const isOnboarding = pathname.startsWith("/onboarding");
-  const isAdmin = pathname.startsWith("/admin");
 
   // --- Returning students land in the product, not the pitch ---------------
   //
@@ -66,7 +65,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Unauthenticated users cannot reach protected areas.
-  if (!user && (isDashboard || isOnboarding || isAdmin)) {
+  if (!user && (isDashboard || isOnboarding)) {
     const url = request.nextUrl.clone();
     url.pathname = "/auth/login";
     url.search = "";
@@ -82,25 +81,12 @@ export async function middleware(request: NextRequest) {
   // is a dashboard toggle nothing in this repo controls, and if it ever gets
   // switched off the entire verification flow becomes decorative. This check
   // does not depend on it.
-  if (user && !user.email_confirmed_at && (isDashboard || isOnboarding || isAdmin)) {
+  if (user && !user.email_confirmed_at && (isDashboard || isOnboarding)) {
     const url = request.nextUrl.clone();
     url.pathname = "/auth/verify";
     url.search = "";
     if (user.email) url.searchParams.set("email", user.email);
     return NextResponse.redirect(url);
-  }
-
-  // Admin area is restricted to a single configured address.
-  if (isAdmin) {
-    const adminEmail = process.env.ADMIN_EMAIL?.toLowerCase().trim();
-    const userEmail = user?.email?.toLowerCase().trim();
-
-    if (!adminEmail || !userEmail || userEmail !== adminEmail) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/dashboard";
-      url.search = "";
-      return NextResponse.redirect(url);
-    }
   }
 
   // Signed-in users have no reason to sit on login or signup.
@@ -119,5 +105,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/dashboard/:path*", "/auth/:path*", "/onboarding", "/admin/:path*"],
+  matcher: ["/", "/dashboard/:path*", "/auth/:path*", "/onboarding"],
 };

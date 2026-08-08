@@ -12,13 +12,12 @@ model User {
   id                String             @id
   email             String?            @unique
   name              String?
-  reviewCredits     Int                @default(0)
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   applications      Application[]
   documents         Document[]
-  payments          Payment[]
   reviews           Review[]
+  dailyUsage        ReviewDailyUsage[]
   roadmapMilestones RoadmapMilestone[]
   profile           UserProfile?
 }
@@ -115,40 +114,6 @@ model Application {
   @@index([scholarshipId])
 }
 
-model Payment {
-  id              String    @id @default(cuid())
-  userId          String
-  amount          Int
-  credits         Int
-  status          String    @default("pending")
-  createdAt       DateTime  @default(now())
-  method          String    @default("stripe")
-  packageId       String?
-  receiptUrl      String?
-  reference       String?
-  rejectionReason String?
-  reviewedAt      DateTime?
-  reviewedBy      String?
-  stripeEventId   String?   @unique
-  stripeSessionId String?
-  updatedAt       DateTime  @default(now()) @updatedAt
-  userNote        String?
-  user            User      @relation(fields: [userId], references: [id])
-
-  @@index([userId])
-  @@index([status, createdAt])
-}
-
-model ReferralCode {
-  id        String   @id @default(cuid())
-  code      String   @unique
-  credits   Int
-  maxUses   Int
-  usedCount Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 model Document {
   id               String                @id @default(cuid())
   userId           String
@@ -203,6 +168,27 @@ model Review {
 
   @@index([documentId])
   @@index([userId])
+}
+
+/// How many AI document reviews a user has used on a given calendar day.
+///
+/// The free model caps reviews at DAILY_REVIEW_LIMIT per user per UTC day. The
+/// count is reserved (incremented) before the AI call and released again if the
+/// call fails, so a failed review never eats a user's slot. `day` is a plain
+/// "YYYY-MM-DD" string keyed to UTC (see src/lib/review-quota.ts), and the
+/// unique constraint makes the reserve an atomic upsert — two concurrent
+/// requests can't both slip past the cap.
+model ReviewDailyUsage {
+  id        String   @id @default(cuid())
+  userId    String
+  day       String
+  count     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, day])
+  @@index([userId, day])
 }
 
 /// A saved roadmap milestone.

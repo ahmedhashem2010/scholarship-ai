@@ -19,16 +19,13 @@ import {
   Rocket,
   ArrowUpRight,
   Trophy,
-  MessageSquareText,
   CheckCircle2,
   ChevronRight,
 } from "lucide-react";
 import { useProfile } from "@/lib/profile-context";
-import { useCredits } from "@/lib/credits-context";
 import { CountUp } from "@/components/dashboard/count-up";
 import { ThreeDObject } from "@/components/landing/three-d";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { OPEN_CHAT_EVENT } from "@/components/chat-widget";
 import { cn } from "@/lib/utils";
 
 interface Match {
@@ -219,8 +216,6 @@ function JourneyHero({
   nextDeadline: Match | null;
   loading: boolean;
 }) {
-  const openChat = () => window.dispatchEvent(new Event(OPEN_CHAT_EVENT));
-
   const floating: {
     icon: React.ElementType;
     value: string;
@@ -315,14 +310,6 @@ function JourneyHero({
                 Explore my matches
                 <ArrowUpRight className="h-4 w-4" />
               </Link>
-              <button
-                type="button"
-                onClick={openChat}
-                className="inline-flex items-center gap-2 rounded-xl border border-white/25 bg-white/5 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
-              >
-                <MessageSquareText className="h-4 w-4" />
-                Ask AI Coach
-              </button>
             </div>
 
             {/* Compact stats inside the panel — mobile gets these instead of the
@@ -500,62 +487,6 @@ function AppProgressRow({ app }: { app: Application }) {
   );
 }
 
-const AI_ACTIONS: { label: string; href?: string; action?: "chat" }[] = [
-  { label: "Chat with AI Coach", action: "chat" },
-  { label: "Explore matches", href: "/scholarships" },
-  { label: "Review my CV", href: "/dashboard/documents" },
-  { label: "Build my roadmap", href: "/dashboard/roadmap" },
-];
-
-function AiCoachCard() {
-  const openChat = () => window.dispatchEvent(new Event(OPEN_CHAT_EVENT));
-  return (
-    <div className="dash-journey relative overflow-hidden rounded-2xl p-5 shadow-[0_22px_50px_-22px_rgb(11_31_58_/_0.6)]">
-      <div className="pointer-events-none absolute -end-8 -top-10 h-32 w-32 opacity-20">
-        <ThreeDObject variant="star" />
-      </div>
-      <div className="pointer-events-none absolute -start-6 bottom-0 h-28 w-28 opacity-[0.12]">
-        <ThreeDObject variant="diploma" />
-      </div>
-
-      <div className="dash-glow pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-secondary-400/70 to-transparent" />
-
-      <div className="relative">
-        <p className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-secondary-300">
-          <Sparkles className="h-3.5 w-3.5" /> AI coach
-        </p>
-        <h3 className="mt-2 text-lg font-bold leading-snug text-white">
-          Need a second opinion on your application?
-        </h3>
-        <p className="mt-1.5 text-sm leading-relaxed text-white/70">
-          Get instant feedback on your documents, deadlines and next steps.
-        </p>
-
-        <div className="mt-4 flex flex-col gap-2">
-          <button
-            type="button"
-            onClick={openChat}
-            className="flex items-center justify-center gap-2 rounded-xl bg-secondary-500 px-4 py-2.5 text-sm font-semibold text-[#162C4C] transition hover:bg-secondary-400"
-          >
-            <MessageSquareText className="h-4 w-4" />
-            Start a conversation
-          </button>
-          {AI_ACTIONS.filter((a) => a.action !== "chat").map((a) => (
-            <Link
-              key={a.label}
-              href={a.href!}
-              className="flex items-center justify-between rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-white/10"
-            >
-              {a.label}
-              <ChevronRight className="h-4 w-4 opacity-70 rtl:rotate-180" />
-            </Link>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function AchievementTile({
   icon: Icon,
   label,
@@ -597,7 +528,6 @@ function AchievementTile({
 export default function DashboardPage() {
   const router = useRouter();
   const { profile, isLoading: profileLoading, hasProfile } = useProfile();
-  const { credits } = useCredits();
 
   const [matches, setMatches] = useState<Match[]>([]);
   const [docs, setDocs] = useState<Doc[]>([]);
@@ -815,13 +745,6 @@ export default function DashboardPage() {
               <FileText className="h-4 w-4 text-secondary-700 dark:text-secondary-400" />
               Upload document
             </Link>
-            <Link
-              href="/dashboard/credits"
-              className="hidden items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground transition hover:border-secondary-500/40 sm:inline-flex"
-            >
-              <Sparkles className="h-4 w-4 text-secondary-700 dark:text-secondary-400" />
-              {credits} credits
-            </Link>
           </div>
         </div>
       </section>
@@ -959,8 +882,6 @@ export default function DashboardPage() {
           </section>
 
           {/* AI Coach */}
-          <AiCoachCard />
-
           {/* Achievements */}
           <section>
             <SectionHeader eyebrow="Badges" title="Achievements" />

@@ -9,18 +9,14 @@ import {
   FolderKanban,
   Map,
   FileText,
-  Sparkles,
-  Coins,
   Settings,
   LifeBuoy,
 } from "lucide-react"
 import { BRAND } from "@/lib/brand"
 import { useLanguage } from "@/contexts/LanguageContext"
 import { useProfile } from "@/lib/profile-context"
-import { useCredits } from "@/lib/credits-context"
 import { ThemeToggle } from "@/components/scholarship/theme-toggle"
 import { cn } from "@/lib/utils"
-import { OPEN_CHAT_EVENT } from "@/components/chat-widget"
 
 function initialsOf(name: string): string {
   const parts = name.trim().split(/\s+/)
@@ -71,28 +67,6 @@ function NavLink({ href, icon: Icon, label, active, badge }: NavItemProps) {
   )
 }
 
-function NavButton({
-  onClick,
-  icon: Icon,
-  label,
-}: {
-  onClick: () => void
-  icon: React.ElementType
-  label: string
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="group relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-start text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-    >
-      <Icon className="h-[18px] w-[18px] shrink-0 text-muted-foreground group-hover:text-foreground" />
-      <span className="flex-1 truncate">{label}</span>
-      <Sparkles className="h-3.5 w-3.5 text-secondary-500" />
-    </button>
-  )
-}
-
 function GroupLabel({ children }: { children: React.ReactNode }) {
   return (
     <p className="px-3 pb-1.5 pt-5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70 first:pt-0">
@@ -104,7 +78,6 @@ function GroupLabel({ children }: { children: React.ReactNode }) {
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const { t, pick } = useLanguage()
   const { profile } = useProfile()
-  const { credits } = useCredits()
   const pathname = usePathname()
 
   const isActive = (href: string) => {
@@ -119,8 +92,6 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  const openChat = () => window.dispatchEvent(new Event(OPEN_CHAT_EVENT))
-
   const mainItems: NavItemProps[] = [
     { href: "/dashboard", icon: LayoutDashboard, label: t("nav.dashboard") },
     { href: "/scholarships", icon: GraduationCap, label: t("nav.scholarships") },
@@ -130,7 +101,6 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   ]
 
   const accountItems: NavItemProps[] = [
-    { href: "/dashboard/credits", icon: Coins, label: t("nav.credits") },
     { href: "/dashboard/profile", icon: Settings, label: t("nav.settings") },
   ]
 
@@ -174,7 +144,6 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             {mainItems.map((item) => (
               <NavLink key={item.href} {...item} active={isActive(item.href)} />
             ))}
-            <NavButton onClick={openChat} icon={Sparkles} label={t("nav.aiAssistant")} />
           </div>
 
           <GroupLabel>{t("nav.profile")}</GroupLabel>
@@ -192,26 +161,9 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
         <div className="border-t border-border p-3">
           <div className="flex items-center justify-between rounded-xl bg-muted/60 px-3 py-2">
-            <button
-              type="button"
-              onClick={openChat}
-              className="flex items-center gap-2 text-sm font-medium text-foreground"
-            >
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-secondary-500 opacity-60" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-secondary-500" />
-              </span>
-              AI Assistant
-            </button>
-            <div className="flex items-center gap-1">
+            <span className="flex items-center gap-2 text-sm font-medium text-foreground">
               <ThemeToggle />
-            </div>
-          </div>
-          <div className="mt-2 flex items-center justify-between px-2 text-xs text-muted-foreground">
-            <span>{credits} credits</span>
-            <Link href="/dashboard/credits" className="font-medium text-primary-600 hover:underline">
-              Add credits
-            </Link>
+            </span>
           </div>
         </div>
       </aside>
@@ -236,10 +188,6 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           </Link>
 
           <div className="flex items-center gap-2">
-            <span className="flex items-center gap-1 rounded-full bg-secondary-500/12 px-2.5 py-1 text-xs font-semibold text-secondary-700 dark:text-secondary-400">
-              <Coins className="h-3.5 w-3.5" />
-              {credits}
-            </span>
             <Link
               href="/dashboard/profile"
               aria-label="Profile"
@@ -287,15 +235,6 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
               </Link>
             )
           })}
-          <button
-            type="button"
-            onClick={openChat}
-            aria-label="AI Assistant"
-            className="relative -top-4 flex h-14 w-14 shrink-0 flex-col items-center justify-center gap-0.5 self-start rounded-full bg-gradient-to-br from-primary to-primary-700 text-primary-foreground shadow-[0_8px_24px_-6px_rgb(22_44_76_/_0.55)] transition-transform hover:scale-105 active:scale-95"
-          >
-            <Sparkles className="h-5 w-5" />
-            <span className="text-[9px] font-semibold">AI</span>
-          </button>
         </div>
       </nav>
     </div>

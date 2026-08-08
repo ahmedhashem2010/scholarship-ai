@@ -161,8 +161,8 @@ export default function ReviewResultsPage() {
             </h2>
             <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
               {pick(
-                "رفعك للملف تم بنجاح. لم يتبقَّ سوى تشغيل المراجعة — تستغرق أقل من دقيقة وتكلّف رصيداً واحداً.",
-                "Your upload worked fine. All that's left is running the review — it takes under a minute and costs one credit."
+                "رفعك للملف تم بنجاح. لم يتبقَّ سوى تشغيل المراجعة — تستغرق أقل من دقيقة.",
+                "Your upload worked fine. All that's left is running the review — it takes under a minute."
               )}
             </p>
             <Link href="/dashboard/documents">

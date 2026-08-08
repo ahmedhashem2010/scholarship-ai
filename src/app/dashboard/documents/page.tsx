@@ -150,8 +150,9 @@ export default function DocumentsPage() {
         setReviews((prev) => ({ ...prev, [docId]: json.data }));
         addToast("success", `Review complete! Score: ${json.data.score}/10`);
         router.push(`/dashboard/reviews/${docId}`);
-      } else if (json.needsCredits) {
-        router.push("/pricing");
+      } else if (json.limitReached) {
+        setError(json.error ?? "You've reached your daily review limit");
+        addToast("error", json.error ?? "You've reached your daily review limit");
       } else {
         setError(json.error ?? "Review failed");
         addToast("error", json.error ?? "Review failed");

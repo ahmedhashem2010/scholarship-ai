@@ -21,11 +21,9 @@ model User {
   id            String       @id
   email         String?  @unique
   name          String?
-  reviewCredits Int          @default(0)
   profile       UserProfile?
   documents     Document[]
   reviews       Review[]
-  payments      Payment[]
   applications  Application[]
   roadmapMilestones RoadmapMilestone[]
   createdAt     DateTime     @default(now())
@@ -155,60 +153,6 @@ model Application {
   @@index([userId])
   @@index([scholarshipId])
   @@unique([userId, scholarshipId])
-}
-
-model Payment {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  amount    Int
-  credits   Int
-  // pending | approved | rejected | refunded
-  status    String   @default("pending")
-
-  // stripe | vodafone_cash | instapay | bank_transfer
-  method    String   @default("stripe")
-  // Which CREDIT_PACKAGES entry was bought (see src/lib/pricing.ts)
-  packageId String?
-
-  // --- Stripe ---------------------------------------------------------------
-  // Unique so a retried webhook cannot grant credits twice. Stripe re-delivers
-  // any event that doesn't get a prompt 2xx, so without this a slow response
-  // silently doubles a user's credits.
-  stripeEventId   String? @unique
-  stripeSessionId String?
-
-  // --- Manual payment (Vodafone Cash / InstaPay / bank transfer) -------------
-  // Screenshot of the transfer, uploaded by the user.
-  receiptUrl      String?
-  // Transaction reference the student types in.
-  reference       String?
-  // Free-text note from the student.
-  userNote        String?
-
-  // --- Admin review ---------------------------------------------------------
-  reviewedAt      DateTime?
-  reviewedBy      String?
-  rejectionReason String?
-
-  createdAt DateTime @default(now())
-  // @default(now()) is required, not optional: @updatedAt only maintains the
-  // value on future writes. Without a default, adding this column to a table
-  // that already has rows fails, and Prisma offers to reset the database.
-  updatedAt DateTime @default(now()) @updatedAt
-
-  @@index([userId])
-  @@index([status, createdAt])
-}
-
-model ReferralCode {
-  id        String   @id @default(cuid())
-  code      String   @unique
-  credits   Int
-  maxUses   Int
-  usedCount Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model Document {

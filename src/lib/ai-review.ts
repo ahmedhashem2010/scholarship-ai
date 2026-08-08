@@ -209,7 +209,8 @@ async function callGemini(prompt: string): Promise<string | null> {
 
     if (!response.ok) {
       // 429 = free-tier quota. Worth surfacing distinctly so the caller can
-      // refund the credit and tell the user to retry rather than blaming them.
+      // free the user's daily review slot and tell them to retry rather than
+      // blaming them.
       if (response.status === 429) {
         throw new Error(
           "AI review is temporarily rate-limited. Please try again in a few minutes."

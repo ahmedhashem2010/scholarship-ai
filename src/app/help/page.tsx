@@ -74,7 +74,7 @@ const faqs = [
       },
       {
         q: "How do I contact support?",
-        a: "Use the AI chat widget (bottom-right corner) for instant answers to common questions. For technical issues, reach out via the support email in your account settings. We typically respond within 24 hours.",
+        a: "Reach out via email at support@smartscholar.org for any question or issue — we typically respond within 24 hours.",
       },
     ],
   },

@@ -5,13 +5,11 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { motion, AnimatePresence, MotionConfig, useScroll, useSpring } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/button";
 import {
-  LogOut, ChevronDown, ChevronRight, ChevronLeft, CreditCard, Globe, Menu, X,
+  LogOut, ChevronDown, ChevronRight, ChevronLeft, Globe, Menu, X,
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useProfile } from "@/lib/profile-context";
-import { useCredits } from "@/lib/credits-context";
 import { ThemeToggle } from "@/components/scholarship/theme-toggle";
 import { BRAND } from "@/lib/brand";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
@@ -205,9 +203,8 @@ function MobileMenu({
 }
 
 export function Nav() {
-  const { t, num, isRTL } = useLanguage();
+  const { t, isRTL } = useLanguage();
   const { profile } = useProfile();
-  const { credits } = useCredits();
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [profileOpen, setProfileOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -284,15 +281,13 @@ export function Nav() {
       { href: "#features", label: t("nav.features") },
       { href: "#how-it-works", label: t("nav.how") },
       { href: "/scholarships", label: t("nav.scholarships") },
-      { href: "/pricing", label: t("nav.pricing") },
     ];
     // On non-landing signed-out pages the section anchors don't exist, so the
-    // mobile sheet falls back to the two page-level destinations.
+    // mobile sheet falls back to the page-level destinations.
     const mobileLinks = isLanding
       ? landingLinks
       : [
           { href: "/scholarships", label: t("nav.scholarships") },
-          { href: "/pricing", label: t("nav.pricing") },
         ];
 
     return (
@@ -404,15 +399,6 @@ export function Nav() {
           <ThemeToggle />
           <LanguageToggle />
 
-          <Link href="/dashboard/credits" className="hidden sm:block">
-            <Button variant="outline" size="sm" className="gap-1.5 text-xs">
-              <CreditCard className="h-3.5 w-3.5" />
-              {credits !== null && credits !== undefined
-                ? `${num(credits)} ${t("nav.credits")}`
-                : t("nav.credits")}
-            </Button>
-          </Link>
-
           <div className="relative">
             <button
               onClick={() => setProfileOpen(!profileOpen)}
@@ -450,14 +436,6 @@ export function Nav() {
                   >
                     {t("nav.profile")}
                   </Link>
-                  <Link
-                    href="/dashboard/credits"
-                    onClick={() => setProfileOpen(false)}
-                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                  >
-                    <CreditCard className="h-4 w-4" />
-                    {t("nav.credits")}
-                  </Link>
                   <button
                     onClick={handleLogout}
                     className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
@@ -481,16 +459,6 @@ export function Nav() {
         links={appLinks}
       >
         <div className="space-y-3 border-t border-border pt-6">
-          <Link
-            href="/dashboard/credits"
-            onClick={() => setMobileOpen(false)}
-            className="flex min-h-12 items-center justify-center gap-2 rounded-xl border border-border text-sm font-semibold text-foreground transition-colors hover:bg-muted"
-          >
-            <CreditCard className="h-4 w-4 text-secondary-600" />
-            {credits !== null && credits !== undefined
-              ? `${num(credits)} ${t("nav.credits")}`
-              : t("nav.credits")}
-          </Link>
           <Link
             href="/dashboard/profile"
             onClick={() => setMobileOpen(false)}

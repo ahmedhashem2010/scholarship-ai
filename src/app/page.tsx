@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Fragment, useEffect, useRef, useState, type CSSProperties } from "react";
 import {
   ArrowLeft, ArrowRight, ArrowUp, ArrowUpRight, BadgeCheck, CalendarClock, Check,
-  ChevronDown, FileCheck2, Flag, GraduationCap, MapPin, MessageSquare,
+  ChevronDown, ClipboardList, FileCheck2, Flag, GraduationCap, MapPin, MessageSquare,
   Quote, Route, ScanSearch, ShieldCheck, Sparkles, Star, UserCheck, Wallet, X,
 } from "lucide-react";
 import { AnimatePresence, motion, MotionConfig } from "framer-motion";
@@ -29,7 +29,7 @@ import { cn } from "@/lib/utils";
  *
  * Rules honoured here (unchanged from v3):
  *   - No backend, auth, payment or routing changes — every CTA points at an
- *     existing route (/auth/signup, /auth/login, /scholarships, /pricing).
+ *     existing route (/auth/signup, /auth/login, /scholarships).
  *   - Brand colours only: navy, gold, white and very light gray. Mode-aware
  *     surfaces use CSS-variable tokens; the navy bands and the app screenshot
  *     are deliberately mode-independent (see globals.css).
@@ -859,16 +859,23 @@ function FeatureVisual({ type }: { type: string }) {
         </div>
       );
 
-    case "chat":
+    case "applications":
       return (
         <div className="relative mt-6 space-y-2">
-          <div className="ms-auto w-fit max-w-[88%] rounded-2xl rounded-br-md bg-[#12294b] px-3.5 py-2 text-xs font-medium text-white">
-            {pick("هل أنا مؤهل لمنحة DAAD؟", "Am I eligible for DAAD?")}
-          </div>
-          <div className="flex w-fit max-w-[88%] items-start gap-2 rounded-2xl rounded-tl-md border border-border bg-muted/50 px-3.5 py-2 text-xs text-foreground">
-            <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-secondary-600" />
-            <span>{pick("نعم — تطابق ٧٨٪. ينقصك خطاب توصية واحد فقط.", "Yes — 78% fit. You're one recommendation letter away.")}</span>
-          </div>
+          {[
+            { n: pick("تشيفنينغ", "Chevening"), s: pick("جاري التقديم", "In progress") },
+            { n: pick("إيراسموس", "Erasmus"), s: pick("المسودة جاهزة", "Draft ready") },
+          ].map((m) => (
+            <div key={m.n} className="flex items-center justify-between rounded-xl border border-border bg-muted/50 px-3.5 py-2.5 text-xs">
+              <span className="font-medium text-foreground">{m.n}</span>
+              <span className="flex items-center gap-1.5 text-muted-foreground">
+                <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-success-500/15 text-success-600">
+                  <Check className="h-2.5 w-2.5" />
+                </span>
+                {m.s}
+              </span>
+            </div>
+          ))}
         </div>
       );
 
@@ -1182,7 +1189,6 @@ function Footer() {
             title={t("foot.resources")}
             links={[
               { href: "/scholarships", label: t("foot.resource.browse") },
-              { href: "/pricing", label: t("foot.resource.pricing") },
               { href: "/help", label: t("foot.resource.help") },
               { href: "/glossary", label: t("foot.resource.glossary") },
             ]}
@@ -1202,7 +1208,6 @@ function Footer() {
               { href: "/auth/signup", label: t("foot.tool.matching") },
               { href: "/auth/signup", label: t("foot.tool.review") },
               { href: "/auth/signup", label: t("foot.tool.roadmap") },
-              { href: "/auth/signup", label: t("foot.tool.chat") },
             ]}
           />
           <FooterCol
@@ -1280,14 +1285,14 @@ const FEATURES = [
     descEn: "We compare your profile against every scholarship's stated criteria and give you a fit score with a clear reason for each one.",
   },
   {
-    key: "chat",
-    icon: MessageSquare,
+    key: "applications",
+    icon: ClipboardList,
     wide: false,
-    visual: "chat",
-    titleAr: "مساعد ذكي على مدار الساعة",
-    titleEn: "AI chat assistant",
-    descAr: "اسأل عن أي منحة أو متطلب، وستحصل على إجابة دقيقة مبنية على بيانات المنح الفعلية.",
-    descEn: "Ask about any scholarship or requirement and get precise answers grounded in our real scholarship data.",
+    visual: "applications",
+    titleAr: "تتبع طلباتك",
+    titleEn: "Application tracking",
+    descAr: "اعرف أين وصلت كل منحة في خطتك — ما الذي بدأته وما الذي بقي له خطوة واحدة.",
+    descEn: "See where every scholarship stands in your plan — what you've started and what's one step from done.",
   },
   {
     key: "docs",
@@ -1489,8 +1494,8 @@ const FAQS = [
   {
     qAr: "هل المنصة مجانية؟",
     qEn: "Is it free?",
-    aAr: "البحث عن المنح ونسبة التطابق والخطة الزمنية مجانية بالكامل ودائماً. تدفع فقط إذا أردت مراجعة مفصّلة لمستنداتك، وكل حساب جديد يحصل على مراجعة مجانية أولى.",
-    aEn: "Searching, fit scores and roadmaps are completely free, always. You only pay if you want a detailed review of your documents — and every new account gets one free review.",
+    aAr: "نعم، المنصة مجانية بالكامل. البحث عن المنح ونسبة التطابق والخطة الزمنية ومراجعة مستنداتك بالذكاء الاصطناعي — كل ذلك مجاني، مع حد يومي معقول للمراجعات ليظل بجودة عالية.",
+    aEn: "Yes, completely free. Searching scholarships, fit scores, roadmaps and AI document reviews are all free — with a sensible daily review limit so quality stays high.",
   },
   {
     qAr: "هل توجد منح لا تتطلب الآيلتس أو التوفل؟",
@@ -1509,12 +1514,6 @@ const FAQS = [
     qEn: "Do you guarantee I'll get a scholarship?",
     aAr: "لا، ولا يستطيع أحد أن يضمن ذلك بصدق. ما نفعله هو توفير وقتك بعدم إضاعته على منح لست مؤهلاً لها أصلاً، ومساعدتك على تقديم طلب أقوى في المنح المناسبة.",
     aEn: "No, and nobody honestly can. What we do is save you from wasting time on scholarships you were never eligible for, and help you submit a stronger application to the ones that do fit.",
-  },
-  {
-    qAr: "كيف أدفع من مصر؟",
-    qEn: "How do I pay from Egypt?",
-    aAr: "فودافون كاش أو إنستاباي أو تحويل بنكي. ترسل لنا صورة إيصال التحويل ونضيف رصيدك يدوياً — عادةً خلال ساعات. الدفع بالبطاقة متاح أيضاً في بعض الدول.",
-    aEn: "Vodafone Cash, InstaPay or bank transfer. Send us a screenshot of the transfer and we add your credits manually — usually within a few hours. Card payment is available in some countries too.",
   },
   {
     qAr: "من أين تأتي بيانات المنح؟",

@@ -16,7 +16,7 @@ import { PrismaClient } from "@prisma/client";
  * the only one that needs calendar time rather than effort. You cannot generate
  * usage numbers in the final week.
  *
- * "43 signups in 11 days, 12 completed profiles, 6 saved plans, 2 paid reviews"
+ * "43 signups in 11 days, 12 completed profiles, 6 saved plans, 2 AI reviews"
  * is an answer. "People liked it" is not. This script gives you the first kind,
  * on demand, without opening the database.
  *
@@ -45,7 +45,7 @@ async function main() {
 
   const [
     users, profiles, documents, reviews, roadmapUsers, roadmapRows,
-    payments, paidPayments, scholarships, verified, applications,
+    scholarships, verified, applications,
   ] = await Promise.all([
     prisma.user.count(),
     prisma.userProfile.count(),
@@ -54,13 +54,6 @@ async function main() {
     prisma.roadmapMilestone.findMany({ select: { userId: true }, distinct: ["userId"] })
       .then((r) => r.length).catch(() => 0),
     prisma.roadmapMilestone.count().catch(() => 0),
-    prisma.payment.count().catch(() => 0),
-    // Payment.status is a free-text String, not an enum. Both success paths —
-    // the Stripe webhook and the manual-transfer admin approval — write
-    // "approved". ("paid" appears in the webhook but that's Stripe's own
-    // session.payment_status, not ours.) "paid" is kept in the filter purely
-    // as a safety net in case a future path writes it.
-    prisma.payment.count({ where: { status: { in: ["approved", "paid"] } } }).catch(() => 0),
     prisma.scholarship.count(),
     prisma.scholarship.count({ where: { isVerified: true } }).catch(() => 0),
     prisma.application.count().catch(() => 0),
@@ -87,8 +80,6 @@ async function main() {
     savedMilestones: roadmapRows,
     milestonesCompleted: completedRoadmaps,
     applicationsTracked: applications,
-    paymentsAttempted: payments,
-    paymentsCompleted: paidPayments,
     scholarships,
     scholarshipsVerified: verified,
   };
@@ -112,7 +103,6 @@ async function main() {
     ["Saved a scholarship plan", roadmapUsers],
     ["Uploaded a document", documents],
     ["Ran an AI review", reviews],
-    ["Paid", paidPayments],
   ];
   const top = funnel[0][1] || 1;
 
@@ -160,7 +150,6 @@ async function main() {
   if (profiles) tail.push(`${profiles} completed a full profile`);
   if (roadmapUsers) tail.push(`${roadmapUsers} saved an application plan`);
   if (reviews) tail.push(`${reviews} ran an AI document review`);
-  if (paidPayments) tail.push(`${paidPayments} paid`);
 
   if (parts.length === 0) {
     console.log(`    No users yet. Nothing to report — this is the number that`);

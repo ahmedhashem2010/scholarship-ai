@@ -3,13 +3,12 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { GraduationCap, Menu, X, CreditCard, Languages } from "lucide-react"
+import { GraduationCap, Menu, X, Languages } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useLanguage } from "@/contexts/LanguageContext"
 import { ThemeToggle } from "@/components/scholarship/theme-toggle"
 import { UserNav } from "@/components/user-nav"
-import { useCredits } from "@/lib/credits-context"
 
 const navLinks = [
   { href: "/dashboard", label: "Dashboard" },
@@ -24,7 +23,6 @@ interface HeaderProps {
 
 export function Header({ className }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const { credits } = useCredits()
   const { language, isRTL, toggleLanguage } = useLanguage()
   const pathname = usePathname()
 
@@ -73,11 +71,6 @@ export function Header({ className }: HeaderProps) {
         </nav>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          <div className="hidden sm:flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1.5">
-            <CreditCard className="h-3.5 w-3.5 text-primary" />
-            <span className="text-xs font-semibold text-primary">{credits}</span>
-          </div>
-
           <Button
             variant="ghost"
             size="sm"
@@ -126,10 +119,6 @@ export function Header({ className }: HeaderProps) {
               )
             })}
             <div className="mt-3 flex items-center gap-2 border-border border-t pt-4">
-              <div className="flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1.5">
-                <CreditCard className="h-3.5 w-3.5 text-primary" />
-                <span className="text-xs font-semibold text-primary">{credits}</span>
-              </div>
               <Button variant="outline" size="sm" onClick={toggleLanguage} className="rounded-full">
                 <Languages className="me-1.5 h-4 w-4" />
                 {language === "en" ? "عربي" : "English"}

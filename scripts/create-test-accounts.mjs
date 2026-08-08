@@ -58,15 +58,14 @@ async function createPrismaUser(authId, acct) {
   try {
     const user = await prisma.user.upsert({
       where: { id: authId },
-      update: { reviewCredits: 20 },
+      update: {},
       create: {
         id: authId,
         email: acct.email,
         name: acct.name,
-        reviewCredits: 20,
       },
     });
-    console.log(`  ✓ Prisma user upserted: ${user.id} (${user.reviewCredits} credits)`);
+    console.log(`  ✓ Prisma user upserted: ${user.id} (${user.email})`);
   } catch (e) {
     console.error(`  ✗ Prisma error:`, e.message);
   } finally {

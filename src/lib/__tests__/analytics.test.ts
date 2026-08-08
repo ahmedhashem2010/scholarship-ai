@@ -36,10 +36,4 @@ describe("ConversionEvents", () => {
     ConversionEvents.onboardingComplete();
     expect(window.dataLayer![0]).toEqual(["event", "onboarding_complete"]);
   });
-
-  it("paymentStarted pushes payment_started event with value", () => {
-    vi.stubEnv("NEXT_PUBLIC_GA_ID", "G-XXXXXXXXXX");
-    ConversionEvents.paymentStarted(30);
-    expect(window.dataLayer![0]).toEqual(["event", "payment_started", { value: 30 }]);
-  });
 });

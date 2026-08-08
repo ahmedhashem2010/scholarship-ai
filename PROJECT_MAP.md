@@ -43,7 +43,6 @@ scholarship-project/
 ## Main Pages (`src/app/**/page.tsx`)
 
 - `/` — landing (`page.tsx`)
-- `/pricing`
 - `/glossary`
 - `/help`
 - `/privacy`
@@ -58,14 +57,12 @@ scholarship-project/
 - `/dashboard/profile`
 - `/dashboard/documents`
 - `/dashboard/roadmap`
-- `/dashboard/credits`
-- `/dashboard/credits/manual`
 - `/dashboard/compare`
 - `/dashboard/reviews/[id]`
+- `/dashboard/applications`
 - `/dashboard/applications/[scholarshipId]`
 - `/scholarships`
 - `/scholarships/[id]`
-- `/admin/payments`
 
 ## API Routes (`src/app/api/**/route.ts` + auth routes)
 
@@ -73,7 +70,6 @@ Auth / user:
 - `POST /api/auth/signup`
 - `POST /api/auth/resend-verification`
 - `GET/PUT/POST /api/user/profile`
-- `GET /api/user/credits`
 - `GET /api/users`
 - `/auth/callback` (PKCE)
 - `/auth/confirm` (token exchange)
@@ -98,16 +94,9 @@ Documents / reviews:
 - `/api/documents/[id]/review`
 - `/api/documents/[id]/latest-review`
 
-Payments / credits / admin:
-- `POST /api/checkout`
-- `POST /api/stripe/webhook`
-- `POST /api/payments/manual`
-- `GET /api/admin/payments`
-- `/api/admin/payments/[id]`
-- `POST /api/admin/credits`
+Payments / credits / admin: *(none — billing, credits, and the admin panel were removed; the product is fully free, AI reviews capped by a daily quota)*
 
-Chat / cron:
-- `POST /api/chat`
+Cron:
 - `GET /api/cron/reminders`
 
 ## Database Models
@@ -117,11 +106,10 @@ Main app (`prisma/schema.prisma`, cuid IDs):
 - `UserProfile`
 - `Scholarship`
 - `Application`
-- `Payment`
-- `ReferralCode`
 - `Document`
 - `ApplicationDocument`
 - `Review`
+- `ReviewDailyUsage`
 - `RoadmapMilestone`
 
 Backend (`smartscholar-backend/`, uuid IDs, normalized): separate 76-table SQL-owned schema (dimension tables, scholarship + child tables, users/applications/AI/analytics, pgvector embeddings, tsvector search, RLS). Not connected to the main app.
@@ -130,7 +118,7 @@ Backend (`smartscholar-backend/`, uuid IDs, normalized): separate 76-table SQL-o
 
 Feature:
 - `DocumentProgress.tsx`, `ImprovementChecklist.tsx`, `ReviewDisplay.tsx`
-- `analytics.tsx`, `chat-widget.tsx`, `compare-selector.tsx`
+- `analytics.tsx`, `compare-selector.tsx`
 - `help-tooltip.tsx`, `hero-ui-provider.tsx`, `nav.tsx`, `sidebar.tsx`
 - `pdf-viewer.tsx`, `scholarship-card-list.tsx`, `theme-provider.tsx`, `user-nav.tsx`
 - `documents/upload-dropzone.tsx`
@@ -143,11 +131,11 @@ UI primitives (`ui/`):
 ## Utilities (`src/lib/`)
 
 - `analytics.ts`, `api-utils.ts`, `application-progress.ts`
-- `brand.ts`, `colors.ts`, `constants.ts`, `contact.ts`
-- `credits-context.tsx`, `document-versions.ts`
+- `brand.ts`, `colors.ts`, `constants.ts`
+- `document-versions.ts`
 - `email.ts`, `email-templates.ts`
-- `i18n.ts`, `pricing.ts`, `prisma.ts`, `profile-context.tsx`
-- `scholarship-filters.ts`, `text-extract.ts`, `utils.ts`
+- `i18n.ts`, `prisma.ts`, `profile-context.tsx`
+- `review-quota.ts`, `scholarship-filters.ts`, `text-extract.ts`, `utils.ts`
 - `supabase/` — `api-auth.ts`, `client.ts`, `server.ts`, `storage.ts`
 - `validations/scholarship.ts`
 - Contexts/hooks: `src/contexts/LanguageContext.tsx`, `src/hooks/use-toast.ts`
@@ -156,9 +144,9 @@ UI primitives (`ui/`):
 
 Main app:
 - `src/lib/ai-review.ts` — document review + provider fallback chain (Groq → Gemini → BazaarLink → AgentRouter)
+- `src/lib/review-quota.ts` — free daily AI review limit
 - `src/lib/scholarship-matcher.ts` — deterministic fit-score matching
 - `src/lib/roadmap-generator.ts` — deterministic milestone generation
-- `src/app/api/chat/route.ts` — chat widget backend
 
 Backend (`smartscholar-backend/src/`):
 - `acquisition/` — pipeline, discover, extractors (html/pdf), normalizers, validators, importers

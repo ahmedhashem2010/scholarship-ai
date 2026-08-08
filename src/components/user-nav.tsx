@@ -1,15 +1,8 @@
 "use client"
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { LogOut, CreditCard, UserCircle } from "lucide-react"
+import { LogOut, UserCircle } from "lucide-react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
@@ -74,10 +67,6 @@ export function UserNav() {
         <DropdownMenuItem onClick={() => router.push('/dashboard/profile')}>
           <UserCircle className="me-2 h-4 w-4" />
           My Profile
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => router.push('/dashboard/credits')}>
-          <CreditCard className="me-2 h-4 w-4" />
-          Get Credits
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem

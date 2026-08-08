@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { createClient } from "@/lib/supabase/server"
-import { createClient as createAdminClient } from "@supabase/supabase-js"
 
 export async function GET() {
   try {
@@ -105,51 +104,6 @@ async function upsertProfile(userId: string, body: Record<string, unknown>) {
 
 }
 
-async function redeemReferralCode(userId: string) {
-  try {
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
-
-    const code = user.user_metadata?.referral_code
-    if (!code || typeof code !== "string") return
-
-    const referral = await prisma.referralCode.findUnique({ where: { code } })
-    if (!referral || referral.usedCount >= referral.maxUses) return
-
-    await prisma.$transaction([
-      prisma.user.update({
-        where: { id: userId },
-        data: { reviewCredits: { increment: referral.credits } },
-      }),
-      prisma.payment.create({
-        data: {
-          userId,
-          amount: 0,
-          credits: referral.credits,
-          status: "approved",
-        },
-      }),
-      prisma.referralCode.update({
-        where: { id: referral.id },
-        data: { usedCount: { increment: 1 } },
-      }),
-    ])
-
-    // Clear the referral code from metadata so it's not redeemed again
-    const admin = createAdminClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      { auth: { autoRefreshToken: false, persistSession: false } }
-    )
-    const meta = { ...user.user_metadata }
-    delete meta.referral_code
-    await admin.auth.admin.updateUserById(user.id, { user_metadata: meta })
-  } catch {
-    // Referral table may not exist yet — don't block profile creation
-  }
-}
-
 export async function POST(request: Request) {
   try {
     const supabase = createClient()
@@ -160,7 +114,6 @@ export async function POST(request: Request) {
 
     const body = await request.json()
     await upsertProfile(user.id, body)
-    await redeemReferralCode(user.id)
     return NextResponse.json({ success: true })
   } catch (error) {
     return NextResponse.json({ success: false, error: "Failed to create profile" }, { status: 500 })

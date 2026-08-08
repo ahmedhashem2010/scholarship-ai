@@ -21,7 +21,7 @@ import { createClient } from "@supabase/supabase-js";
  * ORDER MATTERS
  *
  * Only UserProfile and RoadmapMilestone declare onDelete: Cascade. Document,
- * Review, Payment and Application do not, so deleting the User row first
+ * Review and Application do not, so deleting the User row first
  * fails on a foreign key. Children go first, in dependency order — reviews
  * reference documents, so reviews before documents.
  *
@@ -108,14 +108,13 @@ async function main() {
 
     if (email === adminEmail) {
       anyAdmin = true;
-      warn("THIS IS YOUR ADMIN_EMAIL — deleting it locks you out of /admin");
+      warn("THIS IS YOUR ADMIN_EMAIL — deleting it removes the only account with admin access");
     }
 
     // What's attached.
-    const [docs, reviews, payments, apps, milestones, profile] = await Promise.all([
+    const [docs, reviews, apps, milestones, profile] = await Promise.all([
       prisma.document.findMany({ where: { userId }, select: { id: true, fileUrl: true } }),
       prisma.review.count({ where: { userId } }).catch(() => 0),
-      prisma.payment.findMany({ where: { userId }, select: { id: true, receiptUrl: true } }),
       prisma.application.count({ where: { userId } }).catch(() => 0),
       prisma.roadmapMilestone.count({ where: { userId } }).catch(() => 0),
       prisma.userProfile.findUnique({ where: { userId } }).catch(() => null),
@@ -126,14 +125,10 @@ async function main() {
     info(`profile        ${profile ? "yes" : "—"}`);
     info(`documents      ${docs.length}`);
     info(`reviews        ${reviews}`);
-    info(`payments       ${payments.length}`);
     info(`applications   ${apps}`);
     info(`milestones     ${milestones}`);
 
-    const files = [
-      ...docs.map((d) => storagePath(d.fileUrl)),
-      ...payments.map((p) => storagePath(p.receiptUrl)),
-    ].filter(Boolean);
+    const files = docs.map((d) => storagePath(d.fileUrl)).filter(Boolean);
     info(`storage files  ${files.length}`);
 
     if (!CONFIRM) continue;
@@ -150,7 +145,6 @@ async function main() {
     if (dbUser) {
       await prisma.review.deleteMany({ where: { userId } }).catch(() => {});
       await prisma.document.deleteMany({ where: { userId } }).catch(() => {});
-      await prisma.payment.deleteMany({ where: { userId } }).catch(() => {});
       await prisma.application.deleteMany({ where: { userId } }).catch(() => {});
       await prisma.roadmapMilestone.deleteMany({ where: { userId } }).catch(() => {});
       await prisma.userProfile.deleteMany({ where: { userId } }).catch(() => {});
@@ -174,7 +168,7 @@ async function main() {
     console.log(`  Done.`);
     if (anyAdmin) {
       console.log(`\n  You deleted your ADMIN_EMAIL account. Sign up again with the`);
-      console.log(`  same address to restore admin access — the middleware checks`);
+      console.log(`  same address to restore admin access — the API checks`);
       console.log(`  the email, not a stored role.`);
     }
     console.log();

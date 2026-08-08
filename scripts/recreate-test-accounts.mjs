@@ -64,15 +64,14 @@ async function createPrismaUser(authId, acct) {
   try {
     const user = await prisma.user.upsert({
       where: { id: authId },
-      update: { reviewCredits: 20, name: acct.name, email: acct.email },
+      update: { name: acct.name, email: acct.email },
       create: {
         id: authId,
         email: acct.email,
         name: acct.name,
-        reviewCredits: 20,
       },
     });
-    console.log(`  ✓ Prisma user upserted: ${user.email} (${user.reviewCredits} credits)`);
+    console.log(`  ✓ Prisma user upserted: ${user.email}`);
   } catch (e) {
     console.error(`  ✗ Prisma error:`, e.message);
   } finally {
@@ -100,7 +99,6 @@ async function main() {
       await prisma.applicationDocument.deleteMany({ where: { application: { userId: { in: testUserIds } } } });
       await prisma.application.deleteMany({ where: { userId: { in: testUserIds } } });
       await prisma.document.deleteMany({ where: { userId: { in: testUserIds } } });
-      await prisma.payment.deleteMany({ where: { userId: { in: testUserIds } } });
       await prisma.userProfile.deleteMany({ where: { userId: { in: testUserIds } } });
       await prisma.user.deleteMany({ where: { id: { in: testUserIds } } });
     }

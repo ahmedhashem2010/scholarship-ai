@@ -1,6 +1,6 @@
 # AGENTS.md — SmartScholar
 
-AI-powered platform helping Arab/Middle Eastern students find and apply for international scholarships. Live at **smartscholar.org**. Built with Next.js 14 App Router, Supabase Auth + PostgreSQL, Prisma ORM, Stripe, Zoho SMTP (nodemailer).
+AI-powered platform helping Arab/Middle Eastern students find and apply for international scholarships. Live at **smartscholar.org**. Built with Next.js 14 App Router, Supabase Auth + PostgreSQL, Prisma ORM, Zoho SMTP (nodemailer).
 
 > Renamed from "Scholarship Hub" on 27 July 2026. The product name, domain and
 > email infra changed — **never hardcode the old name or Resend**. Brand
@@ -44,9 +44,8 @@ auto-populate the Prisma `User` table — that's handled by the profile API rout
 - **Database:** PostgreSQL via pooler + Prisma ORM (`prisma/schema.prisma`)
 - **Emails:** Zoho Mail over SMTP via nodemailer (`src/lib/email.ts`) — mailbox `care@smartscholar.org`. Resend is gone.
 - **AI:** Multi-provider fallback chain — **Groq (primary) → Gemini → BazaarLink → AgentRouter** — in `src/lib/ai-review.ts` (see AI Providers)
-- **Payments:** Stripe Checkout (cards) + manual Egyptian methods (Vodafone Cash, InstaPay, Bank Transfer)
+- **Free model:** everything is free. Document reviews run on a daily quota (see `src/lib/review-quota.ts`) — no credits, no billing, no payments.
 - **Matching:** Custom algorithm in `src/lib/scholarship-matcher.ts` (fit score 0-100)
-- **AI Chat:** Same provider chain as above, in a client-side chat widget
 - **RTL:** Arabic-first (default `lang="ar" dir="rtl"`), IBM Plex Sans + IBM Plex Sans Arabic, language toggle persisted as `smartscholar.lang` in localStorage
 - **Deploy target:** Vercel
 
@@ -75,22 +74,19 @@ Key vars (all in `.env` at project root):
 - `EMAIL_FROM` / `EMAIL_REPLY_TO` — must be the authenticated Zoho mailbox
 - `GROQ_API_KEY` — primary AI provider (free tier, no credit card)
 - `GEMINI_API_KEY` / `BAZAARLINK_API_KEY` / `AGENTROUTER_API_KEY` — optional AI fallbacks
-- `ADMIN_EMAIL` — the only account allowed to reach `/admin/*`
-- `NEXT_PUBLIC_SITE_URL` — canonical public URL, used for email links/OG/Stripe redirects
-- `NEXT_PUBLIC_WHATSAPP_NUMBER` / `NEXT_PUBLIC_VODAFONE_CASH_NUMBER` / `NEXT_PUBLIC_INSTAPAY_HANDLE` — manual-payment contacts
-- Stripe keys — `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
+- `NEXT_PUBLIC_SITE_URL` — canonical public URL, used for email links/OG tags
 - `CRON_SECRET` — shared secret guarding `/api/cron/reminders`
 - `NEXT_PUBLIC_GA_ID` — optional GA4
 
 ## Signup Flow (current — real email verification)
 
-1. User submits `POST /api/auth/signup` with email, password, name (optionally referralCode)
+1. User submits `POST /api/auth/signup` with email, password, name
 2. Route calls `supabase.auth.admin.generateLink({ type: "signup" })` — creates the user **unconfirmed** and returns a `hashed_token`
 3. The `action_link` Supabase returns is **not used**: it hands the session back in the URL *fragment*, which never reaches the server. Instead the route builds its own link: `{NEXT_PUBLIC_SITE_URL}/auth/confirm?token_hash=…&type=email&next=/onboarding`
 4. The confirmation email is sent via Zoho SMTP (`confirmSignupHtml` — Arabic-first). If SMTP fails, the account exists but the request returns 502 `email_failed` (with the raw reason exposed outside production)
 5. Student clicks the link → `src/app/auth/confirm/route.ts` exchanges `token_hash` server-side via `verifyOtp` → they land signed in at `/onboarding`
 6. Expired/used links redirect to `/auth/login?error=link_expired|link_invalid`; the login page and `/auth/verify` offer a resend via `POST /api/auth/resend-verification`
-7. Middleware blocks unverified users from `/dashboard`, `/onboarding`, `/admin` → redirects to `/auth/verify` (belt-and-braces; doesn't depend on the Supabase "Confirm email" dashboard toggle)
+7. Middleware blocks unverified users from `/dashboard`, `/onboarding` → redirects to `/auth/verify` (belt-and-braces; doesn't depend on the Supabase "Confirm email" dashboard toggle)
 8. Onboarding checks for an existing profile → if none, shows the form → if one exists, redirects to `/dashboard`
 9. Onboarding submits `POST /api/user/profile`, which upserts a `User` record then upserts `UserProfile`, then redirects to `/dashboard`
 
@@ -104,12 +100,11 @@ which the old PKCE `generateLink` + `exchangeCodeForSession` flow did not.
 
 ## Auth & Middleware
 
-`src/middleware.ts` (matcher: `/`, `/dashboard/:path*`, `/auth/:path*`, `/onboarding`, `/admin/:path*`):
+`src/middleware.ts` (matcher: `/`, `/dashboard/:path*`, `/auth/:path*`, `/onboarding`):
 - `alwaysPublic` (no auth check): `/auth/callback`, `/auth/confirm`, `/auth/verify`
 - Signed-in users on `/` → redirect to `/dashboard` (escape hatch: `?home=1`)
-- Blocks unauthenticated access to `/dashboard/*`, `/onboarding`, `/admin/*` → redirects to `/auth/login` with `redirectTo` preserving intent
+- Blocks unauthenticated access to `/dashboard/*`, `/onboarding` → redirects to `/auth/login` with `redirectTo` preserving intent
 - Blocks **unverified** users from the same routes → `/auth/verify`
-- `/admin/*` gated on `ADMIN_EMAIL` (middleware + every `/api/admin/*` handler)
 - Signed-in users on `/auth/*` → `/dashboard`
 - Uses `supabase.auth.getUser()` (server-revalidated JWT) — never `getSession()` for authorization decisions
 
@@ -119,7 +114,7 @@ Callback route at `src/app/auth/callback/route.ts` — PKCE code exchange (OAuth
 
 `src/lib/ai-review.ts` tries providers in order: **Groq → Gemini → BazaarLink →
 AgentRouter**, falling through on key-missing or HTTP errors; `scripts/test-ai.mjs`
-verifies the chain. The chat widget uses the same stack. Logging is gated behind
+verifies the chain. Logging is gated behind
 `AI_DEBUG` — response bodies can contain fragments of student documents, so it
 stays **off in production**.
 
@@ -134,7 +129,8 @@ stays **off in production**.
 | `Document` | userId, fileName, fileUrl, documentType, version | Version chain via parentDocumentId |
 | `ApplicationDocument` | applicationId, documentType, status | |
 | `Review` | documentId, userId, score, strengths, weaknesses, suggestions | |
-| `Payment` | userId, amount, credits, status | |
+| `ReviewDailyUsage` | userId, day, count | Daily quota tracker for free AI reviews (`@@unique([userId, day])`) |
+| `RoadmapMilestone` | userId, scholarshipId, key, dueDate, isDone | Reminder tracking; unique per user/scholarship/milestone |
 
 ## Profile API (`/api/user/profile`)
 
@@ -162,7 +158,7 @@ Critical: `upsertProfile()` first calls `prisma.user.upsert` to ensure the `User
 All `age` fields were renamed to `dateOfBirth` (stored as `DateTime` in DB, `string` in forms). Age is computed at runtime:
 - `src/lib/scholarship-matcher.ts` — `calcAge()` helper
 - Dashboard profile, edit page, onboarding all use `dateOfBirth` with `<input type="date">`
-- Match API and chat API pass `dateOfBirth` not `age`
+- Match API passes `dateOfBirth` not `age`
 
 ## Key Files
 
@@ -171,14 +167,15 @@ All `age` fields were renamed to `dateOfBirth` (stored as `DateTime` in DB, `str
 | `src/lib/brand.ts` | Brand constants (name, Arabic wordmark, domain, taglines) — import, don't hardcode |
 | `prisma/schema.prisma` | Active PostgreSQL schema (9 models) |
 | `prisma/seed.ts` | Seeds 234 scholarships |
-| `src/middleware.ts` | Auth guard + unverified-user redirect + admin gating |
+| `src/middleware.ts` | Auth guard + unverified-user redirect |
 | `src/app/api/auth/signup/route.ts` | Signup — `generateLink` + custom confirm URL (real verification) |
 | `src/app/api/auth/resend-verification/route.ts` | Re-emails a fresh confirmation link |
 | `src/app/auth/confirm/route.ts` | Server-side token exchange via `verifyOtp` → session |
 | `src/app/auth/verify/page.tsx` | "Check your email" page with resend button |
 | `src/lib/email.ts` | Zoho SMTP client (nodemailer, pooled) |
-| `src/lib/email-templates.ts` | HTML templates (confirm, reset password, credits, reminders) |
+| `src/lib/email-templates.ts` | HTML templates (confirm, reset password, reminders) |
 | `src/lib/ai-review.ts` | AI provider chain (Groq → Gemini → BazaarLink → AgentRouter) |
+| `src/lib/review-quota.ts` | Free daily review limit (`DAILY_REVIEW_LIMIT`) |
 | `src/app/onboarding/page.tsx` | 5-step onboarding wizard |
 | `src/app/dashboard/page.tsx` | Dashboard (redirects to onboarding if no profile) |
 | `src/lib/scholarship-matcher.ts` | Matching algorithm |
@@ -209,9 +206,8 @@ All data that's shared across multiple components uses React Context to fetch on
 | Context | File | Fetches | Used By |
 |---------|------|---------|---------|
 | `ProfileProvider` | `src/lib/profile-context.tsx` | `GET /api/user/profile` (once) | `nav.tsx`, `user-nav.tsx`, `dashboard/page.tsx`, `scholarship-card-list.tsx` |
-| `CreditsProvider` | `src/lib/credits-context.tsx` | `GET /api/user/credits` (once) | `nav.tsx`, `scholarship/header.tsx` |
 
-Both are wrapped in `app/layout.tsx` inside `<ToastProvider>`. The hooks use a `useRef` guard to prevent double-fetch in React StrictMode.
+It is wrapped in `app/layout.tsx` inside `<ToastProvider>`. The hook uses a `useRef` guard to prevent double-fetch in React StrictMode.
 
 ### Before context pattern (11 requests per dashboard load):
 ```
@@ -221,7 +217,6 @@ profile(×4) → credits(×2) → documents + match
 ### After (4-5 requests):
 ```
 profile(×1) → documents + match (parallel)
-credits(×1)
 ```
 
 ## Document Progress & Review Scores
@@ -246,7 +241,7 @@ credits(×1)
 npm run build
 ```
 
-Expected warnings: `Dynamic server usage` errors for `/api/users`, `/api/admin/payments`, `/api/scholarships/match` — these use `request.cookies` and are expected (several routes carry `export const dynamic = "force-dynamic"` to keep the output clean). Prerender errors for pages using auth/cookies are also normal. **Zero TypeScript errors** is the pass/fail criterion.
+Expected warnings: `Dynamic server usage` errors for `/api/users`, `/api/scholarships/match` — these use `request.cookies` and are expected (several routes carry `export const dynamic = "force-dynamic"` to keep the output clean). Prerender errors for pages using auth/cookies are also normal. **Zero TypeScript errors** is the pass/fail criterion.
 
 ## Code Quality
 
@@ -259,8 +254,9 @@ Expected warnings: `Dynamic server usage` errors for `/api/users`, `/api/admin/p
 
 ## Admin
 
-Admin access is gated on `ADMIN_EMAIL` — enforced in both `src/middleware.ts`
-(page routes under `/admin/*`) and each `/api/admin/*` route handler.
+The admin area (pages, APIs, middleware gate) was removed along with the payment
+system it administered — there is no admin UI anymore. Auth and Database are
+separate Supabase projects, so deleting a user must be done on both sides.
 
 Delete a user from Supabase Auth (does NOT delete from Prisma DB — separate projects):
 ```

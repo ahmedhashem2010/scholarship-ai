@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BookOpen, Search } from "lucide-react";
+import { BRAND } from "@/lib/brand";
 
 const terms = [
   {
@@ -120,7 +121,11 @@ export default function GlossaryPage() {
         <Search className="mx-auto h-8 w-8 text-muted-foreground mb-3" />
         <h2 className="text-base font-semibold text-foreground mb-1">Can&apos;t find a term?</h2>
         <p className="text-sm text-muted-foreground">
-          Ask our AI assistant using the chat widget — it can explain any scholarship term on the spot.
+          Not sure what something means? Drop us a line at{" "}
+          <a href={`mailto:${BRAND.supportEmail}`} className="font-medium text-primary hover:underline" dir="ltr">
+            {BRAND.supportEmail}
+          </a>{" "}
+          and we&apos;ll explain it.
         </p>
       </div>
     </div>

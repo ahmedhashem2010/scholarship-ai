@@ -6,6 +6,7 @@ import { reviewDocument, calculateAverageScore } from "@/lib/ai-review";
 import type { ReviewScore } from "@/lib/ai-review";
 import { extractTextFromFile } from "@/lib/text-extract";
 import { getVersionChain } from "@/lib/document-versions";
+import { DAILY_REVIEW_LIMIT, currentDayKey } from "@/lib/review-quota";
 
 
 /**
@@ -40,6 +41,34 @@ function logError(step: string, err: unknown) {
     console.error(`[${step}] Stack:`, err.stack);
   } else {
     console.error(`[${step}] Unknown error:`, err);
+  }
+}
+
+/** Standard response when the daily review quota is exhausted. */
+function quotaExhaustedResponse() {
+  return NextResponse.json(
+    {
+      success: false,
+      error: `You've used all ${DAILY_REVIEW_LIMIT} free AI reviews for today. Your free reviews reset tomorrow.`,
+      limitReached: true,
+    },
+    { status: 429 }
+  );
+}
+
+/**
+ * Gives back a reserved daily review slot. Used whenever a review fails after
+ * reservation but before the review row is saved, so an error never consumes
+ * one of the user's free reviews.
+ */
+async function releaseDailySlot(userId: string, day: string): Promise<void> {
+  try {
+    await prisma.reviewDailyUsage.update({
+      where: { userId_day: { userId, day } },
+      data: { count: { decrement: 1 } },
+    });
+  } catch (releaseErr) {
+    logError("release daily slot", releaseErr);
   }
 }
 
@@ -79,13 +108,16 @@ export async function POST(
     }
     debugLog("[POST] Document found:", document.id, "type:", document.documentType, "fileUrl:", document.fileUrl?.slice(0, 80) ?? "none");
 
-    debugLog("[POST] Step 4/12: Checking user credits...");
-    const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
-    if (!dbUser || dbUser.reviewCredits < 1) {
-      debugLog("[POST] No credits for user:", user.id, "credits:", dbUser?.reviewCredits);
-      return NextResponse.json({ success: false, error: "No credits", needsCredits: true }, { status: 402 });
+    debugLog("[POST] Step 4/12: Checking today's review quota...");
+    const day = currentDayKey();
+    const usage = await prisma.reviewDailyUsage.findUnique({
+      where: { userId_day: { userId: user.id, day } },
+    });
+    if ((usage?.count ?? 0) >= DAILY_REVIEW_LIMIT) {
+      debugLog("[POST] Daily quota exhausted for user:", user.id, "count:", usage?.count);
+      return quotaExhaustedResponse();
     }
-    debugLog("[POST] User credits:", dbUser.reviewCredits);
+    debugLog("[POST] Reviews used today:", usage?.count ?? 0);
 
     debugLog("[POST] Step 5/12: Checking for existing review...");
     const existingReview = await prisma.review.findFirst({
@@ -161,23 +193,53 @@ export async function POST(
       }, { status: 400 });
     }
 
-    debugLog("[POST] Step 8/12: Calling AI review...");
+    // Reserve a daily review slot BEFORE calling the AI, then release it if
+    // anything after this point fails. The upsert is atomic on the
+    // (userId, day) unique key, so two concurrent requests can't both slip
+    // past the cap; the pre-check above is only a cheap early-exit.
+    debugLog("[POST] Step 8/12: Reserving a daily review slot...");
+    try {
+      await prisma.$transaction(async (tx) => {
+        const row = await tx.reviewDailyUsage.upsert({
+          where: { userId_day: { userId: user.id, day } },
+          create: { userId: user.id, day, count: 1 },
+          update: { count: { increment: 1 } },
+        });
+        if (row.count > DAILY_REVIEW_LIMIT) {
+          throw new Error("DAILY_LIMIT_REACHED");
+        }
+      });
+      debugLog("[POST] Daily review slot reserved");
+    } catch (reserveErr) {
+      if (reserveErr instanceof Error && reserveErr.message === "DAILY_LIMIT_REACHED") {
+        debugLog("[POST] Daily limit reached during reservation");
+        return quotaExhaustedResponse();
+      }
+      logError("POST reserve daily slot", reserveErr);
+      return NextResponse.json(
+        { success: false, error: "We couldn't check your daily review limit. Please try again." },
+        { status: 500 }
+      );
+    }
+
+    debugLog("[POST] Step 9/12: Calling AI review...");
     let coaching: ReviewScore;
     try {
       coaching = await reviewDocument(text, document.documentType);
       debugLog("[POST] AI review complete, overall score:", coaching.overallQuality?.score);
     } catch (aiErr) {
       logError("POST reviewDocument", aiErr);
-      // No credit has been charged at this point — the transaction below is
-      // what consumes it — so the user loses nothing on an AI failure.
+      // The daily slot was reserved before the call — release it so a failed
+      // review never consumes one of the user's free reviews.
+      await releaseDailySlot(user.id, day);
       const msg = aiErr instanceof Error ? aiErr.message : "";
       const isCapacity = /quota|rate limit|insufficient|temporarily unavailable/i.test(msg);
       return NextResponse.json(
         {
           success: false,
           error: isCapacity
-            ? "Our review service is busy right now. Please try again in a few minutes — you haven't been charged."
-            : "The review couldn't be completed. You haven't been charged — please try again.",
+            ? "Our review service is busy right now. Please try again in a few minutes — you haven't used a review."
+            : "The review couldn't be completed. Please try again — you haven't used a review.",
         },
         { status: 502 }
       );
@@ -185,6 +247,7 @@ export async function POST(
 
     if (!coaching || typeof coaching.overallQuality?.score !== "number") {
       debugLog("[POST] AI returned invalid response structure");
+      await releaseDailySlot(user.id, day);
       return NextResponse.json({ success: false, error: "AI review returned an invalid response" }, { status: 502 });
     }
 
@@ -197,58 +260,32 @@ export async function POST(
       competitiveness: coaching.competitiveness,
     };
 
-    // Charge the credit and save the review ATOMICALLY.
-    //
-    // Two bugs this closes:
-    //  1. The credit was decremented before the review was written. If the
-    //     write failed, the user paid and got nothing.
-    //  2. The earlier balance check and the decrement were separate statements,
-    //     so two concurrent requests could both pass the check and both
-    //     decrement — one credit, two reviews.
-    //
-    // `updateMany` with `reviewCredits: { gte: 1 }` makes the decrement
-    // conditional at the database level: count 0 means someone else got there
-    // first, and we abort without writing a review.
-    debugLog("[POST] Step 9/12: Charging credit and saving review...");
+    // The daily slot is already reserved, so this is a plain insert. If the
+    // write fails, release the slot so the user can retry without losing a
+    // free review.
+    debugLog("[POST] Step 10/12: Saving review...");
     let review;
     try {
-      review = await prisma.$transaction(async (tx) => {
-        const charged = await tx.user.updateMany({
-          where: { id: user.id, reviewCredits: { gte: 1 } },
-          data: { reviewCredits: { decrement: 1 } },
-        });
-
-        if (charged.count === 0) {
-          throw new Error("INSUFFICIENT_CREDITS");
-        }
-
-        return tx.review.create({
-          data: {
-            documentId: document.id,
-            userId: user.id,
-            score: mainScore,
-            strengths: JSON.stringify(scoresData),
-            weaknesses: JSON.stringify([]),
-            suggestions: JSON.stringify(coaching.topImprovements ?? []),
-            grammarIssues: JSON.stringify(coaching.quickWins ?? []),
-            overallFeedback: coaching.overallAssessment ?? "Review completed.",
-          },
-        });
+      review = await prisma.review.create({
+        data: {
+          documentId: document.id,
+          userId: user.id,
+          score: mainScore,
+          strengths: JSON.stringify(scoresData),
+          weaknesses: JSON.stringify([]),
+          suggestions: JSON.stringify(coaching.topImprovements ?? []),
+          grammarIssues: JSON.stringify(coaching.quickWins ?? []),
+          overallFeedback: coaching.overallAssessment ?? "Review completed.",
+        },
       });
       debugLog("[POST] Review saved, id:", review.id);
     } catch (saveErr) {
-      if (saveErr instanceof Error && saveErr.message === "INSUFFICIENT_CREDITS") {
-        return NextResponse.json(
-          { success: false, error: "No credits remaining", needsCredits: true },
-          { status: 402 }
-        );
-      }
-      // The transaction rolled back, so the credit was NOT consumed.
+      await releaseDailySlot(user.id, day);
       logError("POST save review", saveErr);
       return NextResponse.json(
         {
           success: false,
-          error: "We couldn't save your review. Your credit has not been used — please try again.",
+          error: "We couldn't save your review. Your free review for today is still available — please try again.",
         },
         { status: 500 }
       );

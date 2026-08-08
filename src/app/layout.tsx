@@ -5,16 +5,9 @@ import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { HeroUIProvider } from "@/components/hero-ui-provider";
-import dynamic from "next/dynamic";
 import { Analytics } from "@/components/analytics";
 import { ProfileProvider } from "@/lib/profile-context";
-import { CreditsProvider } from "@/lib/credits-context";
 import { BRAND, SEO, pageTitle } from "@/lib/brand";
-
-const ChatWidget = dynamic(() => import("@/components/chat-widget").then((m) => m.ChatWidget), {
-  ssr: false,
-  loading: () => null,
-});
 
 // One type system for both scripts.
 //
@@ -138,15 +131,12 @@ export default function RootLayout({
           <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
             <LanguageProvider>
               <ProfileProvider>
-                <CreditsProvider>
-                  <div className="min-h-screen bg-background">
-                    <main id="main-content" className="flex-1 min-w-0">
-                      {children}
-                    </main>
-                  </div>
-                  <ChatWidget />
-                  <Analytics />
-                </CreditsProvider>
+                <div className="min-h-screen bg-background">
+                  <main id="main-content" className="flex-1 min-w-0">
+                    {children}
+                  </main>
+                </div>
+                <Analytics />
               </ProfileProvider>
             </LanguageProvider>
           </ThemeProvider>

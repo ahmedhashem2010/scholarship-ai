@@ -29,7 +29,7 @@ export const runtime = "nodejs";
  * documented SSR pattern and it means the student lands already signed in.
  */
 export async function POST(req: NextRequest) {
-  const { email, password, name, referralCode } = await req.json();
+  const { email, password, name } = await req.json();
 
   if (!email || !password) {
     return NextResponse.json({ error: "Email and password required" }, { status: 400 });
@@ -60,7 +60,6 @@ export async function POST(req: NextRequest) {
     options: {
       data: {
         name: cleanName || null,
-        ...(referralCode ? { referral_code: String(referralCode).slice(0, 40) } : {}),
       },
     },
   });
