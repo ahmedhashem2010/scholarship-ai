@@ -1,5 +1,10 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 import { scrapedScholarships } from "./scraped-scholarships";
+import {
+  normalizeRecord,
+  mergeScholarship,
+  type ScholarshipLike,
+} from "../scripts/lib/scholarship-data.mjs";
 
 const prisma = new PrismaClient();
 
@@ -1050,74 +1055,73 @@ const scholarships: ScholarshipInput[] = [
 async function main() {
   console.log("Seeding scholarships...");
 
-  for (const s of scholarships) {
-    await prisma.scholarship.upsert({
-      where: { nameEn: s.nameEn },
-      update: {
-        nameAr: s.nameAr,
-        country: s.country,
-        university: s.university,
-        degree: s.degree,
-        deadline: s.deadline,
-        flagUrl: s.flagUrl,
-        description: s.description,
-        benefits: s.benefits,
-        requirements: s.requirements,
-        eligibleCountries: s.eligibleCountries,
-        eligibleEducation: s.eligibleEducation,
-        fieldOfStudy: s.fieldOfStudy,
-        minimumAge: s.minimumAge,
-        maximumAge: s.maximumAge,
-        minimumGPA: s.minimumGPA,
-        englishRequirement: s.englishRequirement,
-        requiresResearch: s.requiresResearch,
-        requiresWorkExp: s.requiresWorkExp,
-        applicationFee: s.applicationFee,
-        competitionLevel: s.competitionLevel,
-        requiredDocuments: s.requiredDocuments,
-        sourceUrl: s.sourceUrl,
-        source: s.source,
-      },
-      create: {
-        nameEn: s.nameEn,
-        nameAr: s.nameAr,
-        country: s.country,
-        university: s.university,
-        degree: s.degree,
-        deadline: s.deadline,
-        flagUrl: s.flagUrl,
-        description: s.description,
-        benefits: s.benefits,
-        requirements: s.requirements,
-        eligibleCountries: s.eligibleCountries,
-        eligibleEducation: s.eligibleEducation,
-        fieldOfStudy: s.fieldOfStudy,
-        minimumAge: s.minimumAge,
-        maximumAge: s.maximumAge,
-        minimumGPA: s.minimumGPA,
-        englishRequirement: s.englishRequirement,
-        requiresResearch: s.requiresResearch,
-        requiresWorkExp: s.requiresWorkExp,
-        applicationFee: s.applicationFee,
-        competitionLevel: s.competitionLevel,
-        requiredDocuments: s.requiredDocuments,
-        sourceUrl: s.sourceUrl,
-        source: s.source,
-      },
-    });
+  const stats = { created: 0, updated: 0, renamed: 0, unchanged: 0, keptFields: 0 };
+
+  /**
+   * One upsert for every source (curated + scraped), sharing the merge logic
+   * from scripts/lib/scholarship-data.mjs (also used by the import CLI):
+   *
+   *  - Incoming text is normalised + mojibake-repaired at ingest time.
+   *  - Match by nameEn first, then by sourceUrl (single match only) — a
+   *    sourceUrl match with a different nameEn is treated as a safe rename.
+   *  - Never overwrite a populated existing field (fill-empty only), so a
+   *    re-seed can't clobber an operator's manual edits or enrichments.
+   */
+  async function applyRecord(input: ScholarshipInput | Prisma.ScholarshipCreateInput) {
+    const incoming = normalizeRecord(input as unknown as ScholarshipLike);
+    const nameEn = String(incoming.nameEn ?? "");
+
+    let existing = await prisma.scholarship.findUnique({ where: { nameEn } });
+    let matchKind: "exact" | "source-url" | "none" = existing ? "exact" : "none";
+
+    if (!existing && incoming.sourceUrl) {
+      const byUrl = await prisma.scholarship.findMany({
+        where: { sourceUrl: String(incoming.sourceUrl) },
+      });
+      if (byUrl.length === 1) {
+        existing = byUrl[0] ?? null;
+        matchKind = "source-url";
+      }
+    }
+
+    if (!existing) {
+      await prisma.scholarship.create({
+        data: incoming as unknown as Prisma.ScholarshipCreateInput,
+      });
+      stats.created += 1;
+      return;
+    }
+
+    const merge = mergeScholarship(existing, incoming, { force: false });
+    const data = merge.update as unknown as Prisma.ScholarshipUpdateInput;
+
+    if (matchKind === "source-url" && existing.nameEn !== nameEn) {
+      data.nameEn = nameEn;
+      stats.renamed += 1;
+    }
+
+    if (Object.keys(merge.update).length === 0 && !data.nameEn) {
+      stats.unchanged += 1;
+      return;
+    }
+
+    await prisma.scholarship.update({ where: { id: existing.id }, data });
+    stats.updated += 1;
+    stats.keptFields += merge.kept.length;
   }
+
+  for (const s of scholarships) await applyRecord(s);
 
   console.log(`Seeding ${scrapedScholarships.length} scraped scholarships...`);
-  for (const s of scrapedScholarships) {
-    await prisma.scholarship.upsert({
-      where: { nameEn: s.nameEn },
-      update: s,
-      create: s,
-    });
-  }
+  for (const s of scrapedScholarships) await applyRecord(s);
 
   const count = await prisma.scholarship.count();
-  console.log(`Done. Total scholarships: ${count}`);
+  console.log(
+    `Done. Total scholarships: ${count} ` +
+      `(created=${stats.created}, updated=${stats.updated}, ` +
+      `renamed=${stats.renamed}, unchanged=${stats.unchanged}, ` +
+      `kept-conflicts=${stats.keptFields})`
+  );
 }
 
 main()
