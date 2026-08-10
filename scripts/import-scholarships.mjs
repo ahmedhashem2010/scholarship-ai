@@ -17,11 +17,14 @@ import {
  *   node scripts/import-scholarships.mjs ./data/new-scholarships.json --apply
  *   node scripts/import-scholarships.mjs ./data/new-scholarships.json --apply --force
  *   node scripts/import-scholarships.mjs ./data/new-scholarships.json --json
+ *   npx tsx scripts/import-scholarships.mjs prisma/priority-scholarships-2026.ts  # priority 2026–27 dataset (dry run)
  *
  * File formats (auto-detected by extension):
  *   .json   — a bare array, or { scholarships: [...] } / { records: [...] }
  *   .cjs/.js/.mjs/.ts — a module whose default/named export is an array
- *                       (run .ts files through `npx tsx`).
+ *                       (run .ts files through `npx tsx`). Recognised named
+ *                       exports: `scholarships`, `records`,
+ *                       `priorityScholarships2026`.
  *
  * Behaviour (shared with prisma/seed.ts via scripts/lib/scholarship-data.mjs):
  *   - Identity is nameEn. An incoming record matching an existing nameEn is an
@@ -60,7 +63,11 @@ async function loadRecords(file) {
   }
   try {
     const mod = await import(`${pathToFileURL(file).href}?t=${Date.now()}`);
-    const value = mod.default ?? mod.scholarships ?? mod.records;
+    const value =
+      mod.default ??
+      mod.priorityScholarships2026 ??
+      mod.scholarships ??
+      mod.records;
     if (Array.isArray(value)) return value;
     throw new Error(`Module export is not an array (file: ${file})`);
   } catch (err) {
