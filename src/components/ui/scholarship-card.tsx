@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -7,7 +8,18 @@ import { Button } from "@/components/ui/button";
 import { FitScore } from "@/components/ui/fit-score";
 import { DeadlineIndicator } from "@/components/ui/deadline-indicator";
 import { HelpTooltip } from "@/components/help-tooltip";
-import { ArrowRight, GraduationCap, Building2, Award, TrendingUp } from "lucide-react";
+import {
+  ArrowRight,
+  GraduationCap,
+  Building2,
+  Award,
+  TrendingUp,
+  CheckCircle2,
+  AlertTriangle,
+  Flame,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { MatchResult } from "@/lib/scholarship-matcher";
 
@@ -40,6 +52,43 @@ function getTotalValue(benefits: string | null): string {
   } catch { return "Full Scholarship"; }
 }
 
+/**
+ * Reasons carry a status prefix from the matcher ("✓", "⚠", "🔥"). Render the
+ * prefix as a coloured icon and show the bare evidence text, so the card never
+ * invents a fact — the wording is exactly what the matcher emitted.
+ */
+type ReasonTone = "good" | "warn" | "hot" | "neutral";
+
+function reasonTone(reason: string): ReasonTone {
+  if (reason.startsWith("🔥")) return "hot";
+  if (reason.startsWith("⚠")) return "warn";
+  if (reason.startsWith("✓")) return "good";
+  return "neutral";
+}
+
+function reasonText(reason: string): string {
+  return reason
+    .replace(/^[✓⚠🔥✗]\s*/, "")
+    .replace(/^(Your|Open to|Accepts) /, "");
+}
+
+function ReasonIcon({ tone }: { tone: ReasonTone }) {
+  const cls =
+    tone === "good"
+      ? "text-success"
+      : tone === "warn"
+        ? "text-[rgb(var(--accent-warm))]"
+        : tone === "hot"
+          ? "text-[rgb(var(--accent-warm))]"
+          : "text-muted-foreground/60";
+  if (tone === "hot") return <Flame className={cn("mt-0.5 h-3.5 w-3.5 shrink-0", cls)} />;
+  if (tone === "warn") return <AlertTriangle className={cn("mt-0.5 h-3.5 w-3.5 shrink-0", cls)} />;
+  return <CheckCircle2 className={cn("mt-0.5 h-3.5 w-3.5 shrink-0", cls)} />;
+}
+
+/** Reasons shown before "Show all": keeps cards short on mobile. */
+const DEFAULT_REASON_COUNT = 3;
+
 interface ScholarshipCardProps {
   match: MatchResult;
   index: number;
@@ -59,6 +108,9 @@ export function ScholarshipCard({
 }: ScholarshipCardProps) {
   const sch = match.scholarship;
   const rankEmojis = ["🥇", "🥈", "🥉"];
+  const [showAllReasons, setShowAllReasons] = useState(false);
+  const visibleReasons =
+    showAllReasons ? match.reasons : match.reasons.slice(0, DEFAULT_REASON_COUNT);
 
   return (
     <Card className={cn("flex flex-col card-hover group", isSelected && "ring-2 ring-primary", className)}>
@@ -101,13 +153,32 @@ export function ScholarshipCard({
             Why this fits you
           </p>
           <ul className="space-y-1.5">
-            {match.reasons.slice(0, 3).map((r, i) => (
+            {visibleReasons.map((r, i) => (
               <li key={i} className="text-xs text-white/70 flex items-start gap-1.5">
-                <span className="text-success mt-0.5 shrink-0">•</span>
-                <span>{r.replace(/^(Your|Open to|Accepts) /, "")}</span>
+                <ReasonIcon tone={reasonTone(r)} />
+                <span>{reasonText(r)}</span>
               </li>
             ))}
           </ul>
+          {match.reasons.length > DEFAULT_REASON_COUNT && (
+            <button
+              type="button"
+              onClick={() => setShowAllReasons((v) => !v)}
+              className="inline-flex items-center gap-1 text-[11px] font-medium text-primary hover:underline"
+            >
+              {showAllReasons ? (
+                <>
+                  Show fewer
+                  <ChevronUp className="h-3 w-3" />
+                </>
+              ) : (
+                <>
+                  Show all reasons ({match.reasons.length})
+                  <ChevronDown className="h-3 w-3" />
+                </>
+              )}
+            </button>
+          )}
         </div>
 
         <div className="flex items-center justify-between gap-2">
@@ -141,12 +212,14 @@ export function ScholarshipCard({
             <span className="text-[11px] text-muted-foreground">Compare</span>
           </label>
         )}
-        <Link href={`/dashboard/applications/${sch.id}`} className="flex-1">
-          <Button size="sm" className="w-full gap-1.5 text-xs group/btn">
-            Start Application
-            <ArrowRight className="h-3 w-3 transition-transform group-hover/btn:translate-x-0.5" />
-          </Button>
-        </Link>
+        {match.isEligible && (
+          <Link href={`/dashboard/applications/${sch.id}`} className="flex-1">
+            <Button size="sm" className="w-full gap-1.5 text-xs group/btn">
+              Start Application
+              <ArrowRight className="h-3 w-3 transition-transform group-hover/btn:translate-x-0.5" />
+            </Button>
+          </Link>
+        )}
         <Link href={`/scholarships/${sch.id}`}>
           <Button variant="outline" size="sm" className="text-xs">Details</Button>
         </Link>

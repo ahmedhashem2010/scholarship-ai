@@ -24,6 +24,10 @@ export const scholarshipCreateSchema = z.object({
   requirements: z.string().optional(),
   benefits: z.string().optional(),
   sourceUrl: z.string().optional().or(z.literal("")),
+  // Official links — validated as real URLs so an aggregator listing can never
+  // be written into the field the UI renders as the "official" one.
+  officialWebsite: z.string().url({ message: "رابط الموقع الرسمي غير صالح" }).optional().or(z.literal("")),
+  applicationUrl: z.string().url({ message: "رابط التقديم غير صالح" }).optional().or(z.literal("")),
 });
 
 export const scholarshipUpdateSchema = scholarshipCreateSchema.partial();

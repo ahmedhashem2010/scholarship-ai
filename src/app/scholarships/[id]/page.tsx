@@ -13,6 +13,11 @@ import { Nav } from "@/components/nav";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useProfile } from "@/lib/profile-context";
 import { generateRoadmap, type Milestone } from "@/lib/roadmap-generator";
+import {
+  resolveSourceLinks,
+  hostOf,
+  AGGREGATOR_LABELS,
+} from "@/lib/source-links";
 
 /**
  * Scholarship detail.
@@ -43,6 +48,9 @@ interface Scholarship {
   benefits: string | null;
   requirements: string | null;
   sourceUrl: string | null;
+  source: string | null;
+  officialWebsite: string | null;
+  applicationUrl: string | null;
   eligibleCountries: string[];
   eligibleEducation: string[];
   fieldOfStudy: string[];
@@ -245,17 +253,7 @@ export default function ScholarshipDetailPage() {
               </div>
             )}
 
-            {s.sourceUrl && (
-              <a
-                href={s.sourceUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3.5 text-sm font-semibold text-primary-foreground transition hover:opacity-90"
-              >
-                {pick("الصفحة الرسمية", "Official page")}
-                <ExternalLink className="h-4 w-4" />
-              </a>
-            )}
+            <SourceActions s={s} />
 
             <p className="text-center text-xs leading-relaxed text-muted-foreground">
               {pick(
@@ -390,6 +388,73 @@ function Section({ title, children }: { title: string; children: React.ReactNode
       <h2 className="text-base font-semibold text-foreground">{title}</h2>
       <div className="mt-3">{children}</div>
     </section>
+  );
+}
+
+/**
+ * External links, classified so an aggregator listing is never labelled
+ * "official". Priority: official application link > official website > an
+ * honest provenance link to the page the record was scraped from. When no
+ * official URL is known yet we say so, and the listing is clearly a listing.
+ */
+function SourceActions({ s }: { s: Scholarship }) {
+  const { pick } = useLanguage();
+  const { primary, source, hasOfficial } = resolveSourceLinks({
+    sourceUrl: s.sourceUrl,
+    officialWebsite: s.officialWebsite,
+    applicationUrl: s.applicationUrl,
+  });
+
+  return (
+    <div className="space-y-2.5">
+      {primary && (
+        <a
+          href={primary.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3.5 text-sm font-semibold text-primary-foreground transition hover:opacity-90"
+        >
+          {primary.kind === "apply"
+            ? pick("قدّم على الموقع الرسمي", primary.label)
+            : pick("الموقع الرسمي", primary.label)}
+          <ExternalLink className="h-4 w-4" />
+        </a>
+      )}
+
+      {source && !hasOfficial && (
+        <>
+          <a
+            href={source.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-primary/20 px-5 py-3 text-sm font-medium text-foreground transition hover:border-primary/40 hover:bg-primary/5"
+          >
+            {source.kind === "aggregator-listing"
+              ? pick(
+                  `عرض الإعلان على ${AGGREGATOR_LABELS[hostOf(source.href) ?? ""] ?? "موقع المصدر"}`,
+                  source.label
+                )
+              : pick("عرض الصفحة المصدرية", source.label)}
+            <ExternalLink className="h-4 w-4" />
+          </a>
+          <p className="text-center text-xs leading-relaxed text-muted-foreground">
+            {pick(
+              "لم نتحقق من الموقع الرسمي بعد — هذا رابط صفحة الإعلان، راجعه قبل التقديم.",
+              "Official website not verified yet — this is the listing page. Check it before applying."
+            )}
+          </p>
+        </>
+      )}
+
+      {!primary && !source && (
+        <p className="text-center text-xs leading-relaxed text-muted-foreground">
+          {pick(
+            "لا يتوفر رابط خارجي لهذه المنحة حالياً.",
+            "No external link available for this scholarship yet."
+          )}
+        </p>
+      )}
+    </div>
   );
 }
 

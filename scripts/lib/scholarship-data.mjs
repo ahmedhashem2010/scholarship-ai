@@ -37,6 +37,8 @@ export const FIELD_DEFS = {
   benefits: { type: "string", allowNull: true },
   requirements: { type: "string", allowNull: true },
   sourceUrl: { type: "string", allowNull: true },
+  officialWebsite: { type: "string", allowNull: true },
+  applicationUrl: { type: "string", allowNull: true },
   source: { type: "string" },
 };
 

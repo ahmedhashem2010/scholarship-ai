@@ -1,0 +1,4521 @@
+{
+  "generatedAt": "2026-08-10T20:46:33.024Z",
+  "scholarshipCount": 50,
+  "personas": [
+    {
+      "id": "P01",
+      "label": "Egyptian high-school → Bachelor (CS)",
+      "intent": "Basic bachelor applicant, likely eligible for broad programmes.",
+      "profile": {
+        "dateOfBirth": "2009-01-15",
+        "country": "Egypt",
+        "educationLevel": "high-school",
+        "major": "Computer Science",
+        "targetDegree": "bachelor",
+        "englishLevel": "INTERMEDIATE",
+        "hasEnglishTest": "WILLING",
+        "budget": "NONE",
+        "gpa": 3.6,
+        "hasResearch": false,
+        "hasWorkExperience": false
+      },
+      "totalReturned": 27,
+      "eligibleCount": 27,
+      "topEligible": [
+        {
+          "nameEn": "Fully Funded Undergraduate, Master’s & PhD Scholarship in China 2026",
+          "fitScore": 85
+        },
+        {
+          "nameEn": "Russian Government Quota Scholarship (Rossotrudnichestvo)",
+          "fitScore": 81
+        },
+        {
+          "nameEn": "Fully Funded Undergraduate and Postgraduate Scholarships at Curtin University in Australia",
+          "fitScore": 81
+        },
+        {
+          "nameEn": "MAIPs-UniSIRAJ Higher Education Scholarship (Malaysia)",
+          "fitScore": 81
+        },
+        {
+          "nameEn": "Turkiye Burslari Scholarship (Türkiye)",
+          "fitScore": 81
+        },
+        {
+          "nameEn": "Romanian Government Scholarship (MFA Scholarships for non-EU Students)",
+          "fitScore": 81
+        },
+        {
+          "nameEn": "Fully-funded Bachelor's Scholarships in Various Disciplines from Nanyang Technological University in Singapore",
+          "fitScore": 79
+        },
+        {
+          "nameEn": "New Zealand Government Scholarship for International Students 2026",
+          "fitScore": 79
+        },
+        {
+          "nameEn": "Australia Awards Scholarship",
+          "fitScore": 78
+        },
+        {
+          "nameEn": "Chinese Government Scholarship (CSC)",
+          "fitScore": 78
+        }
+      ],
+      "top10": [
+        {
+          "rank": 1,
+          "nameEn": "Fully Funded Undergraduate, Master’s & PhD Scholarship in China 2026",
+          "fitScore": 85,
+          "successProbability": 53,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 17 is within the accepted range",
+            "✓ Your field (Computer Science) aligns with their fields of study",
+            "✓ No minimum GPA requirement",
+            "✓ 52 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 2,
+          "nameEn": "Russian Government Quota Scholarship (Rossotrudnichestvo)",
+          "fitScore": 81,
+          "successProbability": 51,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 17 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لا تشترط اختبار لغة إنجليزية",
+            "✓ 159 days until deadline",
+            "⚠ Has $0 application fee",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 3,
+          "nameEn": "Fully Funded Undergraduate and Postgraduate Scholarships at Curtin University in Australia",
+          "fitScore": 81,
+          "successProbability": 51,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 17 is within the accepted range",
+            "✓ Your field (Computer Science) aligns with their fields of study",
+            "✓ No minimum GPA requirement",
+            "✓ Plenty of time (264 days until deadline)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 4,
+          "nameEn": "MAIPs-UniSIRAJ Higher Education Scholarship (Malaysia)",
+          "fitScore": 81,
+          "successProbability": 51,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 17 is within the accepted range",
+            "✓ Your field (Computer Science) aligns with their fields of study",
+            "✓ No minimum GPA requirement",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية",
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        },
+        {
+          "rank": 5,
+          "nameEn": "Turkiye Burslari Scholarship (Türkiye)",
+          "fitScore": 81,
+          "successProbability": 61,
+          "isEligible": true,
+          "competitionLabel": "Low Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 17 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لا تشترط اختبار لغة إنجليزية",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        },
+        {
+          "rank": 6,
+          "nameEn": "Romanian Government Scholarship (MFA Scholarships for non-EU Students)",
+          "fitScore": 81,
+          "successProbability": 61,
+          "isEligible": true,
+          "competitionLabel": "Low Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 17 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لا تشترط اختبار لغة إنجليزية",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        },
+        {
+          "rank": 7,
+          "nameEn": "Fully-funded Bachelor's Scholarships in Various Disciplines from Nanyang Technological University in Singapore",
+          "fitScore": 79,
+          "successProbability": 50,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 17 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ Plenty of time (222 days until deadline)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 8,
+          "nameEn": "New Zealand Government Scholarship for International Students 2026",
+          "fitScore": 79,
+          "successProbability": 50,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 17 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ Plenty of time (234 days until deadline)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 9,
+          "nameEn": "Australia Awards Scholarship",
+          "fitScore": 78,
+          "successProbability": 49,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 17 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية",
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        },
+        {
+          "rank": 10,
+          "nameEn": "Chinese Government Scholarship (CSC)",
+          "fitScore": 78,
+          "successProbability": 59,
+          "isEligible": true,
+          "competitionLabel": "Low Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 17 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية",
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P02",
+      "label": "Egyptian undergrad → Master (CS, strong GPA)",
+      "intent": "Common Egyptian applicant: good GPA, targeting master's.",
+      "profile": {
+        "dateOfBirth": "2003-05-20",
+        "country": "Egypt",
+        "educationLevel": "bachelor",
+        "major": "Computer Science",
+        "targetDegree": "master",
+        "englishLevel": "ADVANCED",
+        "hasEnglishTest": "YES",
+        "budget": "NONE",
+        "gpa": 3.6,
+        "hasResearch": true,
+        "hasWorkExperience": false
+      },
+      "totalReturned": 40,
+      "eligibleCount": 40,
+      "topEligible": [
+        {
+          "nameEn": "Fully Funded Undergraduate, Master’s & PhD Scholarship in China 2026",
+          "fitScore": 89
+        },
+        {
+          "nameEn": "KAUST Fellowship (Saudi Arabia)",
+          "fitScore": 89
+        },
+        {
+          "nameEn": "Fully Funded Scholarships for Bachelor's, Master's, and PhD in Germany 2026",
+          "fitScore": 88
+        },
+        {
+          "nameEn": "Schwarzman Scholars (China)",
+          "fitScore": 88
+        },
+        {
+          "nameEn": "McCall MacBain Scholarship | Fully Funded Master's Programs at McGill University in Canada",
+          "fitScore": 86
+        },
+        {
+          "nameEn": "Mastercard Foundation Scholarship at the University of Pretoria",
+          "fitScore": 86
+        },
+        {
+          "nameEn": "Knight-Hennessy Scholars (Stanford)",
+          "fitScore": 86
+        },
+        {
+          "nameEn": "Gates Cambridge Scholarship (UK)",
+          "fitScore": 85
+        },
+        {
+          "nameEn": "University of Sydney International Scholarship for Postgraduates Students 2026",
+          "fitScore": 85
+        },
+        {
+          "nameEn": "Fully Funded Research Scholarships at CQUniversity Australia",
+          "fitScore": 85
+        }
+      ],
+      "top10": [
+        {
+          "rank": 1,
+          "nameEn": "Fully Funded Undergraduate, Master’s & PhD Scholarship in China 2026",
+          "fitScore": 89,
+          "successProbability": 65,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ Your field (Computer Science) aligns with their fields of study",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ 52 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 2,
+          "nameEn": "KAUST Fellowship (Saudi Arabia)",
+          "fitScore": 89,
+          "successProbability": 65,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ Your field (Computer Science) aligns with their fields of study",
+            "✓ GPA 3.6 meets the minimum 3",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ Has research experience (preferred)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        },
+        {
+          "rank": 3,
+          "nameEn": "Fully Funded Scholarships for Bachelor's, Master's, and PhD in Germany 2026",
+          "fitScore": 88,
+          "successProbability": 64,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "🔥 Urgent: Only 23 days left to apply!",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 4,
+          "nameEn": "Schwarzman Scholars (China)",
+          "fitScore": 88,
+          "successProbability": 54,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "🔥 Urgent: Only 30 days left to apply!",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 5,
+          "nameEn": "McCall MacBain Scholarship | Fully Funded Master's Programs at McGill University in Canada",
+          "fitScore": 86,
+          "successProbability": 53,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ 45 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 6,
+          "nameEn": "Mastercard Foundation Scholarship at the University of Pretoria",
+          "fitScore": 86,
+          "successProbability": 63,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ 52 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 7,
+          "nameEn": "Knight-Hennessy Scholars (Stanford)",
+          "fitScore": 86,
+          "successProbability": 53,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ 57 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 8,
+          "nameEn": "Gates Cambridge Scholarship (UK)",
+          "fitScore": 85,
+          "successProbability": 53,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ 116 days until deadline",
+            "✓ Has research experience (preferred)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 9,
+          "nameEn": "University of Sydney International Scholarship for Postgraduates Students 2026",
+          "fitScore": 85,
+          "successProbability": 63,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ 131 days until deadline",
+            "✓ Has research experience (preferred)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 10,
+          "nameEn": "Fully Funded Research Scholarships at CQUniversity Australia",
+          "fitScore": 85,
+          "successProbability": 63,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ 143 days until deadline",
+            "✓ Has research experience (preferred)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        }
+      ]
+    },
+    {
+      "id": "P03",
+      "label": "Egyptian graduate → PhD (Engineering, research-heavy)",
+      "intent": "Research-focused PhD candidate with work experience.",
+      "profile": {
+        "dateOfBirth": "1998-11-12",
+        "country": "Egypt",
+        "educationLevel": "master",
+        "major": "Engineering",
+        "targetDegree": "phd",
+        "englishLevel": "ADVANCED",
+        "hasEnglishTest": "YES",
+        "budget": "NONE",
+        "gpa": 3.5,
+        "hasResearch": true,
+        "hasWorkExperience": true
+      },
+      "totalReturned": 32,
+      "eligibleCount": 32,
+      "topEligible": [
+        {
+          "nameEn": "Fully Funded Undergraduate, Master’s & PhD Scholarship in China 2026",
+          "fitScore": 89
+        },
+        {
+          "nameEn": "KAUST Fellowship (Saudi Arabia)",
+          "fitScore": 89
+        },
+        {
+          "nameEn": "Fully Funded Scholarships for Bachelor's, Master's, and PhD in Germany 2026",
+          "fitScore": 88
+        },
+        {
+          "nameEn": "PhD Scholarships for Development Countries Students at the University of Cambridge 2026",
+          "fitScore": 88
+        },
+        {
+          "nameEn": "Knight-Hennessy Scholars (Stanford)",
+          "fitScore": 86
+        },
+        {
+          "nameEn": "Gates Cambridge Scholarship (UK)",
+          "fitScore": 85
+        },
+        {
+          "nameEn": "University of Sydney International Scholarship for Postgraduates Students 2026",
+          "fitScore": 85
+        },
+        {
+          "nameEn": "Fully Funded Research Scholarships at CQUniversity Australia",
+          "fitScore": 85
+        },
+        {
+          "nameEn": "Fully Funded Undergraduate and Postgraduate Scholarships at Curtin University in Australia",
+          "fitScore": 85
+        },
+        {
+          "nameEn": "Government of Turkey Research Scholarships in Different Fields in PhD in Turkey",
+          "fitScore": 84
+        }
+      ],
+      "top10": [
+        {
+          "rank": 1,
+          "nameEn": "Fully Funded Undergraduate, Master’s & PhD Scholarship in China 2026",
+          "fitScore": 89,
+          "successProbability": 70,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts phd students",
+            "✓ Age 27 is within the accepted range",
+            "✓ Your field (Engineering) aligns with their fields of study",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ 52 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 2,
+          "nameEn": "KAUST Fellowship (Saudi Arabia)",
+          "fitScore": 89,
+          "successProbability": 70,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts phd students",
+            "✓ Age 27 is within the accepted range",
+            "✓ Your field (Engineering) aligns with their fields of study",
+            "✓ GPA 3.5 meets the minimum 3",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ Has research experience (preferred)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        },
+        {
+          "rank": 3,
+          "nameEn": "Fully Funded Scholarships for Bachelor's, Master's, and PhD in Germany 2026",
+          "fitScore": 88,
+          "successProbability": 69,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts phd students",
+            "✓ Age 27 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "🔥 Urgent: Only 23 days left to apply!",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 4,
+          "nameEn": "PhD Scholarships for Development Countries Students at the University of Cambridge 2026",
+          "fitScore": 88,
+          "successProbability": 69,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts phd students",
+            "✓ Age 27 is within the accepted range",
+            "✓ Your field (Engineering) aligns with their fields of study",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ 115 days until deadline",
+            "✓ Has research experience (preferred)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 5,
+          "nameEn": "Knight-Hennessy Scholars (Stanford)",
+          "fitScore": 86,
+          "successProbability": 58,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts phd students",
+            "✓ Age 27 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ 57 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 6,
+          "nameEn": "Gates Cambridge Scholarship (UK)",
+          "fitScore": 85,
+          "successProbability": 58,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts phd students",
+            "✓ Age 27 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ 116 days until deadline",
+            "✓ Has research experience (preferred)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 7,
+          "nameEn": "University of Sydney International Scholarship for Postgraduates Students 2026",
+          "fitScore": 85,
+          "successProbability": 68,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts phd students",
+            "✓ Age 27 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ 131 days until deadline",
+            "✓ Has research experience (preferred)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 8,
+          "nameEn": "Fully Funded Research Scholarships at CQUniversity Australia",
+          "fitScore": 85,
+          "successProbability": 68,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts phd students",
+            "✓ Age 27 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ 143 days until deadline",
+            "✓ Has research experience (preferred)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 9,
+          "nameEn": "Fully Funded Undergraduate and Postgraduate Scholarships at Curtin University in Australia",
+          "fitScore": 85,
+          "successProbability": 68,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts phd students",
+            "✓ Age 27 is within the accepted range",
+            "✓ Your field (Engineering) aligns with their fields of study",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ Plenty of time (264 days until deadline)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 10,
+          "nameEn": "Government of Turkey Research Scholarships in Different Fields in PhD in Turkey",
+          "fitScore": 84,
+          "successProbability": 57,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts phd students",
+            "✓ Age 27 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ Plenty of time (195 days until deadline)",
+            "✓ Has research experience (preferred)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        }
+      ]
+    },
+    {
+      "id": "P04",
+      "label": "Saudi undergrad → Master (Business)",
+      "intent": "Gulf applicant; some scholarships are MENA-only, some 'All'.",
+      "profile": {
+        "dateOfBirth": "2002-07-01",
+        "country": "Saudi Arabia",
+        "educationLevel": "bachelor",
+        "major": "Business Administration",
+        "targetDegree": "master",
+        "englishLevel": "ADVANCED",
+        "hasEnglishTest": "YES",
+        "budget": "MODERATE",
+        "gpa": 3.2,
+        "hasResearch": false,
+        "hasWorkExperience": true
+      },
+      "totalReturned": 38,
+      "eligibleCount": 38,
+      "topEligible": [
+        {
+          "nameEn": "Fully Funded Scholarships for Bachelor's, Master's, and PhD in Germany 2026",
+          "fitScore": 83
+        },
+        {
+          "nameEn": "Schwarzman Scholars (China)",
+          "fitScore": 83
+        },
+        {
+          "nameEn": "Fully Funded ADB Master's Scholarship in Asia and Pacific 2026",
+          "fitScore": 83
+        },
+        {
+          "nameEn": "Chevening Scholarship (UK Government)",
+          "fitScore": 82
+        },
+        {
+          "nameEn": "McCall MacBain Scholarship | Fully Funded Master's Programs at McGill University in Canada",
+          "fitScore": 81
+        },
+        {
+          "nameEn": "Knight-Hennessy Scholars (Stanford)",
+          "fitScore": 81
+        },
+        {
+          "nameEn": "Fully Funded Undergraduate and Postgraduate Scholarships at Curtin University in Australia",
+          "fitScore": 80
+        },
+        {
+          "nameEn": "Eric Bleumink Fund Scholarship for International Masters Students at the University of Groningen",
+          "fitScore": 79
+        },
+        {
+          "nameEn": "Russian Government Quota Scholarship (Rossotrudnichestvo)",
+          "fitScore": 79
+        },
+        {
+          "nameEn": "MAIPs-UniSIRAJ Higher Education Scholarship (Malaysia)",
+          "fitScore": 79
+        }
+      ],
+      "top10": [
+        {
+          "rank": 1,
+          "nameEn": "Fully Funded Scholarships for Bachelor's, Master's, and PhD in Germany 2026",
+          "fitScore": 83,
+          "successProbability": 52,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Saudi Arabia is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 24 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "🔥 Urgent: Only 23 days left to apply!",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 2,
+          "nameEn": "Schwarzman Scholars (China)",
+          "fitScore": 83,
+          "successProbability": 42,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Saudi Arabia is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 24 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "🔥 Urgent: Only 30 days left to apply!",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 3,
+          "nameEn": "Fully Funded ADB Master's Scholarship in Asia and Pacific 2026",
+          "fitScore": 83,
+          "successProbability": 42,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Saudi Arabia is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 24 is within the accepted range",
+            "✓ Your field (Business Administration) aligns with their fields of study",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ 143 days until deadline",
+            "✓ Has work experience (required)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 4,
+          "nameEn": "Chevening Scholarship (UK Government)",
+          "fitScore": 82,
+          "successProbability": 41,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Saudi Arabia is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 24 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ 57 days until deadline — start soon",
+            "✓ Has work experience (required)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 5,
+          "nameEn": "McCall MacBain Scholarship | Fully Funded Master's Programs at McGill University in Canada",
+          "fitScore": 81,
+          "successProbability": 41,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Saudi Arabia is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 24 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ 45 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 6,
+          "nameEn": "Knight-Hennessy Scholars (Stanford)",
+          "fitScore": 81,
+          "successProbability": 41,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Saudi Arabia is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 24 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ 57 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 7,
+          "nameEn": "Fully Funded Undergraduate and Postgraduate Scholarships at Curtin University in Australia",
+          "fitScore": 80,
+          "successProbability": 50,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Saudi Arabia is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 24 is within the accepted range",
+            "✓ Your field (Business Administration) aligns with their fields of study",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ Plenty of time (264 days until deadline)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 8,
+          "nameEn": "Eric Bleumink Fund Scholarship for International Masters Students at the University of Groningen",
+          "fitScore": 79,
+          "successProbability": 40,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Saudi Arabia is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 24 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ 114 days until deadline",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 9,
+          "nameEn": "Russian Government Quota Scholarship (Rossotrudnichestvo)",
+          "fitScore": 79,
+          "successProbability": 50,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Saudi Arabia is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 24 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ 159 days until deadline",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 10,
+          "nameEn": "MAIPs-UniSIRAJ Higher Education Scholarship (Malaysia)",
+          "fitScore": 79,
+          "successProbability": 50,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Saudi Arabia is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 24 is within the accepted range",
+            "✓ Your field (Business Administration) aligns with their fields of study",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P05",
+      "label": "Indian applicant (excluded by Arab/MENA-restricted scholarships)",
+      "intent": "Country not on several MENA-only lists — tests hard country exclusion.",
+      "profile": {
+        "dateOfBirth": "2002-07-01",
+        "country": "India",
+        "educationLevel": "bachelor",
+        "major": "Engineering",
+        "targetDegree": "master",
+        "englishLevel": "ADVANCED",
+        "hasEnglishTest": "YES",
+        "budget": "NONE",
+        "gpa": 3.7,
+        "hasResearch": false,
+        "hasWorkExperience": false
+      },
+      "totalReturned": 27,
+      "eligibleCount": 27,
+      "topEligible": [
+        {
+          "nameEn": "Fully Funded Undergraduate, Master’s & PhD Scholarship in China 2026",
+          "fitScore": 89
+        },
+        {
+          "nameEn": "Fully Funded Scholarships for Bachelor's, Master's, and PhD in Germany 2026",
+          "fitScore": 88
+        },
+        {
+          "nameEn": "Schwarzman Scholars (China)",
+          "fitScore": 88
+        },
+        {
+          "nameEn": "McCall MacBain Scholarship | Fully Funded Master's Programs at McGill University in Canada",
+          "fitScore": 86
+        },
+        {
+          "nameEn": "Knight-Hennessy Scholars (Stanford)",
+          "fitScore": 86
+        },
+        {
+          "nameEn": "Fully Funded Undergraduate and Postgraduate Scholarships at Curtin University in Australia",
+          "fitScore": 85
+        },
+        {
+          "nameEn": "Eric Bleumink Fund Scholarship for International Masters Students at the University of Groningen",
+          "fitScore": 84
+        },
+        {
+          "nameEn": "Fully Funded ADB Master's Scholarship in Asia and Pacific 2026",
+          "fitScore": 83
+        },
+        {
+          "nameEn": "New Zealand Government Scholarship for International Students 2026",
+          "fitScore": 83
+        },
+        {
+          "nameEn": "Russian Government Quota Scholarship (Rossotrudnichestvo)",
+          "fitScore": 82
+        }
+      ],
+      "top10": [
+        {
+          "rank": 1,
+          "nameEn": "Fully Funded Undergraduate, Master’s & PhD Scholarship in China 2026",
+          "fitScore": 89,
+          "successProbability": 60,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ India is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 24 is within the accepted range",
+            "✓ Your field (Engineering) aligns with their fields of study",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ 52 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 2,
+          "nameEn": "Fully Funded Scholarships for Bachelor's, Master's, and PhD in Germany 2026",
+          "fitScore": 88,
+          "successProbability": 59,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ India is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 24 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "🔥 Urgent: Only 23 days left to apply!",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 3,
+          "nameEn": "Schwarzman Scholars (China)",
+          "fitScore": 88,
+          "successProbability": 49,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ India is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 24 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "🔥 Urgent: Only 30 days left to apply!",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 4,
+          "nameEn": "McCall MacBain Scholarship | Fully Funded Master's Programs at McGill University in Canada",
+          "fitScore": 86,
+          "successProbability": 48,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ India is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 24 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ 45 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 5,
+          "nameEn": "Knight-Hennessy Scholars (Stanford)",
+          "fitScore": 86,
+          "successProbability": 48,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ India is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 24 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ 57 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 6,
+          "nameEn": "Fully Funded Undergraduate and Postgraduate Scholarships at Curtin University in Australia",
+          "fitScore": 85,
+          "successProbability": 58,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ India is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 24 is within the accepted range",
+            "✓ Your field (Engineering) aligns with their fields of study",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ Plenty of time (264 days until deadline)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 7,
+          "nameEn": "Eric Bleumink Fund Scholarship for International Masters Students at the University of Groningen",
+          "fitScore": 84,
+          "successProbability": 47,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ India is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 24 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ 114 days until deadline",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 8,
+          "nameEn": "Fully Funded ADB Master's Scholarship in Asia and Pacific 2026",
+          "fitScore": 83,
+          "successProbability": 47,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ India is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 24 is within the accepted range",
+            "✓ Your field (Engineering) aligns with their fields of study",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ 143 days until deadline",
+            "⚠ Work experience preferred",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 9,
+          "nameEn": "New Zealand Government Scholarship for International Students 2026",
+          "fitScore": 83,
+          "successProbability": 57,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ India is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 24 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ Plenty of time (234 days until deadline)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 10,
+          "nameEn": "Russian Government Quota Scholarship (Rossotrudnichestvo)",
+          "fitScore": 82,
+          "successProbability": 56,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ India is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 24 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ 159 days until deadline",
+            "⚠ Has $0 application fee",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        }
+      ]
+    },
+    {
+      "id": "P06",
+      "label": "Above-max-age applicant (40)",
+      "intent": "Exceeds maximumAge on the 4 scholarships that set an upper bound.",
+      "profile": {
+        "dateOfBirth": "1986-08-09",
+        "country": "Egypt",
+        "educationLevel": "master",
+        "major": "Engineering",
+        "targetDegree": "phd",
+        "englishLevel": "INTERMEDIATE",
+        "hasEnglishTest": "WILLING",
+        "budget": "NONE",
+        "gpa": 3,
+        "hasResearch": true,
+        "hasWorkExperience": true
+      },
+      "totalReturned": 29,
+      "eligibleCount": 29,
+      "topEligible": [
+        {
+          "nameEn": "Fully Funded Undergraduate, Master’s & PhD Scholarship in China 2026",
+          "fitScore": 85
+        },
+        {
+          "nameEn": "KAUST Fellowship (Saudi Arabia)",
+          "fitScore": 85
+        },
+        {
+          "nameEn": "Fully Funded Scholarships for Bachelor's, Master's, and PhD in Germany 2026",
+          "fitScore": 84
+        },
+        {
+          "nameEn": "PhD Scholarships for Development Countries Students at the University of Cambridge 2026",
+          "fitScore": 84
+        },
+        {
+          "nameEn": "Knight-Hennessy Scholars (Stanford)",
+          "fitScore": 82
+        },
+        {
+          "nameEn": "Gates Cambridge Scholarship (UK)",
+          "fitScore": 81
+        },
+        {
+          "nameEn": "University of Sydney International Scholarship for Postgraduates Students 2026",
+          "fitScore": 81
+        },
+        {
+          "nameEn": "Fully Funded Research Scholarships at CQUniversity Australia",
+          "fitScore": 81
+        },
+        {
+          "nameEn": "Russian Government Quota Scholarship (Rossotrudnichestvo)",
+          "fitScore": 81
+        },
+        {
+          "nameEn": "Fully Funded Undergraduate and Postgraduate Scholarships at Curtin University in Australia",
+          "fitScore": 81
+        }
+      ],
+      "top10": [
+        {
+          "rank": 1,
+          "nameEn": "Fully Funded Undergraduate, Master’s & PhD Scholarship in China 2026",
+          "fitScore": 85,
+          "successProbability": 53,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts phd students",
+            "✓ Age 40 is within the accepted range",
+            "✓ Your field (Engineering) aligns with their fields of study",
+            "✓ No minimum GPA requirement",
+            "✓ 52 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 2,
+          "nameEn": "KAUST Fellowship (Saudi Arabia)",
+          "fitScore": 85,
+          "successProbability": 53,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts phd students",
+            "✓ Age 40 is within the accepted range",
+            "✓ Your field (Engineering) aligns with their fields of study",
+            "✓ GPA 3 meets the minimum 3",
+            "✓ Has research experience (preferred)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية",
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        },
+        {
+          "rank": 3,
+          "nameEn": "Fully Funded Scholarships for Bachelor's, Master's, and PhD in Germany 2026",
+          "fitScore": 84,
+          "successProbability": 52,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts phd students",
+            "✓ Age 40 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "🔥 Urgent: Only 23 days left to apply!",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 4,
+          "nameEn": "PhD Scholarships for Development Countries Students at the University of Cambridge 2026",
+          "fitScore": 84,
+          "successProbability": 52,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts phd students",
+            "✓ Age 40 is within the accepted range",
+            "✓ Your field (Engineering) aligns with their fields of study",
+            "✓ No minimum GPA requirement",
+            "✓ 115 days until deadline",
+            "✓ Has research experience (preferred)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 5,
+          "nameEn": "Knight-Hennessy Scholars (Stanford)",
+          "fitScore": 82,
+          "successProbability": 41,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts phd students",
+            "✓ Age 40 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ 57 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 6,
+          "nameEn": "Gates Cambridge Scholarship (UK)",
+          "fitScore": 81,
+          "successProbability": 41,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts phd students",
+            "✓ Age 40 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ 116 days until deadline",
+            "✓ Has research experience (preferred)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 7,
+          "nameEn": "University of Sydney International Scholarship for Postgraduates Students 2026",
+          "fitScore": 81,
+          "successProbability": 51,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts phd students",
+            "✓ Age 40 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ 131 days until deadline",
+            "✓ Has research experience (preferred)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 8,
+          "nameEn": "Fully Funded Research Scholarships at CQUniversity Australia",
+          "fitScore": 81,
+          "successProbability": 51,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts phd students",
+            "✓ Age 40 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ 143 days until deadline",
+            "✓ Has research experience (preferred)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 9,
+          "nameEn": "Russian Government Quota Scholarship (Rossotrudnichestvo)",
+          "fitScore": 81,
+          "successProbability": 51,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts phd students",
+            "✓ Age 40 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لا تشترط اختبار لغة إنجليزية",
+            "✓ 159 days until deadline",
+            "⚠ Has $0 application fee",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 10,
+          "nameEn": "Fully Funded Undergraduate and Postgraduate Scholarships at Curtin University in Australia",
+          "fitScore": 81,
+          "successProbability": 51,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts phd students",
+            "✓ Age 40 is within the accepted range",
+            "✓ Your field (Engineering) aligns with their fields of study",
+            "✓ No minimum GPA requirement",
+            "✓ Plenty of time (264 days until deadline)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P07",
+      "label": "Below-min-age applicant (15)",
+      "intent": "Younger than the minimumAge on the 4 scholarships that set a bound.",
+      "profile": {
+        "dateOfBirth": "2011-06-30",
+        "country": "Egypt",
+        "educationLevel": "high-school",
+        "major": "Science",
+        "targetDegree": "bachelor",
+        "englishLevel": "BEGINNER",
+        "hasEnglishTest": "PREFER_WITHOUT",
+        "budget": "NONE",
+        "gpa": null,
+        "hasResearch": false,
+        "hasWorkExperience": false
+      },
+      "totalReturned": 26,
+      "eligibleCount": 26,
+      "topEligible": [
+        {
+          "nameEn": "Russian Government Quota Scholarship (Rossotrudnichestvo)",
+          "fitScore": 86
+        },
+        {
+          "nameEn": "Turkiye Burslari Scholarship (Türkiye)",
+          "fitScore": 86
+        },
+        {
+          "nameEn": "Romanian Government Scholarship (MFA Scholarships for non-EU Students)",
+          "fitScore": 86
+        },
+        {
+          "nameEn": "Fully Funded Undergraduate and Postgraduate Scholarships at Curtin University in Australia",
+          "fitScore": 79
+        },
+        {
+          "nameEn": "Fully-funded Bachelor's Scholarships in Various Disciplines from Nanyang Technological University in Singapore",
+          "fitScore": 76
+        },
+        {
+          "nameEn": "New Zealand Government Scholarship for International Students 2026",
+          "fitScore": 76
+        },
+        {
+          "nameEn": "Australia Awards Scholarship",
+          "fitScore": 75
+        },
+        {
+          "nameEn": "Chinese Government Scholarship (CSC)",
+          "fitScore": 75
+        },
+        {
+          "nameEn": "Stipendium Hungaricum Scholarship",
+          "fitScore": 75
+        },
+        {
+          "nameEn": "Greek Government Scholarship (IKY — Foreign Nationals)",
+          "fitScore": 75
+        }
+      ],
+      "top10": [
+        {
+          "rank": 1,
+          "nameEn": "Russian Government Quota Scholarship (Rossotrudnichestvo)",
+          "fitScore": 86,
+          "successProbability": 43,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 15 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لا تشترط اختبار لغة إنجليزية / No English test required",
+            "✓ 159 days until deadline",
+            "⚠ Has $0 application fee",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 2,
+          "nameEn": "Turkiye Burslari Scholarship (Türkiye)",
+          "fitScore": 86,
+          "successProbability": 53,
+          "isEligible": true,
+          "competitionLabel": "Low Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 15 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لا تشترط اختبار لغة إنجليزية / No English test required",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        },
+        {
+          "rank": 3,
+          "nameEn": "Romanian Government Scholarship (MFA Scholarships for non-EU Students)",
+          "fitScore": 86,
+          "successProbability": 53,
+          "isEligible": true,
+          "competitionLabel": "Low Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 15 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لا تشترط اختبار لغة إنجليزية / No English test required",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        },
+        {
+          "rank": 4,
+          "nameEn": "Fully Funded Undergraduate and Postgraduate Scholarships at Curtin University in Australia",
+          "fitScore": 79,
+          "successProbability": 40,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 15 is within the accepted range",
+            "✓ Your field (Science) aligns with their fields of study",
+            "✓ No minimum GPA requirement",
+            "⚠ تشترط اختبار إنجليزية — وأنت تفضّل تجنّبه",
+            "✓ Plenty of time (264 days until deadline)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 5,
+          "nameEn": "Fully-funded Bachelor's Scholarships in Various Disciplines from Nanyang Technological University in Singapore",
+          "fitScore": 76,
+          "successProbability": 38,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 15 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "⚠ تشترط اختبار إنجليزية — وأنت تفضّل تجنّبه",
+            "✓ Plenty of time (222 days until deadline)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 6,
+          "nameEn": "New Zealand Government Scholarship for International Students 2026",
+          "fitScore": 76,
+          "successProbability": 38,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 15 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "⚠ تشترط اختبار إنجليزية — وأنت تفضّل تجنّبه",
+            "✓ Plenty of time (234 days until deadline)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 7,
+          "nameEn": "Australia Awards Scholarship",
+          "fitScore": 75,
+          "successProbability": 38,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 15 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "⚠ تشترط اختبار إنجليزية — وأنت تفضّل تجنّبه",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        },
+        {
+          "rank": 8,
+          "nameEn": "Chinese Government Scholarship (CSC)",
+          "fitScore": 75,
+          "successProbability": 48,
+          "isEligible": true,
+          "competitionLabel": "Low Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 15 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "⚠ تشترط اختبار إنجليزية — وأنت تفضّل تجنّبه",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        },
+        {
+          "rank": 9,
+          "nameEn": "Stipendium Hungaricum Scholarship",
+          "fitScore": 75,
+          "successProbability": 48,
+          "isEligible": true,
+          "competitionLabel": "Low Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 15 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "⚠ تشترط اختبار إنجليزية — وأنت تفضّل تجنّبه",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        },
+        {
+          "rank": 10,
+          "nameEn": "Greek Government Scholarship (IKY — Foreign Nationals)",
+          "fitScore": 75,
+          "successProbability": 38,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 15 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "⚠ تشترط اختبار إنجليزية — وأنت تفضّل تجنّبه",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P08",
+      "label": "GPA below the single minimum (2.5 vs 3.0)",
+      "intent": "Below minimumGPA on the only scholarship that sets one.",
+      "profile": {
+        "dateOfBirth": "2003-05-20",
+        "country": "Egypt",
+        "educationLevel": "bachelor",
+        "major": "Business Administration",
+        "targetDegree": "master",
+        "englishLevel": "INTERMEDIATE",
+        "hasEnglishTest": "WILLING",
+        "budget": "NONE",
+        "gpa": 2.5,
+        "hasResearch": false,
+        "hasWorkExperience": false
+      },
+      "totalReturned": 39,
+      "eligibleCount": 39,
+      "topEligible": [
+        {
+          "nameEn": "Fully Funded Scholarships for Bachelor's, Master's, and PhD in Germany 2026",
+          "fitScore": 84
+        },
+        {
+          "nameEn": "Schwarzman Scholars (China)",
+          "fitScore": 84
+        },
+        {
+          "nameEn": "McCall MacBain Scholarship | Fully Funded Master's Programs at McGill University in Canada",
+          "fitScore": 82
+        },
+        {
+          "nameEn": "Mastercard Foundation Scholarship at the University of Pretoria",
+          "fitScore": 82
+        },
+        {
+          "nameEn": "Knight-Hennessy Scholars (Stanford)",
+          "fitScore": 82
+        },
+        {
+          "nameEn": "Russian Government Quota Scholarship (Rossotrudnichestvo)",
+          "fitScore": 81
+        },
+        {
+          "nameEn": "Fully Funded Undergraduate and Postgraduate Scholarships at Curtin University in Australia",
+          "fitScore": 81
+        },
+        {
+          "nameEn": "MAIPs-UniSIRAJ Higher Education Scholarship (Malaysia)",
+          "fitScore": 81
+        },
+        {
+          "nameEn": "Turkiye Burslari Scholarship (Türkiye)",
+          "fitScore": 81
+        },
+        {
+          "nameEn": "Romanian Government Scholarship (MFA Scholarships for non-EU Students)",
+          "fitScore": 81
+        }
+      ],
+      "top10": [
+        {
+          "rank": 1,
+          "nameEn": "Fully Funded Scholarships for Bachelor's, Master's, and PhD in Germany 2026",
+          "fitScore": 84,
+          "successProbability": 42,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "🔥 Urgent: Only 23 days left to apply!",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 2,
+          "nameEn": "Schwarzman Scholars (China)",
+          "fitScore": 84,
+          "successProbability": 32,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "🔥 Urgent: Only 30 days left to apply!",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 3,
+          "nameEn": "McCall MacBain Scholarship | Fully Funded Master's Programs at McGill University in Canada",
+          "fitScore": 82,
+          "successProbability": 31,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ 45 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 4,
+          "nameEn": "Mastercard Foundation Scholarship at the University of Pretoria",
+          "fitScore": 82,
+          "successProbability": 41,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ 52 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 5,
+          "nameEn": "Knight-Hennessy Scholars (Stanford)",
+          "fitScore": 82,
+          "successProbability": 31,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ 57 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 6,
+          "nameEn": "Russian Government Quota Scholarship (Rossotrudnichestvo)",
+          "fitScore": 81,
+          "successProbability": 41,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لا تشترط اختبار لغة إنجليزية",
+            "✓ 159 days until deadline",
+            "⚠ Has $0 application fee",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 7,
+          "nameEn": "Fully Funded Undergraduate and Postgraduate Scholarships at Curtin University in Australia",
+          "fitScore": 81,
+          "successProbability": 41,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ Your field (Business Administration) aligns with their fields of study",
+            "✓ No minimum GPA requirement",
+            "✓ Plenty of time (264 days until deadline)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 8,
+          "nameEn": "MAIPs-UniSIRAJ Higher Education Scholarship (Malaysia)",
+          "fitScore": 81,
+          "successProbability": 41,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ Your field (Business Administration) aligns with their fields of study",
+            "✓ No minimum GPA requirement",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية",
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        },
+        {
+          "rank": 9,
+          "nameEn": "Turkiye Burslari Scholarship (Türkiye)",
+          "fitScore": 81,
+          "successProbability": 51,
+          "isEligible": true,
+          "competitionLabel": "Low Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لا تشترط اختبار لغة إنجليزية",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        },
+        {
+          "rank": 10,
+          "nameEn": "Romanian Government Scholarship (MFA Scholarships for non-EU Students)",
+          "fitScore": 81,
+          "successProbability": 51,
+          "isEligible": true,
+          "competitionLabel": "Low Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لا تشترط اختبار لغة إنجليزية",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P09",
+      "label": "GPA above the single minimum (3.8)",
+      "intent": "Comfortably clears the 3.0 minimum on the same scholarship.",
+      "profile": {
+        "dateOfBirth": "2003-05-20",
+        "country": "Egypt",
+        "educationLevel": "bachelor",
+        "major": "Business Administration",
+        "targetDegree": "master",
+        "englishLevel": "ADVANCED",
+        "hasEnglishTest": "YES",
+        "budget": "NONE",
+        "gpa": 3.8,
+        "hasResearch": false,
+        "hasWorkExperience": false
+      },
+      "totalReturned": 40,
+      "eligibleCount": 40,
+      "topEligible": [
+        {
+          "nameEn": "Fully Funded Scholarships for Bachelor's, Master's, and PhD in Germany 2026",
+          "fitScore": 88
+        },
+        {
+          "nameEn": "Schwarzman Scholars (China)",
+          "fitScore": 88
+        },
+        {
+          "nameEn": "McCall MacBain Scholarship | Fully Funded Master's Programs at McGill University in Canada",
+          "fitScore": 86
+        },
+        {
+          "nameEn": "Mastercard Foundation Scholarship at the University of Pretoria",
+          "fitScore": 86
+        },
+        {
+          "nameEn": "Knight-Hennessy Scholars (Stanford)",
+          "fitScore": 86
+        },
+        {
+          "nameEn": "Fully Funded Undergraduate and Postgraduate Scholarships at Curtin University in Australia",
+          "fitScore": 85
+        },
+        {
+          "nameEn": "MAIPs-UniSIRAJ Higher Education Scholarship (Malaysia)",
+          "fitScore": 85
+        },
+        {
+          "nameEn": "Eric Bleumink Fund Scholarship for International Masters Students at the University of Groningen",
+          "fitScore": 84
+        },
+        {
+          "nameEn": "Fully Funded ADB Master's Scholarship in Asia and Pacific 2026",
+          "fitScore": 83
+        },
+        {
+          "nameEn": "New Zealand Government Scholarship for International Students 2026",
+          "fitScore": 83
+        }
+      ],
+      "top10": [
+        {
+          "rank": 1,
+          "nameEn": "Fully Funded Scholarships for Bachelor's, Master's, and PhD in Germany 2026",
+          "fitScore": 88,
+          "successProbability": 59,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "🔥 Urgent: Only 23 days left to apply!",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 2,
+          "nameEn": "Schwarzman Scholars (China)",
+          "fitScore": 88,
+          "successProbability": 49,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "🔥 Urgent: Only 30 days left to apply!",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 3,
+          "nameEn": "McCall MacBain Scholarship | Fully Funded Master's Programs at McGill University in Canada",
+          "fitScore": 86,
+          "successProbability": 48,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ 45 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 4,
+          "nameEn": "Mastercard Foundation Scholarship at the University of Pretoria",
+          "fitScore": 86,
+          "successProbability": 58,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ 52 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 5,
+          "nameEn": "Knight-Hennessy Scholars (Stanford)",
+          "fitScore": 86,
+          "successProbability": 48,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ 57 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 6,
+          "nameEn": "Fully Funded Undergraduate and Postgraduate Scholarships at Curtin University in Australia",
+          "fitScore": 85,
+          "successProbability": 58,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ Your field (Business Administration) aligns with their fields of study",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ Plenty of time (264 days until deadline)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 7,
+          "nameEn": "MAIPs-UniSIRAJ Higher Education Scholarship (Malaysia)",
+          "fitScore": 85,
+          "successProbability": 58,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ Your field (Business Administration) aligns with their fields of study",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        },
+        {
+          "rank": 8,
+          "nameEn": "Eric Bleumink Fund Scholarship for International Masters Students at the University of Groningen",
+          "fitScore": 84,
+          "successProbability": 47,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ 114 days until deadline",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 9,
+          "nameEn": "Fully Funded ADB Master's Scholarship in Asia and Pacific 2026",
+          "fitScore": 83,
+          "successProbability": 47,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ Your field (Business Administration) aligns with their fields of study",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ 143 days until deadline",
+            "⚠ Work experience preferred",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 10,
+          "nameEn": "New Zealand Government Scholarship for International Students 2026",
+          "fitScore": 83,
+          "successProbability": 57,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ Plenty of time (234 days until deadline)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        }
+      ]
+    },
+    {
+      "id": "P10",
+      "label": "Wrong field (Chemistry vs Business/Human-Rights scholarships)",
+      "intent": "Field not on the 3 narrow field lists; all 'Any' scholarships unaffected.",
+      "profile": {
+        "dateOfBirth": "2003-05-20",
+        "country": "Egypt",
+        "educationLevel": "bachelor",
+        "major": "Chemistry",
+        "targetDegree": "master",
+        "englishLevel": "INTERMEDIATE",
+        "hasEnglishTest": "WILLING",
+        "budget": "NONE",
+        "gpa": 3.4,
+        "hasResearch": false,
+        "hasWorkExperience": false
+      },
+      "totalReturned": 40,
+      "eligibleCount": 40,
+      "topEligible": [
+        {
+          "nameEn": "Fully Funded Undergraduate, Master’s & PhD Scholarship in China 2026",
+          "fitScore": 85
+        },
+        {
+          "nameEn": "Fully Funded Scholarships for Bachelor's, Master's, and PhD in Germany 2026",
+          "fitScore": 84
+        },
+        {
+          "nameEn": "Schwarzman Scholars (China)",
+          "fitScore": 84
+        },
+        {
+          "nameEn": "McCall MacBain Scholarship | Fully Funded Master's Programs at McGill University in Canada",
+          "fitScore": 82
+        },
+        {
+          "nameEn": "Mastercard Foundation Scholarship at the University of Pretoria",
+          "fitScore": 82
+        },
+        {
+          "nameEn": "Knight-Hennessy Scholars (Stanford)",
+          "fitScore": 82
+        },
+        {
+          "nameEn": "Russian Government Quota Scholarship (Rossotrudnichestvo)",
+          "fitScore": 81
+        },
+        {
+          "nameEn": "Turkiye Burslari Scholarship (Türkiye)",
+          "fitScore": 81
+        },
+        {
+          "nameEn": "Romanian Government Scholarship (MFA Scholarships for non-EU Students)",
+          "fitScore": 81
+        },
+        {
+          "nameEn": "Eric Bleumink Fund Scholarship for International Masters Students at the University of Groningen",
+          "fitScore": 80
+        }
+      ],
+      "top10": [
+        {
+          "rank": 1,
+          "nameEn": "Fully Funded Undergraduate, Master’s & PhD Scholarship in China 2026",
+          "fitScore": 85,
+          "successProbability": 43,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ Your field (Chemistry) aligns with their fields of study",
+            "✓ No minimum GPA requirement",
+            "✓ 52 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 2,
+          "nameEn": "Fully Funded Scholarships for Bachelor's, Master's, and PhD in Germany 2026",
+          "fitScore": 84,
+          "successProbability": 42,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "🔥 Urgent: Only 23 days left to apply!",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 3,
+          "nameEn": "Schwarzman Scholars (China)",
+          "fitScore": 84,
+          "successProbability": 32,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "🔥 Urgent: Only 30 days left to apply!",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 4,
+          "nameEn": "McCall MacBain Scholarship | Fully Funded Master's Programs at McGill University in Canada",
+          "fitScore": 82,
+          "successProbability": 31,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ 45 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 5,
+          "nameEn": "Mastercard Foundation Scholarship at the University of Pretoria",
+          "fitScore": 82,
+          "successProbability": 41,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ 52 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 6,
+          "nameEn": "Knight-Hennessy Scholars (Stanford)",
+          "fitScore": 82,
+          "successProbability": 31,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ 57 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 7,
+          "nameEn": "Russian Government Quota Scholarship (Rossotrudnichestvo)",
+          "fitScore": 81,
+          "successProbability": 41,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لا تشترط اختبار لغة إنجليزية",
+            "✓ 159 days until deadline",
+            "⚠ Has $0 application fee",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 8,
+          "nameEn": "Turkiye Burslari Scholarship (Türkiye)",
+          "fitScore": 81,
+          "successProbability": 51,
+          "isEligible": true,
+          "competitionLabel": "Low Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لا تشترط اختبار لغة إنجليزية",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        },
+        {
+          "rank": 9,
+          "nameEn": "Romanian Government Scholarship (MFA Scholarships for non-EU Students)",
+          "fitScore": 81,
+          "successProbability": 51,
+          "isEligible": true,
+          "competitionLabel": "Low Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لا تشترط اختبار لغة إنجليزية",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        },
+        {
+          "rank": 10,
+          "nameEn": "Eric Bleumink Fund Scholarship for International Masters Students at the University of Groningen",
+          "fitScore": 80,
+          "successProbability": 30,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ 114 days until deadline",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P11",
+      "label": "Correct field (Business student)",
+      "intent": "Matches the 3 business/human-rights-restricted scholarships exactly.",
+      "profile": {
+        "dateOfBirth": "2003-05-20",
+        "country": "Egypt",
+        "educationLevel": "bachelor",
+        "major": "Business Administration",
+        "targetDegree": "master",
+        "englishLevel": "ADVANCED",
+        "hasEnglishTest": "YES",
+        "budget": "NONE",
+        "gpa": 3.4,
+        "hasResearch": false,
+        "hasWorkExperience": false
+      },
+      "totalReturned": 40,
+      "eligibleCount": 40,
+      "topEligible": [
+        {
+          "nameEn": "Fully Funded Scholarships for Bachelor's, Master's, and PhD in Germany 2026",
+          "fitScore": 88
+        },
+        {
+          "nameEn": "Schwarzman Scholars (China)",
+          "fitScore": 88
+        },
+        {
+          "nameEn": "McCall MacBain Scholarship | Fully Funded Master's Programs at McGill University in Canada",
+          "fitScore": 86
+        },
+        {
+          "nameEn": "Mastercard Foundation Scholarship at the University of Pretoria",
+          "fitScore": 86
+        },
+        {
+          "nameEn": "Knight-Hennessy Scholars (Stanford)",
+          "fitScore": 86
+        },
+        {
+          "nameEn": "Fully Funded Undergraduate and Postgraduate Scholarships at Curtin University in Australia",
+          "fitScore": 85
+        },
+        {
+          "nameEn": "MAIPs-UniSIRAJ Higher Education Scholarship (Malaysia)",
+          "fitScore": 85
+        },
+        {
+          "nameEn": "Eric Bleumink Fund Scholarship for International Masters Students at the University of Groningen",
+          "fitScore": 84
+        },
+        {
+          "nameEn": "Fully Funded ADB Master's Scholarship in Asia and Pacific 2026",
+          "fitScore": 83
+        },
+        {
+          "nameEn": "New Zealand Government Scholarship for International Students 2026",
+          "fitScore": 83
+        }
+      ],
+      "top10": [
+        {
+          "rank": 1,
+          "nameEn": "Fully Funded Scholarships for Bachelor's, Master's, and PhD in Germany 2026",
+          "fitScore": 88,
+          "successProbability": 49,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "🔥 Urgent: Only 23 days left to apply!",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 2,
+          "nameEn": "Schwarzman Scholars (China)",
+          "fitScore": 88,
+          "successProbability": 39,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "🔥 Urgent: Only 30 days left to apply!",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 3,
+          "nameEn": "McCall MacBain Scholarship | Fully Funded Master's Programs at McGill University in Canada",
+          "fitScore": 86,
+          "successProbability": 38,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ 45 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 4,
+          "nameEn": "Mastercard Foundation Scholarship at the University of Pretoria",
+          "fitScore": 86,
+          "successProbability": 48,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ 52 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 5,
+          "nameEn": "Knight-Hennessy Scholars (Stanford)",
+          "fitScore": 86,
+          "successProbability": 38,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ 57 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 6,
+          "nameEn": "Fully Funded Undergraduate and Postgraduate Scholarships at Curtin University in Australia",
+          "fitScore": 85,
+          "successProbability": 48,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ Your field (Business Administration) aligns with their fields of study",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ Plenty of time (264 days until deadline)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 7,
+          "nameEn": "MAIPs-UniSIRAJ Higher Education Scholarship (Malaysia)",
+          "fitScore": 85,
+          "successProbability": 48,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ Your field (Business Administration) aligns with their fields of study",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        },
+        {
+          "rank": 8,
+          "nameEn": "Eric Bleumink Fund Scholarship for International Masters Students at the University of Groningen",
+          "fitScore": 84,
+          "successProbability": 37,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ 114 days until deadline",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 9,
+          "nameEn": "Fully Funded ADB Master's Scholarship in Asia and Pacific 2026",
+          "fitScore": 83,
+          "successProbability": 37,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ Your field (Business Administration) aligns with their fields of study",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ 143 days until deadline",
+            "⚠ Work experience preferred",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 10,
+          "nameEn": "New Zealand Government Scholarship for International Students 2026",
+          "fitScore": 83,
+          "successProbability": 47,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لديك نتيجة اختبار سارية / You hold a test score",
+            "✓ Plenty of time (234 days until deadline)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        }
+      ]
+    },
+    {
+      "id": "P12",
+      "label": "Missing GPA (null)",
+      "intent": "gpa unknown — tests missing-data handling for GPA.",
+      "profile": {
+        "dateOfBirth": "2002-07-01",
+        "country": "Egypt",
+        "educationLevel": "bachelor",
+        "major": "Economics",
+        "targetDegree": "master",
+        "englishLevel": "INTERMEDIATE",
+        "hasEnglishTest": "WILLING",
+        "budget": "NONE",
+        "gpa": null,
+        "hasResearch": false,
+        "hasWorkExperience": false
+      },
+      "totalReturned": 40,
+      "eligibleCount": 40,
+      "topEligible": [
+        {
+          "nameEn": "Fully Funded Scholarships for Bachelor's, Master's, and PhD in Germany 2026",
+          "fitScore": 84
+        },
+        {
+          "nameEn": "Schwarzman Scholars (China)",
+          "fitScore": 84
+        },
+        {
+          "nameEn": "McCall MacBain Scholarship | Fully Funded Master's Programs at McGill University in Canada",
+          "fitScore": 82
+        },
+        {
+          "nameEn": "Mastercard Foundation Scholarship at the University of Pretoria",
+          "fitScore": 82
+        },
+        {
+          "nameEn": "Knight-Hennessy Scholars (Stanford)",
+          "fitScore": 82
+        },
+        {
+          "nameEn": "Russian Government Quota Scholarship (Rossotrudnichestvo)",
+          "fitScore": 81
+        },
+        {
+          "nameEn": "Turkiye Burslari Scholarship (Türkiye)",
+          "fitScore": 81
+        },
+        {
+          "nameEn": "Erasmus Mundus Joint Master Degree",
+          "fitScore": 81
+        },
+        {
+          "nameEn": "Romanian Government Scholarship (MFA Scholarships for non-EU Students)",
+          "fitScore": 81
+        },
+        {
+          "nameEn": "Eric Bleumink Fund Scholarship for International Masters Students at the University of Groningen",
+          "fitScore": 80
+        }
+      ],
+      "top10": [
+        {
+          "rank": 1,
+          "nameEn": "Fully Funded Scholarships for Bachelor's, Master's, and PhD in Germany 2026",
+          "fitScore": 84,
+          "successProbability": 42,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 24 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "🔥 Urgent: Only 23 days left to apply!",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 2,
+          "nameEn": "Schwarzman Scholars (China)",
+          "fitScore": 84,
+          "successProbability": 32,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 24 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "🔥 Urgent: Only 30 days left to apply!",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 3,
+          "nameEn": "McCall MacBain Scholarship | Fully Funded Master's Programs at McGill University in Canada",
+          "fitScore": 82,
+          "successProbability": 31,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 24 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ 45 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 4,
+          "nameEn": "Mastercard Foundation Scholarship at the University of Pretoria",
+          "fitScore": 82,
+          "successProbability": 41,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 24 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ 52 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 5,
+          "nameEn": "Knight-Hennessy Scholars (Stanford)",
+          "fitScore": 82,
+          "successProbability": 31,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 24 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ 57 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 6,
+          "nameEn": "Russian Government Quota Scholarship (Rossotrudnichestvo)",
+          "fitScore": 81,
+          "successProbability": 41,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 24 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لا تشترط اختبار لغة إنجليزية",
+            "✓ 159 days until deadline",
+            "⚠ Has $0 application fee",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 7,
+          "nameEn": "Turkiye Burslari Scholarship (Türkiye)",
+          "fitScore": 81,
+          "successProbability": 51,
+          "isEligible": true,
+          "competitionLabel": "Low Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 24 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لا تشترط اختبار لغة إنجليزية",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        },
+        {
+          "rank": 8,
+          "nameEn": "Erasmus Mundus Joint Master Degree",
+          "fitScore": 81,
+          "successProbability": 31,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 24 is within the accepted range",
+            "✓ Your field (Economics) aligns with their fields of study",
+            "✓ No minimum GPA requirement",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية",
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        },
+        {
+          "rank": 9,
+          "nameEn": "Romanian Government Scholarship (MFA Scholarships for non-EU Students)",
+          "fitScore": 81,
+          "successProbability": 51,
+          "isEligible": true,
+          "competitionLabel": "Low Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 24 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لا تشترط اختبار لغة إنجليزية",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        },
+        {
+          "rank": 10,
+          "nameEn": "Eric Bleumink Fund Scholarship for International Masters Students at the University of Groningen",
+          "fitScore": 80,
+          "successProbability": 30,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts master students",
+            "✓ Age 24 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ 114 days until deadline",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P13",
+      "label": "Missing nationality (country = '')",
+      "intent": "country missing — tests country handling when the user value is empty.",
+      "profile": {
+        "dateOfBirth": "2003-05-20",
+        "country": "",
+        "educationLevel": "bachelor",
+        "major": "Engineering",
+        "targetDegree": "master",
+        "englishLevel": "INTERMEDIATE",
+        "hasEnglishTest": "WILLING",
+        "budget": "NONE",
+        "gpa": 3,
+        "hasResearch": false,
+        "hasWorkExperience": false
+      },
+      "totalReturned": 42,
+      "eligibleCount": 42,
+      "topEligible": [
+        {
+          "nameEn": "Fully Funded Undergraduate, Master’s & PhD Scholarship in China 2026",
+          "fitScore": 79
+        },
+        {
+          "nameEn": "Fully Funded Scholarships for Bachelor's, Master's, and PhD in Germany 2026",
+          "fitScore": 78
+        },
+        {
+          "nameEn": "Schwarzman Scholars (China)",
+          "fitScore": 78
+        },
+        {
+          "nameEn": "McCall MacBain Scholarship | Fully Funded Master's Programs at McGill University in Canada",
+          "fitScore": 76
+        },
+        {
+          "nameEn": "Mastercard Foundation Scholarship at the University of Pretoria",
+          "fitScore": 76
+        },
+        {
+          "nameEn": "Knight-Hennessy Scholars (Stanford)",
+          "fitScore": 76
+        },
+        {
+          "nameEn": "Russian Government Quota Scholarship (Rossotrudnichestvo)",
+          "fitScore": 75
+        },
+        {
+          "nameEn": "Fully Funded Undergraduate and Postgraduate Scholarships at Curtin University in Australia",
+          "fitScore": 75
+        },
+        {
+          "nameEn": "Turkiye Burslari Scholarship (Türkiye)",
+          "fitScore": 75
+        },
+        {
+          "nameEn": "Erasmus Mundus Joint Master Degree",
+          "fitScore": 75
+        }
+      ],
+      "top10": [
+        {
+          "rank": 1,
+          "nameEn": "Fully Funded Undergraduate, Master’s & PhD Scholarship in China 2026",
+          "fitScore": 79,
+          "successProbability": 40,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ Your field (Engineering) aligns with their fields of study",
+            "✓ No minimum GPA requirement",
+            "✓ 52 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Your nationality isn't set on your profile — eligibility can't be verified",
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 2,
+          "nameEn": "Fully Funded Scholarships for Bachelor's, Master's, and PhD in Germany 2026",
+          "fitScore": 78,
+          "successProbability": 39,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "🔥 Urgent: Only 23 days left to apply!",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Your nationality isn't set on your profile — eligibility can't be verified",
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 3,
+          "nameEn": "Schwarzman Scholars (China)",
+          "fitScore": 78,
+          "successProbability": 29,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "🔥 Urgent: Only 30 days left to apply!",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Your nationality isn't set on your profile — eligibility can't be verified",
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 4,
+          "nameEn": "McCall MacBain Scholarship | Fully Funded Master's Programs at McGill University in Canada",
+          "fitScore": 76,
+          "successProbability": 28,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ 45 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Your nationality isn't set on your profile — eligibility can't be verified",
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 5,
+          "nameEn": "Mastercard Foundation Scholarship at the University of Pretoria",
+          "fitScore": 76,
+          "successProbability": 38,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ 52 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Your nationality isn't set on your profile — eligibility can't be verified",
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 6,
+          "nameEn": "Knight-Hennessy Scholars (Stanford)",
+          "fitScore": 76,
+          "successProbability": 28,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ 57 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Your nationality isn't set on your profile — eligibility can't be verified",
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 7,
+          "nameEn": "Russian Government Quota Scholarship (Rossotrudnichestvo)",
+          "fitScore": 75,
+          "successProbability": 38,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لا تشترط اختبار لغة إنجليزية",
+            "✓ 159 days until deadline",
+            "⚠ Has $0 application fee",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Your nationality isn't set on your profile — eligibility can't be verified"
+          ]
+        },
+        {
+          "rank": 8,
+          "nameEn": "Fully Funded Undergraduate and Postgraduate Scholarships at Curtin University in Australia",
+          "fitScore": 75,
+          "successProbability": 38,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ Your field (Engineering) aligns with their fields of study",
+            "✓ No minimum GPA requirement",
+            "✓ Plenty of time (264 days until deadline)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Your nationality isn't set on your profile — eligibility can't be verified",
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 9,
+          "nameEn": "Turkiye Burslari Scholarship (Türkiye)",
+          "fitScore": 75,
+          "successProbability": 48,
+          "isEligible": true,
+          "competitionLabel": "Low Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لا تشترط اختبار لغة إنجليزية",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Your nationality isn't set on your profile — eligibility can't be verified",
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        },
+        {
+          "rank": 10,
+          "nameEn": "Erasmus Mundus Joint Master Degree",
+          "fitScore": 75,
+          "successProbability": 28,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Accepts master students",
+            "✓ Age 23 is within the accepted range",
+            "✓ Your field (Engineering) aligns with their fields of study",
+            "✓ No minimum GPA requirement",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Your nationality isn't set on your profile — eligibility can't be verified",
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية",
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P14",
+      "label": "Fully-funded hunter, no English test wanted",
+      "intent": "Prefers no English test; ranks no-test scholarships up hard.",
+      "profile": {
+        "dateOfBirth": "2006-03-10",
+        "country": "Egypt",
+        "educationLevel": "high-school",
+        "major": "Medicine",
+        "targetDegree": "bachelor",
+        "englishLevel": "BEGINNER",
+        "hasEnglishTest": "PREFER_WITHOUT",
+        "budget": "NONE",
+        "gpa": 3.9,
+        "hasResearch": false,
+        "hasWorkExperience": false
+      },
+      "totalReturned": 27,
+      "eligibleCount": 27,
+      "topEligible": [
+        {
+          "nameEn": "Russian Government Quota Scholarship (Rossotrudnichestvo)",
+          "fitScore": 86
+        },
+        {
+          "nameEn": "Turkiye Burslari Scholarship (Türkiye)",
+          "fitScore": 86
+        },
+        {
+          "nameEn": "Romanian Government Scholarship (MFA Scholarships for non-EU Students)",
+          "fitScore": 86
+        },
+        {
+          "nameEn": "Fully Funded Undergraduate and Postgraduate Scholarships at Curtin University in Australia",
+          "fitScore": 79
+        },
+        {
+          "nameEn": "Fully-funded Bachelor's Scholarships in Various Disciplines from Nanyang Technological University in Singapore",
+          "fitScore": 76
+        },
+        {
+          "nameEn": "New Zealand Government Scholarship for International Students 2026",
+          "fitScore": 76
+        },
+        {
+          "nameEn": "Australia Awards Scholarship",
+          "fitScore": 75
+        },
+        {
+          "nameEn": "Chinese Government Scholarship (CSC)",
+          "fitScore": 75
+        },
+        {
+          "nameEn": "Stipendium Hungaricum Scholarship",
+          "fitScore": 75
+        },
+        {
+          "nameEn": "Greek Government Scholarship (IKY — Foreign Nationals)",
+          "fitScore": 75
+        }
+      ],
+      "top10": [
+        {
+          "rank": 1,
+          "nameEn": "Russian Government Quota Scholarship (Rossotrudnichestvo)",
+          "fitScore": 86,
+          "successProbability": 53,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 20 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لا تشترط اختبار لغة إنجليزية / No English test required",
+            "✓ 159 days until deadline",
+            "⚠ Has $0 application fee",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 2,
+          "nameEn": "Turkiye Burslari Scholarship (Türkiye)",
+          "fitScore": 86,
+          "successProbability": 63,
+          "isEligible": true,
+          "competitionLabel": "Low Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 20 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لا تشترط اختبار لغة إنجليزية / No English test required",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        },
+        {
+          "rank": 3,
+          "nameEn": "Romanian Government Scholarship (MFA Scholarships for non-EU Students)",
+          "fitScore": 86,
+          "successProbability": 63,
+          "isEligible": true,
+          "competitionLabel": "Low Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 20 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لا تشترط اختبار لغة إنجليزية / No English test required",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        },
+        {
+          "rank": 4,
+          "nameEn": "Fully Funded Undergraduate and Postgraduate Scholarships at Curtin University in Australia",
+          "fitScore": 79,
+          "successProbability": 50,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 20 is within the accepted range",
+            "✓ Your field (Medicine) aligns with their fields of study",
+            "✓ No minimum GPA requirement",
+            "⚠ تشترط اختبار إنجليزية — وأنت تفضّل تجنّبه",
+            "✓ Plenty of time (264 days until deadline)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 5,
+          "nameEn": "Fully-funded Bachelor's Scholarships in Various Disciplines from Nanyang Technological University in Singapore",
+          "fitScore": 76,
+          "successProbability": 48,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 20 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "⚠ تشترط اختبار إنجليزية — وأنت تفضّل تجنّبه",
+            "✓ Plenty of time (222 days until deadline)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 6,
+          "nameEn": "New Zealand Government Scholarship for International Students 2026",
+          "fitScore": 76,
+          "successProbability": 48,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 20 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "⚠ تشترط اختبار إنجليزية — وأنت تفضّل تجنّبه",
+            "✓ Plenty of time (234 days until deadline)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 7,
+          "nameEn": "Australia Awards Scholarship",
+          "fitScore": 75,
+          "successProbability": 48,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 20 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "⚠ تشترط اختبار إنجليزية — وأنت تفضّل تجنّبه",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        },
+        {
+          "rank": 8,
+          "nameEn": "Chinese Government Scholarship (CSC)",
+          "fitScore": 75,
+          "successProbability": 58,
+          "isEligible": true,
+          "competitionLabel": "Low Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 20 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "⚠ تشترط اختبار إنجليزية — وأنت تفضّل تجنّبه",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        },
+        {
+          "rank": 9,
+          "nameEn": "Stipendium Hungaricum Scholarship",
+          "fitScore": 75,
+          "successProbability": 58,
+          "isEligible": true,
+          "competitionLabel": "Low Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 20 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "⚠ تشترط اختبار إنجليزية — وأنت تفضّل تجنّبه",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        },
+        {
+          "rank": 10,
+          "nameEn": "Greek Government Scholarship (IKY — Foreign Nationals)",
+          "fitScore": 75,
+          "successProbability": 48,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 20 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "⚠ تشترط اختبار إنجليزية — وأنت تفضّل تجنّبه",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P15",
+      "label": "Broad applicant (Egyptian, bachelor, all levels)",
+      "intent": "Likely eligible for many scholarships at once — tests multi-match.",
+      "profile": {
+        "dateOfBirth": "2006-03-10",
+        "country": "Egypt",
+        "educationLevel": "bachelor",
+        "major": "Computer Science",
+        "targetDegree": "bachelor",
+        "englishLevel": "INTERMEDIATE",
+        "hasEnglishTest": "WILLING",
+        "budget": "LIMITED",
+        "gpa": 3.3,
+        "hasResearch": false,
+        "hasWorkExperience": true
+      },
+      "totalReturned": 27,
+      "eligibleCount": 27,
+      "topEligible": [
+        {
+          "nameEn": "Fully Funded Undergraduate, Master’s & PhD Scholarship in China 2026",
+          "fitScore": 82
+        },
+        {
+          "nameEn": "Russian Government Quota Scholarship (Rossotrudnichestvo)",
+          "fitScore": 80
+        },
+        {
+          "nameEn": "Fully Funded Undergraduate and Postgraduate Scholarships at Curtin University in Australia",
+          "fitScore": 79
+        },
+        {
+          "nameEn": "MAIPs-UniSIRAJ Higher Education Scholarship (Malaysia)",
+          "fitScore": 78
+        },
+        {
+          "nameEn": "Turkiye Burslari Scholarship (Türkiye)",
+          "fitScore": 78
+        },
+        {
+          "nameEn": "Romanian Government Scholarship (MFA Scholarships for non-EU Students)",
+          "fitScore": 78
+        },
+        {
+          "nameEn": "Fully-funded Bachelor's Scholarships in Various Disciplines from Nanyang Technological University in Singapore",
+          "fitScore": 76
+        },
+        {
+          "nameEn": "New Zealand Government Scholarship for International Students 2026",
+          "fitScore": 76
+        },
+        {
+          "nameEn": "Australia Awards Scholarship",
+          "fitScore": 75
+        },
+        {
+          "nameEn": "Chinese Government Scholarship (CSC)",
+          "fitScore": 75
+        }
+      ],
+      "top10": [
+        {
+          "rank": 1,
+          "nameEn": "Fully Funded Undergraduate, Master’s & PhD Scholarship in China 2026",
+          "fitScore": 82,
+          "successProbability": 46,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 20 is within the accepted range",
+            "✓ Your field (Computer Science) aligns with their fields of study",
+            "✓ No minimum GPA requirement",
+            "✓ 52 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 2,
+          "nameEn": "Russian Government Quota Scholarship (Rossotrudnichestvo)",
+          "fitScore": 80,
+          "successProbability": 45,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 20 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لا تشترط اختبار لغة إنجليزية",
+            "✓ 159 days until deadline",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 3,
+          "nameEn": "Fully Funded Undergraduate and Postgraduate Scholarships at Curtin University in Australia",
+          "fitScore": 79,
+          "successProbability": 45,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 20 is within the accepted range",
+            "✓ Your field (Computer Science) aligns with their fields of study",
+            "✓ No minimum GPA requirement",
+            "✓ Plenty of time (264 days until deadline)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 4,
+          "nameEn": "MAIPs-UniSIRAJ Higher Education Scholarship (Malaysia)",
+          "fitScore": 78,
+          "successProbability": 44,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 20 is within the accepted range",
+            "✓ Your field (Computer Science) aligns with their fields of study",
+            "✓ No minimum GPA requirement",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية",
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        },
+        {
+          "rank": 5,
+          "nameEn": "Turkiye Burslari Scholarship (Türkiye)",
+          "fitScore": 78,
+          "successProbability": 54,
+          "isEligible": true,
+          "competitionLabel": "Low Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 20 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لا تشترط اختبار لغة إنجليزية",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        },
+        {
+          "rank": 6,
+          "nameEn": "Romanian Government Scholarship (MFA Scholarships for non-EU Students)",
+          "fitScore": 78,
+          "successProbability": 54,
+          "isEligible": true,
+          "competitionLabel": "Low Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 20 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ لا تشترط اختبار لغة إنجليزية",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        },
+        {
+          "rank": 7,
+          "nameEn": "Fully-funded Bachelor's Scholarships in Various Disciplines from Nanyang Technological University in Singapore",
+          "fitScore": 76,
+          "successProbability": 43,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 20 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ Plenty of time (222 days until deadline)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 8,
+          "nameEn": "New Zealand Government Scholarship for International Students 2026",
+          "fitScore": 76,
+          "successProbability": 43,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 20 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ Plenty of time (234 days until deadline)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية"
+          ]
+        },
+        {
+          "rank": 9,
+          "nameEn": "Australia Awards Scholarship",
+          "fitScore": 75,
+          "successProbability": 43,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 20 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية",
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        },
+        {
+          "rank": 10,
+          "nameEn": "Chinese Government Scholarship (CSC)",
+          "fitScore": 75,
+          "successProbability": 53,
+          "isEligible": true,
+          "competitionLabel": "Low Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Egypt is eligible for this scholarship",
+            "✓ Accepts bachelor students",
+            "✓ Age 20 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "ستحتاج لأداء اختبار إنجليزية — أضفناه إلى خطتك الزمنية",
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P16",
+      "label": "Exchange-program target (targetDegree=exchange)",
+      "intent": "targetDegree not in any eligibleEducation list — tests partial-match path.",
+      "profile": {
+        "dateOfBirth": "2003-05-20",
+        "country": "Egypt",
+        "educationLevel": "bachelor",
+        "major": "Economics",
+        "targetDegree": "exchange",
+        "englishLevel": "INTERMEDIATE",
+        "hasEnglishTest": "WILLING",
+        "budget": "NONE",
+        "gpa": 3.2,
+        "hasResearch": false,
+        "hasWorkExperience": false
+      },
+      "totalReturned": 0,
+      "eligibleCount": 0,
+      "topEligible": [],
+      "top10": []
+    },
+    {
+      "id": "P17",
+      "label": "Legacy profile (no hasEnglishTest, englishLevel=ADVANCED)",
+      "intent": "Profiles created before hasEnglishTest existed — legacy branch.",
+      "profile": {
+        "dateOfBirth": "1996-02-25",
+        "country": "Jordan",
+        "educationLevel": "master",
+        "major": "Political Science",
+        "targetDegree": "phd",
+        "englishLevel": "ADVANCED",
+        "hasEnglishTest": null,
+        "budget": "NONE",
+        "gpa": 3.4,
+        "hasResearch": true,
+        "hasWorkExperience": false
+      },
+      "totalReturned": 32,
+      "eligibleCount": 32,
+      "topEligible": [
+        {
+          "nameEn": "Fully Funded Scholarships for Bachelor's, Master's, and PhD in Germany 2026",
+          "fitScore": 87
+        },
+        {
+          "nameEn": "Knight-Hennessy Scholars (Stanford)",
+          "fitScore": 85
+        },
+        {
+          "nameEn": "Gates Cambridge Scholarship (UK)",
+          "fitScore": 84
+        },
+        {
+          "nameEn": "University of Sydney International Scholarship for Postgraduates Students 2026",
+          "fitScore": 84
+        },
+        {
+          "nameEn": "Fully Funded Research Scholarships at CQUniversity Australia",
+          "fitScore": 84
+        },
+        {
+          "nameEn": "Fully Funded Undergraduate and Postgraduate Scholarships at Curtin University in Australia",
+          "fitScore": 84
+        },
+        {
+          "nameEn": "Government of Turkey Research Scholarships in Different Fields in PhD in Turkey",
+          "fitScore": 83
+        },
+        {
+          "nameEn": "Swiss Government Excellence Scholarship",
+          "fitScore": 82
+        },
+        {
+          "nameEn": "MEXT Scholarship (Japanese Government Scholarship)",
+          "fitScore": 82
+        },
+        {
+          "nameEn": "Russian Government Quota Scholarship (Rossotrudnichestvo)",
+          "fitScore": 81
+        }
+      ],
+      "top10": [
+        {
+          "rank": 1,
+          "nameEn": "Fully Funded Scholarships for Bachelor's, Master's, and PhD in Germany 2026",
+          "fitScore": 87,
+          "successProbability": 54,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Jordan is eligible for this scholarship",
+            "✓ Accepts phd students",
+            "✓ Age 30 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "🔥 Urgent: Only 23 days left to apply!",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 2,
+          "nameEn": "Knight-Hennessy Scholars (Stanford)",
+          "fitScore": 85,
+          "successProbability": 43,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Jordan is eligible for this scholarship",
+            "✓ Accepts phd students",
+            "✓ Age 30 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ 57 days until deadline — start soon",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 3,
+          "nameEn": "Gates Cambridge Scholarship (UK)",
+          "fitScore": 84,
+          "successProbability": 42,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Jordan is eligible for this scholarship",
+            "✓ Accepts phd students",
+            "✓ Age 30 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ 116 days until deadline",
+            "✓ Has research experience (preferred)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 4,
+          "nameEn": "University of Sydney International Scholarship for Postgraduates Students 2026",
+          "fitScore": 84,
+          "successProbability": 52,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Jordan is eligible for this scholarship",
+            "✓ Accepts phd students",
+            "✓ Age 30 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ 131 days until deadline",
+            "✓ Has research experience (preferred)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 5,
+          "nameEn": "Fully Funded Research Scholarships at CQUniversity Australia",
+          "fitScore": 84,
+          "successProbability": 52,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Jordan is eligible for this scholarship",
+            "✓ Accepts phd students",
+            "✓ Age 30 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ 143 days until deadline",
+            "✓ Has research experience (preferred)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 6,
+          "nameEn": "Fully Funded Undergraduate and Postgraduate Scholarships at Curtin University in Australia",
+          "fitScore": 84,
+          "successProbability": 52,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Jordan is eligible for this scholarship",
+            "✓ Accepts phd students",
+            "✓ Age 30 is within the accepted range",
+            "✓ Your field (Political Science) aligns with their fields of study",
+            "✓ No minimum GPA requirement",
+            "✓ Plenty of time (264 days until deadline)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 7,
+          "nameEn": "Government of Turkey Research Scholarships in Different Fields in PhD in Turkey",
+          "fitScore": 83,
+          "successProbability": 42,
+          "isEligible": true,
+          "competitionLabel": "High Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Jordan is eligible for this scholarship",
+            "✓ Accepts phd students",
+            "✓ Age 30 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ Plenty of time (195 days until deadline)",
+            "✓ Has research experience (preferred)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        },
+        {
+          "rank": 8,
+          "nameEn": "Swiss Government Excellence Scholarship",
+          "fitScore": 82,
+          "successProbability": 51,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Jordan is eligible for this scholarship",
+            "✓ Accepts phd students",
+            "✓ Age 30 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ Has research experience (preferred)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        },
+        {
+          "rank": 9,
+          "nameEn": "MEXT Scholarship (Japanese Government Scholarship)",
+          "fitScore": 82,
+          "successProbability": 51,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 86,
+          "reasons": [
+            "✓ Jordan is eligible for this scholarship",
+            "✓ Accepts phd students",
+            "✓ Age 30 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ Has research experience (preferred)",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": [
+            "Deadline not listed — confirm on the official page before applying"
+          ]
+        },
+        {
+          "rank": 10,
+          "nameEn": "Russian Government Quota Scholarship (Rossotrudnichestvo)",
+          "fitScore": 81,
+          "successProbability": 51,
+          "isEligible": true,
+          "competitionLabel": "Medium Competition",
+          "dataCompleteness": 100,
+          "reasons": [
+            "✓ Jordan is eligible for this scholarship",
+            "✓ Accepts phd students",
+            "✓ Age 30 is within the accepted range",
+            "✓ All fields of study are accepted",
+            "✓ No minimum GPA requirement",
+            "✓ 159 days until deadline",
+            "⚠ Has $0 application fee",
+            "✓ Fully funded — tuition and living costs covered"
+          ],
+          "disqualifiers": [],
+          "unknowns": []
+        }
+      ]
+    }
+  ]
+}

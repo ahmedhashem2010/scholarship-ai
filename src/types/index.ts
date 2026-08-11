@@ -47,6 +47,8 @@ export interface ScholarshipCreateInput {
   requirements?: Record<string, unknown>;
   benefits?: Record<string, unknown>;
   sourceUrl?: string;
+  officialWebsite?: string;
+  applicationUrl?: string;
 }
 
 export interface ScholarshipUpdateInput extends Partial<ScholarshipCreateInput> {}

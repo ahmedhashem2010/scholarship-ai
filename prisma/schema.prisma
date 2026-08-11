@@ -67,6 +67,12 @@ model Scholarship {
   requirements        String?
   sourceUrl           String?
   source              String?
+  // The real scholarship website / application URL, when a human has found it.
+  // Kept separate from `sourceUrl` (the page where the record was found —
+  // often a for9a.com listing) so the UI never presents an aggregator page as
+  // the "official" one.
+  officialWebsite     String?
+  applicationUrl      String?
   eligibleCountries   String[]
   eligibleEducation   String[]
   fieldOfStudy        String[]

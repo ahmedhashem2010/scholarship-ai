@@ -101,6 +101,8 @@ export async function POST(request: NextRequest) {
         requirements: data.requirements ?? null,
         benefits: data.benefits ?? null,
         sourceUrl: data.sourceUrl || null,
+        officialWebsite: data.officialWebsite || null,
+        applicationUrl: data.applicationUrl || null,
       },
     });
 

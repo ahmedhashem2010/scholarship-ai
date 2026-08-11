@@ -304,7 +304,7 @@ function JourneyHero({
 
             <div className="mt-6 flex flex-wrap items-center gap-3">
               <Link
-                href="/scholarships"
+                href="/scholarships/matches"
                 className="inline-flex items-center gap-2 rounded-xl bg-secondary-500 px-5 py-3 text-sm font-semibold text-[#162C4C] shadow-[0_12px_28px_-10px_rgb(198_161_75_/_0.65)] transition hover:bg-secondary-400"
               >
                 Explore my matches
@@ -579,6 +579,7 @@ export default function DashboardPage() {
         if (matchJson.success) {
           setMatches(
             (matchJson.data ?? [])
+              .filter((m: any) => m.isEligible !== false)
               .slice(0, 6)
               .map((m: any) => {
                 const s = m.scholarship;
@@ -799,7 +800,7 @@ export default function DashboardPage() {
         <div className="space-y-8 lg:col-span-2">
           {/* Recommended */}
           <section>
-            <SectionHeader eyebrow="Recommended" title="Your best matches" href="/scholarships" />
+            <SectionHeader eyebrow="Recommended" title="Your best matches" href="/scholarships/matches" />
             <div className="mt-4 space-y-3">
               {sectionsLoading ? (
                 [0, 1, 2].map((i) => <SkeletonBlock key={i} className="h-[86px]" />)

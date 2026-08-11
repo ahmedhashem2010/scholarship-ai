@@ -62,6 +62,8 @@ export async function PUT(
         ...(data.requirements !== undefined && { requirements: data.requirements ?? null }),
         ...(data.benefits !== undefined && { benefits: data.benefits ?? null }),
         ...(data.sourceUrl !== undefined && { sourceUrl: data.sourceUrl || null }),
+        ...(data.officialWebsite !== undefined && { officialWebsite: data.officialWebsite || null }),
+        ...(data.applicationUrl !== undefined && { applicationUrl: data.applicationUrl || null }),
       },
     });
 

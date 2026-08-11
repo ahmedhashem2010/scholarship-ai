@@ -27,6 +27,10 @@ export interface ScholarshipData {
   requirements: string | null;
   sourceUrl: string | null;
   source: string | null;
+  /** Real official links, set only when a human verified them. Never the
+   *  aggregator listing in `sourceUrl`. Surfaced by the UI, not scored. */
+  officialWebsite?: string | null;
+  applicationUrl?: string | null;
   eligibleCountries: string[];
   eligibleEducation: string[];
   fieldOfStudy: string[];
@@ -75,6 +79,135 @@ function calcAge(dateOfBirth: string): number {
   return age;
 }
 
+export type FundingClass = "FULL" | "TUITION_ONLY" | "PARTIAL" | "UNKNOWN";
+export type Budget = "NONE" | "LIMITED" | "MODERATE" | "FULL";
+
+// Funding classification runs on raw benefits text. The marker patterns are
+// deliberately pure ASCII: real data contains U+2013 en-dashes ("covers 20–100%
+// of tuition"), and typing that dash literally here is fragile across file
+// encodings, so dash ranges are matched via \u2010-\u2015 and \u2212 instead.
+const FUNDING_PARTIAL_WORD =
+  /(?:discount|reduction|partial|not\s+fully\s+funded|no\s+full[- ]?cost|grants?\/discounts)/;
+const FUNDING_PARTIAL_PERCENT =
+  /(?:[0-9]{1,2})\s*[\u2010-\u2015\u2212-]\s*[0-9]{1,3}\s*%\s*.*?(?:tuition|fee|waiv)|(?:^|[^\d])(?:[1-9][0-9]?)\s*%\s*.*?(?:tuition|fee|waiv)/;
+const FUNDING_NO_LIVING =
+  /cost\s+of\s+study\s+only|stipend[^,.]*\s+not\s+(?:automatically\s+)?included|no\s+(?:living|monthly)\s+(?:stipend|allowance)/;
+const FUNDING_FULL =
+  /stipend|allowance|living|subsistence|fully\s+funded|full\s+funding|complete\s+funding|all\s+costs|full\s+costs|room\s+and\s+board|monthly\s+scholarship/;
+const FUNDING_TUITION = /tuition|fee|fees/;
+
+/**
+ * Classify how much of a student's costs a scholarship actually covers, read
+ * from the free-text benefits JSON. Every benefit value is evaluated as its
+ * own segment so a GPA requirement ("average of at least 97%") is never taken
+ * for a tuition discount, and a Singapore-style "Tuition Grant" is never
+ * mistaken for partial funding.
+ */
+export function classifyFunding(benefits: string | null): FundingClass {
+  if (!benefits) return "UNKNOWN";
+  let segments: string[];
+  try {
+    const parsed = JSON.parse(benefits);
+    if (parsed && typeof parsed === "object") {
+      segments = Object.values(parsed)
+        .filter((v): v is string => typeof v === "string")
+        .map((v) => v.toLowerCase());
+    } else {
+      segments = [String(parsed).toLowerCase()];
+    }
+  } catch {
+    segments = [benefits.toLowerCase()];
+  }
+  if (segments.length === 0) return "UNKNOWN";
+
+  let hasPartial = false;
+  let hasFull = false;
+  let hasTuitionOnly = false;
+
+  for (const segment of segments) {
+    if (FUNDING_NO_LIVING.test(segment)) {
+      hasTuitionOnly = true;
+      continue;
+    }
+    if (FUNDING_PARTIAL_WORD.test(segment) || FUNDING_PARTIAL_PERCENT.test(segment)) {
+      hasPartial = true;
+      continue;
+    }
+    if (FUNDING_FULL.test(segment)) {
+      hasFull = true;
+      continue;
+    }
+    if (FUNDING_TUITION.test(segment)) hasTuitionOnly = true;
+  }
+
+  if (hasPartial) return "PARTIAL";
+  if (hasFull) return "FULL";
+  if (hasTuitionOnly) return "TUITION_ONLY";
+  return "UNKNOWN";
+}
+
+// Generic words that carry no discipline signal in field matching. "information",
+// "technology" and "management" are deliberately NOT here: telling Computer
+// Science from Information Technology matters, and a Management major really
+// does belong to a Business Management scholarship.
+const FIELD_STOPWORDS = new Set([
+  "science", "sciences", "study", "studies", "the", "and", "of", "in", "for",
+  "with", "international", "applied", "it",
+]);
+
+// Fields whose name doesn't contain the matching major but that clearly accept
+// it (a Biology major belongs to a "Life Sciences" scholarship). Hand-picked
+// one-way mappings, kept tiny so the token algorithm stays the primary judge.
+const FIELD_ALIASES: Record<string, readonly string[]> = {
+  "life sciences": ["biology", "biochemistry", "biotechnology", "ecology"],
+  "natural sciences": ["biology", "physics", "chemistry", "mathematics", "geosciences", "geology", "astronomy"],
+  "health sciences": ["medicine", "pharmacy", "nursing", "dentistry", "public health"],
+  "social sciences": ["political science", "sociology", "psychology", "economics"],
+  "humanities and social sciences": ["political science", "arts", "history", "education", "psychology"],
+  "humanities": ["arts", "history", "education"],
+  "media and communication": ["journalism", "communication", "media"],
+  "business and economics": ["business", "economics", "finance"],
+  "business and management": ["business", "management"],
+  "science and engineering": ["engineering", "physics", "chemistry"],
+  "stem": ["engineering", "computer science", "physics", "chemistry", "biology", "mathematics"],
+};
+
+function fieldTokens(value: string): string[] {
+  return value
+    .toLowerCase()
+    .split(/[^a-z0-9]+/i)
+    .filter((w) => w.length > 1 && !FIELD_STOPWORDS.has(w));
+}
+
+function wordCount(value: string): number {
+  return value.split(/[^a-z0-9]+/i).filter((w) => w.length > 0).length;
+}
+
+/**
+ * Tight field alignment. A major and a listed field only match on a whole
+ * phrase, a strong shared token, or a hand-picked alias. A single-token major
+ * ("Arts", "Biology") must hit a whole token — never a substring — so "Arts"
+ * can't match "Artificial Intelligence".
+ */
+function fieldsMatch(userMajor: string, field: string): boolean {
+  const major = userMajor.toLowerCase().trim();
+  const f = field.toLowerCase().trim();
+  if (f === "any" || major === f) return true;
+  if (major.includes(f)) return true;
+  if (f.includes(major) && wordCount(major) >= 2) return true;
+
+  const alias = FIELD_ALIASES[f];
+  if (alias && alias.includes(major)) return true;
+
+  const majorTokens = fieldTokens(major);
+  const fieldTokensArr = fieldTokens(f);
+  const shared = majorTokens.filter((t) => fieldTokensArr.includes(t));
+  if (shared.length >= 2) return true;
+  if (shared.length === 1 && shared[0]!.length >= 5) return true;
+  if (majorTokens.length === 1 && fieldTokensArr.includes(majorTokens[0]!)) return true;
+  return false;
+}
+
 function getCompetitionLabel(level: string): string {
   switch (level) {
     case "high": return "High Competition";
@@ -120,6 +253,7 @@ export function matchScholarshipsToUser(
     const eligibleCountries = parseStrArray(scholarship.eligibleCountries);
     const eligibleEducation = parseStrArray(scholarship.eligibleEducation);
     const fieldOfStudy = parseStrArray(scholarship.fieldOfStudy);
+    const fundingClass = classifyFunding(scholarship.benefits);
 
     // An empty eligibility array means WE DON'T KNOW, not "excluded".
     // 195 of the 234 seeded scholarships were scraped without structured
@@ -141,22 +275,27 @@ export function matchScholarshipsToUser(
       score += 16;
       unknowns.push("Eligible nationalities aren't listed — check the official page");
     } else {
-      countryEligible = eligibleCountries.some((c) => {
-        const cl = c.toLowerCase();
-        return (
-          cl === "all" ||
-          cl === "any" ||
-          cl === "all middle east" ||
-          cl === user.country.toLowerCase()
-        );
-      });
+      const userCountry = (user.country ?? "").trim();
+      const openToAll = eligibleCountries.some((c) =>
+        ["all", "any", "all middle east"].includes(c.toLowerCase())
+      );
 
-      if (countryEligible) {
-        score += 25;
-        reasons.push(`✓ ${user.country} is eligible for this scholarship`);
+      if (!userCountry) {
+        // Nationality not set on the profile: can't verify, never blocks.
+        countryEligible = null;
+        score += 16;
+        unknowns.push("Your nationality isn't set on your profile — eligibility can't be verified");
       } else {
-        score += 8;
-        disqualifiers.push(`✗ ${user.country} is not in the eligible countries list`);
+        countryEligible = openToAll ||
+          eligibleCountries.some((c) => c.toLowerCase() === userCountry.toLowerCase());
+
+        if (countryEligible) {
+          score += 25;
+          reasons.push(`✓ ${userCountry} is eligible for this scholarship`);
+        } else {
+          score += 8;
+          disqualifiers.push(`✗ ${userCountry} is not in the eligible countries list`);
+        }
       }
     }
 
@@ -200,18 +339,14 @@ export function matchScholarshipsToUser(
     if (!fieldKnown) {
       score += 13;
       unknowns.push("Eligible fields of study aren't listed — check the official page");
+    } else if (!userMajor || userMajor === "other") {
+      // Major not set, or an unlisted specialty: can't align, and that's not a
+      // mark against the user.
+      score += 13;
+      unknowns.push("Your major isn't set — field alignment can't be judged");
     } else {
       const acceptsAny = fieldOfStudy.some((f) => f.toLowerCase() === "any");
-      const fieldMatch = fieldOfStudy.some((f) => {
-        const fLower = f.toLowerCase();
-        return (
-          fLower === "any" ||
-          fLower === userMajor ||
-          (userMajor.length > 0 && userMajor.includes(fLower)) ||
-          (userMajor.length > 0 && fLower.includes(userMajor)) ||
-          userMajor.split(/[\s,/]+/).some((word) => word.length > 2 && fLower.includes(word))
-        );
-      });
+      const fieldMatch = fieldOfStudy.some((f) => fieldsMatch(userMajor, f));
 
       if (acceptsAny) {
         score += 16;
@@ -291,7 +426,9 @@ export function matchScholarshipsToUser(
         reasons.push(`⚠ Deadline has passed`);
         disqualifiers.push(`✗ Deadline passed (${Math.abs(daysLeft)} days ago)`);
       } else if (daysLeft <= 30) {
-        score += 12;
+        // An urgent deadline matters less when the funding is partial — don't
+        // let the "last chance" bump overwhelm a weak funding match.
+        score += fundingClass === "PARTIAL" ? 9 : 12;
         reasons.push(`🔥 Urgent: Only ${daysLeft} days left to apply!`);
       } else if (daysLeft <= 60) {
         score += 9;
@@ -340,20 +477,53 @@ export function matchScholarshipsToUser(
       reasons.push(`⚠ Has $${scholarship.applicationFee} application fee`);
     }
 
-    const maxScore = 130;
+    // Funding fit: how well the scholarship's real coverage matches what the
+    // student can afford. Classified from the benefits text, never the record
+    // name (several records are named "Fully Funded" but are only partial).
+    // A null budget is treated as MODERATE. Partial coverage is a real drag for
+    // students who can't self-fund and nearly irrelevant for those who can.
+    const fundingScores: Record<Budget, Record<FundingClass, number>> = {
+      NONE: { FULL: 18, TUITION_ONLY: 4, PARTIAL: -10, UNKNOWN: 4 },
+      LIMITED: { FULL: 14, TUITION_ONLY: 5, PARTIAL: -3, UNKNOWN: 4 },
+      MODERATE: { FULL: 10, TUITION_ONLY: 6, PARTIAL: 2, UNKNOWN: 2 },
+      FULL: { FULL: 6, TUITION_ONLY: 6, PARTIAL: 6, UNKNOWN: 2 },
+    };
+    const fundingRow = fundingScores[(user.budget ?? "MODERATE") as Budget] ?? fundingScores.MODERATE;
+    score += fundingRow[fundingClass];
+
+    if (fundingClass === "FULL") {
+      reasons.push(`✓ Fully funded — tuition and living costs covered`);
+    } else if (fundingClass === "TUITION_ONLY") {
+      reasons.push(`⚠ Tuition covered only — living costs are on you`);
+    } else if (fundingClass === "PARTIAL") {
+      reasons.push(`⚠ Partially funded — only part of your costs are covered`);
+    } else {
+      unknowns.push("Funding details aren't listed — check the official page");
+    }
+
+    const maxScore = 150;
     const normalizedFitScore = Math.min(Math.max(Math.round((score / maxScore) * 100), 0), 100);
 
     const successProbability = calcSuccessProbability(normalizedFitScore, user, scholarship.competitionLevel);
 
     // Unknown never blocks — only an explicit `false` does. Someone must not be
     // told they're ineligible because our scraper missed a field.
+    // A confirmed GPA below the minimum is a hard exclusion, same as a country
+    // or degree mismatch. A missing GPA stays "unknown" (never blocks) —
+    // consistent with the missing-data philosophy used elsewhere.
+    const gpaEligible =
+      scholarship.minimumGPA === null ||
+      user.gpa === null ||
+      user.gpa >= scholarship.minimumGPA;
+
     const eligible = (
       score >= 30 &&
       countryEligible !== false &&
       eduMatch !== false &&
       (scholarship.minimumAge === null || userAge >= scholarship.minimumAge) &&
       (scholarship.maximumAge === null || userAge <= scholarship.maximumAge) &&
-      (daysLeft === null || daysLeft > 0)
+      (daysLeft === null || daysLeft > 0) &&
+      gpaEligible
     );
 
     // How much structured data this record actually has. Surfaced in the UI so
@@ -393,28 +563,9 @@ export function matchScholarshipsToUser(
     return b.dataCompleteness - a.dataCompleteness;
   });
 
-  const MIN_RESULTS = 5;
-  if (results.length > 0) {
-    const eligibleCount = results.filter((r) => r.isEligible).length;
-    if (eligibleCount < MIN_RESULTS) {
-      const needed = MIN_RESULTS;
-      const taken = new Set<string>();
-      const finalResults: MatchResult[] = [];
-
-      for (const result of results) {
-        if (finalResults.length >= needed) break;
-        if (!taken.has(result.scholarship.id)) {
-          taken.add(result.scholarship.id);
-          finalResults.push(result);
-        }
-      }
-
-      finalResults.forEach((r, i) => { r.rank = i + 1; });
-      return finalResults;
-    }
-  }
-
-  const finalResults = results.slice(0, Math.max(MIN_RESULTS, results.length));
+  // NEVER pad with ineligible scholarships to hit a minimum count. A student
+  // with 0 eligible matches gets 0 recommendations, not 5 misleading cards.
+  const finalResults = results.filter((r) => r.isEligible);
   finalResults.forEach((r, i) => { r.rank = i + 1; });
   return finalResults;
 }
