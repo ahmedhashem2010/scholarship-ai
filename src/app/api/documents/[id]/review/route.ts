@@ -228,7 +228,7 @@ export async function POST(
       );
     }
 
-    debugLog("[POST] Step 9/12: Calling AI review via AgentRouter...");
+    debugLog("[POST] Step 9/12: Calling AI review service...");
     let coaching: ReviewScore;
     try {
       coaching = await reviewDocument(text, document.documentType);
@@ -242,7 +242,7 @@ export async function POST(
       let message: string;
       if (aiErr instanceof AiConfigError) {
         message =
-          "AI review failed. The AI provider is not configured — AGENTROUTER_API_KEY is missing from the server environment.";
+          "AI review failed. The AI review service is not configured — AI_REVIEW_SERVICE_URL is missing from the server environment.";
       } else if (
         aiErr instanceof AiCapacityError ||
         /quota|rate limit|insufficient|temporarily unavailable|high demand/i.test(technical)

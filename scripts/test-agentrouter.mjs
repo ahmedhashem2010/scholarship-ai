@@ -2,14 +2,16 @@ import "./_env.mjs";
 
 /**
  * AgentRouter API diagnostic — probes the configured AgentRouter gateway with
- * the Anthropic Messages protocol, exactly like src/lib/ai-review.ts.
+ * the Anthropic Messages protocol. The SmartScholar app no longer calls
+ * AgentRouter directly: the Railway review service owns the AgentRouter key
+ * and is the only caller. Run this script from the Railway service's
+ * environment (not SmartScholar's) to debug its upstream.
  *
  *   node scripts/test-agentrouter.mjs
  *
- * AgentRouter is the ONLY AI provider in SmartScholar (no fallback). Claude
- * models are served over POST /v1/messages with an `x-api-key` header and an
- * `anthropic-version` header — never a Bearer `Authorization` header, which
- * AgentRouter answers with HTTP 401.
+ * Claude models are served over POST /v1/messages with an `x-api-key` header
+ * and an `anthropic-version` header — never a Bearer `Authorization` header,
+ * which AgentRouter answers with HTTP 401.
  *
  * Tries a small set of model IDs so you can see which ones your AgentRouter
  * account group actually serves, and reports the live status for each.

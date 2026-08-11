@@ -1,99 +1,92 @@
 import "./_env.mjs";
 
 /**
- * Checks whether the AgentRouter AI provider is actually reachable.
+ * Checks whether the AI review service on Railway is actually reachable.
  *
  *   node scripts/test-ai.mjs
  *
- * AgentRouter is the ONLY AI provider in SmartScholar — there is no fallback
- * chain, so this script tells you whether document reviews can run at all.
+ * SmartScholar never calls AgentRouter directly — it POSTs { documentType,
+ * text } to AI_REVIEW_SERVICE_URL and expects a ReviewScore JSON back. That
+ * service (on Railway) is the only component that holds the AgentRouter key,
+ * so this script tells you whether document reviews can run at all.
  *
  * Reads nothing from the database and writes nothing anywhere.
  */
 
-const KEY = process.env.AGENTROUTER_API_KEY || "";
-const MODEL = process.env.AGENTROUTER_MODEL || "claude-opus-4-8";
-const URL = process.env.AGENTROUTER_ENDPOINT || "https://agentrouter.org/v1/messages";
-
-// AgentRouter fingerprints its clients and answers unrecognised ones with
-// HTTP 401 "unauthorized client detected" — indistinguishable from a bad key.
-const CLIENT_HEADERS = {
-  Originator: process.env.AGENTROUTER_ORIGINATOR || "codex_cli_rs",
-  "User-Agent": process.env.AGENTROUTER_USER_AGENT || "codex_cli_rs/0.101.0",
-  Version: process.env.AGENTROUTER_VERSION || "0.101.0",
-};
+const URL = process.env.AI_REVIEW_SERVICE_URL || "";
 
 function ok(m) { console.log(`  \x1b[32m✓\x1b[0m ${m}`); }
 function bad(m) { console.log(`  \x1b[31m✗\x1b[0m ${m}`); }
 function info(m) { console.log(`    ${m}`); }
 
+function validScore(s) {
+  return (
+    s &&
+    typeof s === "object" &&
+    typeof s.overallQuality?.score === "number" &&
+    typeof s.atsCompatibility?.score === "number" &&
+    typeof s.competitiveness?.score === "number"
+  );
+}
+
 async function main() {
-  console.log("AgentRouter (the only AI provider)");
-  if (!KEY) {
-    bad("AGENTROUTER_API_KEY not set in .env");
-    info("Get a key at https://agentrouter.org and add to .env:");
-    info("  AGENTROUTER_API_KEY=sk-...");
+  console.log("AI review service (Railway — the only AI path)");
+  if (!URL) {
+    bad("AI_REVIEW_SERVICE_URL not set in .env");
+    info("Add the Railway service URL to .env:");
+    info("  AI_REVIEW_SERVICE_URL=https://your-service.up.railway.app");
     process.exitCode = 1;
     return;
   }
-  info(`model: ${MODEL}`);
+  info(`endpoint: ${URL}/review`);
 
   try {
-    const res = await fetch(URL, {
+    const res = await fetch(`${URL}/review`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": KEY,
-        "anthropic-version": "2023-06-01",
-        ...CLIENT_HEADERS,
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: MODEL,
-        max_tokens: 50,
-        messages: [{ role: "user", content: "Say OK" }],
+        documentType: "CV",
+        text: "Say OK in one word.",
       }),
+      signal: AbortSignal.timeout(60_000),
     });
-    const ct = res.headers.get("content-type") || "";
     const body = await res.text();
+
     if (!res.ok) {
-      bad(`HTTP ${res.status} (content-type: ${ct})`);
-      if (res.status === 401 || res.status === 403) {
-        info("Key rejected or client not recognised. Copy the full key from");
-        info("https://agentrouter.org/console/token and make sure it has credits.");
-      } else if (res.status === 429) {
-        info("Rate limited — the key works; wait a moment and re-run.");
-      } else if (body.includes("unauthorized_client")) {
-        info("Client rejected (not the key). The app sends the required headers.");
-      } else if (body.includes("\u65e0\u53ef\u7528\u6e20\u9053")) {
-        info("Your AgentRouter account group has no channel for this model.");
-        info(`Try setting AGENTROUTER_MODEL in .env to a model your group serves.`);
-      } else {
+      bad(`HTTP ${res.status}`);
+      try {
+        const parsed = JSON.parse(body);
+        info(parsed.message || JSON.stringify(parsed).slice(0, 300));
+      } catch {
         info(body.replace(/\s+/g, " ").slice(0, 300));
+      }
+      if (res.status === 401 || res.status === 403) {
+        info("The review service rejects SmartScholar — check its auth config in Railway.");
+      } else if (res.status === 503) {
+        info("The review service or its AgentRouter upstream is unavailable right now.");
       }
       process.exitCode = 1;
       return;
     }
-    // Parse by body shape, not content-type — the gateway serves its JSON as
-    // text/plain. Handle the Anthropic Messages shape and the OpenAI-compatible
-    // one so a changed upstream can't hide behind a 200.
+
     let parsed;
     try {
       parsed = JSON.parse(body);
     } catch {
-      bad(`200 OK but body is not JSON (content-type: ${ct})`);
+      bad(`200 OK but body is not JSON (content-type: ${res.headers.get("content-type") || ""})`);
       process.exitCode = 1;
       return;
     }
-    const text =
-      (parsed?.content?.map((c) => c?.text ?? "").join("") ?? "") ||
-      (parsed?.choices?.[0]?.message?.content ?? "");
-    if (!text.trim()) {
-      bad("200 OK but empty response");
+    if (!validScore(parsed)) {
+      bad("200 OK but response is not a valid ReviewScore (missing 1-10 sub-scores)");
       process.exitCode = 1;
       return;
     }
     ok("working");
-    info(`sample output: ${text.trim().slice(0, 120)}`);
+    info(
+      `overall=${parsed.overallQuality.score} ats=${parsed.atsCompatibility.score} ` +
+        `competitive=${parsed.competitiveness.score}`
+    );
   } catch (e) {
     bad(`network error: ${e.message}`);
     process.exitCode = 1;

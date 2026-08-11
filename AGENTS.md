@@ -72,8 +72,8 @@ Key vars (all in `.env` at project root):
 - `SUPABASE_SERVICE_ROLE_KEY` — Auth project service role (admin operations)
 - `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASSWORD` — Zoho SMTP (`smtp.zoho.com:465`, app password, not login password)
 - `EMAIL_FROM` / `EMAIL_REPLY_TO` — must be the authenticated Zoho mailbox
-- `AGENTROUTER_API_KEY` — the only AI provider (required for document reviews)
-- `AGENTROUTER_MODEL` — model requested through AgentRouter (default `claude-opus-4-8`, live-verified through the gateway; if a group lacks a channel for it the API returns HTTP 503 "无可用渠道")
+- `AI_REVIEW_SERVICE_URL` — base URL of the Railway AI review service (required for document reviews). SmartScholar POSTs `{ documentType, text }` to `{AI_REVIEW_SERVICE_URL}/review` and never calls AgentRouter directly; the AgentRouter API key lives only in Railway
+- `AGENTROUTER_MODEL` — metadata only (recorded on the Review record; default `claude-opus-4-8`, live-verified through the gateway; if the Railway group lacks a channel for it the API returns HTTP 503 "无可用渠道")
 - `NEXT_PUBLIC_SITE_URL` — canonical public URL, used for email links/OG tags
 - `CRON_SECRET` — shared secret guarding `/api/cron/reminders`
 - `NEXT_PUBLIC_GA_ID` — optional GA4
@@ -112,17 +112,22 @@ Callback route at `src/app/auth/callback/route.ts` — PKCE code exchange (OAuth
 
 ## AI Providers
 
-`src/lib/ai-review.ts` is the single AI service. It calls only **AgentRouter**
-(`AGENTROUTER_ENDPOINT`, default `https://agentrouter.org/v1/messages`),
-speaking the **Anthropic Messages API** for Claude models — the AgentRouter
-key goes in the `x-api-key` header with an `anthropic-version` header (never a
-Bearer `Authorization` header, which AgentRouter answers with 401). There is
-**no provider fallback** — a missing key, HTTP error or malformed
+`src/lib/ai-review.ts` is the single AI client, and it no longer talks to
+AgentRouter directly. Every review is delegated to the isolated review service
+on Railway: SmartScholar POSTs `{ documentType, text }` to
+`{AI_REVIEW_SERVICE_URL}/review` and receives the `ReviewScore` JSON (or
+`{ error, message }` with a mapped status: 400 invalid request, 401/403
+config/auth, 413 too large, 429 rate limit, 502 malformed upstream, 503
+unavailable / timeout / WAF block). The AgentRouter API key and the review
+prompt live **only in Railway** — they are not part of this repo or of
+SmartScholar's environment. AgentRouter remains the **only** AI provider, and
+there is **no provider fallback** — a missing URL, HTTP error or malformed
 response surfaces as a structured `AI_REVIEW_FAILED` error, never a fake
-review. `scripts/test-ai.mjs` verifies the connection. Safe pipeline metrics
-(text/prompt lengths, fingerprints, model, HTTP status, response size) are
-always logged; verbose logging is gated behind
-`AI_DEBUG` — response bodies can contain fragments of student documents, so it
+review. `scripts/test-ai.mjs` verifies the Railway chain (the AgentRouter
+diagnostic `scripts/test-agentrouter.mjs` is for the Railway service's own
+environment). Safe pipeline metrics (text lengths, fingerprints, model, HTTP
+status, response size) are always logged; verbose logging is gated behind
+`AI_DEBUG` — request bodies can contain fragments of student documents, so it
 stays **off in production**.
 
 ## Prisma Schema (9 models)
