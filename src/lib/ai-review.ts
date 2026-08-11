@@ -14,14 +14,18 @@ export const AGENTROUTER_CLIENT = {
  * through this gateway — there is deliberately no fallback provider, so a
  * failure is a real failure and never a silent switch to another vendor.
  *
+ * The gateway speaks the Anthropic Messages API for Claude models:
+ *   endpoint: POST https://agentrouter.org/v1/messages
+ *   auth:     x-api-key (AgentRouter key) + anthropic-version header
+ *
  * Endpoint overridable with AGENTROUTER_ENDPOINT, model overridable with
  * AGENTROUTER_MODEL. Both read once at module load.
  */
 export const AGENTROUTER_URL =
-  process.env.AGENTROUTER_ENDPOINT || "https://agentrouter.org/v1/chat/completions";
+  process.env.AGENTROUTER_ENDPOINT || "https://agentrouter.org/v1/messages";
 
 export const AGENTROUTER_MODEL =
-  process.env.AGENTROUTER_MODEL || "claude-sonnet-4-20250514";
+  process.env.AGENTROUTER_MODEL || "claude-opus-4-8";
 
 /** AI service not configured — e.g. AGENTROUTER_API_KEY missing. */
 export class AiConfigError extends Error {
@@ -83,6 +87,8 @@ Document Type: {documentType}
 
 Document:
 {documentText}
+
+Keep every text field short (one or two sentences).
 
 Return ONLY JSON (no other text):
 {
@@ -151,13 +157,51 @@ export function fingerprint(input: string): string {
 }
 
 /**
+ * Max chars of a response body printed to the server log (via console.error)
+ * when a request fails or the body isn't JSON. Bodies can contain fragments of
+ * the user's document, so on failure we log a compact one-line preview that
+ * never includes full document text. Off in production except for genuinely
+ * broken responses, where a short preview is worth far more than a mystery
+ * 500 for the developer triaging it.
+ */
+const MAX_BODY_PREVIEW = 500;
+function safeBodyPreview(body: string): string {
+  return body.replace(/\s+/g, " ").trim().slice(0, MAX_BODY_PREVIEW);
+}
+
+/**
+ * Pull the model's text out of a JSON response. AgentRouter returns the
+ * Anthropic Messages shape for Claude models:
+ *
+ *   { "content": [{ "type": "text", "text": "..." }] }
+ *
+ * but we tolerate the OpenAI chat-completion shape
+ * ({ choices: [{ message: { content } }] }) as well, because the gateway may
+ * sit in front of non-Claude models for other customers and the failure mode
+ * ("empty completion") is confusing to debug. Returns "" when no text is found.
+ */
+function extractAgentRouterText(data: unknown): string {
+  if (!data || typeof data !== "object") return "";
+  const d = data as {
+    content?: { type?: string; text?: string }[];
+    choices?: { message?: { content?: string } }[];
+  };
+  const anthropicText = Array.isArray(d.content)
+    ? d.content.map((c) => c?.text ?? "").join("")
+    : "";
+  if (anthropicText.trim()) return anthropicText;
+  return d.choices?.[0]?.message?.content ?? "";
+}
+
+/**
  * Send the prompt to AgentRouter and return the model's text.
  *
  * Single-provider by design: no fallback chain, no generic canned reply.
  * Every failure throws:
  *   - AiConfigError    — AGENTROUTER_API_KEY missing
  *   - AiCapacityError  — 429 / quota / rate-limit
- *   - Error            — auth failure, non-JSON body, empty completion, network
+ *   - Error            — auth failure, HTTP error, no channel for model,
+ *                        non-JSON body, empty completion, network
  *
  * The caller surfaces the error to the user; a successful review is never
  * fabricated.
@@ -181,7 +225,11 @@ async function callAgentRouter(prompt: string): Promise<string> {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${key}`,
+        // Anthropic Messages API auth: the AgentRouter key goes in x-api-key,
+        // never in a Bearer Authorization header. Sending Authorization gets a
+        // 401, which used to look like a bad key.
+        "x-api-key": key,
+        "anthropic-version": "2023-06-01",
         // AgentRouter fingerprints the calling client and rejects requests it
         // doesn't recognise with HTTP 401 "unauthorized client detected" —
         // which looks exactly like a bad API key. Without these three headers
@@ -192,7 +240,11 @@ async function callAgentRouter(prompt: string): Promise<string> {
       },
       body: JSON.stringify({
         model: AGENTROUTER_MODEL,
-        max_tokens: 2000,
+        // 4096, not 2000: this model channel emits a forced "thinking" block
+        // that can consume most of a 2000-token budget, truncating the review
+        // JSON mid-field (stop_reason "max_tokens"). The extra headroom keeps
+        // the structured answer intact even after a long thinking sequence.
+        max_tokens: 4096,
         temperature: 0.4,
         messages: [{ role: "user", content: prompt }],
       }),
@@ -230,25 +282,38 @@ async function callAgentRouter(prompt: string): Promise<string> {
           "). Please verify your API key at https://agentrouter.org/console/token and ensure it has credits."
       );
     }
-    throw new Error(`AgentRouter request failed (HTTP ${response.status}, ${ct}).`);
-  }
-
-  if (!ct.includes("application/json")) {
+    // 503 "无可用渠道" = "no available channel" — the group serving this key has
+    // no channel for the requested model. The error message alone is not
+    // actionable, so map it to the fix: change AGENTROUTER_MODEL.
+    if (response.status === 503 && msg.includes("\u65e0\u53ef\u7528\u6e20\u9053")) {
+      throw new Error(
+        `AgentRouter has no available channel for model "${AGENTROUTER_MODEL}" (HTTP 503). ` +
+          `Set AGENTROUTER_MODEL in .env to a model your AgentRouter group serves.`
+      );
+    }
+    console.error(
+      `[ai-review] AgentRouter HTTP ${response.status} content-type=${ct} body preview: ${safeBodyPreview(body)}`
+    );
     throw new Error(
-      `AgentRouter returned a non-JSON response (content-type: ${ct}).`
+      `AgentRouter request failed (HTTP ${response.status}, content-type: ${ct}).`
     );
   }
 
+  // The gateway serves JSON with content-type text/plain (and HTML for some
+  // error pages), so we trust the body shape, not the header.
   let data: unknown;
   try {
     data = JSON.parse(body);
   } catch {
-    throw new Error("AgentRouter returned an unparseable response body.");
+    console.error(
+      `[ai-review] AgentRouter non-JSON body: status=${response.status} content-type=${ct} body preview: ${safeBodyPreview(body)}`
+    );
+    throw new Error(
+      `AgentRouter returned a non-JSON response (HTTP ${response.status}, content-type: ${ct}).`
+    );
   }
 
-  const content =
-    (data as { choices?: { message?: { content?: string } }[] } | null)
-      ?.choices?.[0]?.message?.content ?? "";
+  const content = extractAgentRouterText(data);
   if (!content.trim()) {
     throw new Error("AgentRouter returned an empty completion for the review request.");
   }

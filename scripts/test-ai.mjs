@@ -12,8 +12,8 @@ import "./_env.mjs";
  */
 
 const KEY = process.env.AGENTROUTER_API_KEY || "";
-const MODEL = process.env.AGENTROUTER_MODEL || "claude-sonnet-4-20250514";
-const URL = process.env.AGENTROUTER_ENDPOINT || "https://agentrouter.org/v1/chat/completions";
+const MODEL = process.env.AGENTROUTER_MODEL || "claude-opus-4-8";
+const URL = process.env.AGENTROUTER_ENDPOINT || "https://agentrouter.org/v1/messages";
 
 // AgentRouter fingerprints its clients and answers unrecognised ones with
 // HTTP 401 "unauthorized client detected" — indistinguishable from a bad key.
@@ -43,7 +43,8 @@ async function main() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${KEY}`,
+        "x-api-key": KEY,
+        "anthropic-version": "2023-06-01",
         ...CLIENT_HEADERS,
       },
       body: JSON.stringify({
@@ -52,9 +53,10 @@ async function main() {
         messages: [{ role: "user", content: "Say OK" }],
       }),
     });
+    const ct = res.headers.get("content-type") || "";
     const body = await res.text();
     if (!res.ok) {
-      bad(`HTTP ${res.status}`);
+      bad(`HTTP ${res.status} (content-type: ${ct})`);
       if (res.status === 401 || res.status === 403) {
         info("Key rejected or client not recognised. Copy the full key from");
         info("https://agentrouter.org/console/token and make sure it has credits.");
@@ -66,12 +68,25 @@ async function main() {
         info("Your AgentRouter account group has no channel for this model.");
         info(`Try setting AGENTROUTER_MODEL in .env to a model your group serves.`);
       } else {
-        info(body.slice(0, 300));
+        info(body.replace(/\s+/g, " ").slice(0, 300));
       }
       process.exitCode = 1;
       return;
     }
-    const text = JSON.parse(body)?.choices?.[0]?.message?.content ?? "";
+    // Parse by body shape, not content-type — the gateway serves its JSON as
+    // text/plain. Handle the Anthropic Messages shape and the OpenAI-compatible
+    // one so a changed upstream can't hide behind a 200.
+    let parsed;
+    try {
+      parsed = JSON.parse(body);
+    } catch {
+      bad(`200 OK but body is not JSON (content-type: ${ct})`);
+      process.exitCode = 1;
+      return;
+    }
+    const text =
+      (parsed?.content?.map((c) => c?.text ?? "").join("") ?? "") ||
+      (parsed?.choices?.[0]?.message?.content ?? "");
     if (!text.trim()) {
       bad("200 OK but empty response");
       process.exitCode = 1;

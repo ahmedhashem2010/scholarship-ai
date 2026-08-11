@@ -34,9 +34,10 @@ const LIMIT = (() => {
 })();
 
 const BATCH_SIZE = 15;
-const ENDPOINT = "https://agentrouter.org/v1/chat/completions";
-// Must be a model this gateway actually serves. The app uses the same one.
-const MODEL = process.env.TRANSLATE_MODEL || "claude-sonnet-4-20250514";
+// AgentRouter speaks the Anthropic Messages API for Claude models. The app
+// uses the same endpoint, auth and model (src/lib/ai-review.ts).
+const ENDPOINT = "https://agentrouter.org/v1/messages";
+const MODEL = process.env.TRANSLATE_MODEL || "claude-opus-4-8";
 
 // AgentRouter fingerprints its clients and answers unrecognised ones with
 // HTTP 401 "unauthorized client detected" — indistinguishable from a bad key.
@@ -166,17 +167,16 @@ async function viaAgentRouter(names) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${key}`,
+      "x-api-key": key,
+      "anthropic-version": "2023-06-01",
       ...CLIENT_HEADERS,
     },
     body: JSON.stringify({
       model: MODEL,
       temperature: 0.2,
       max_tokens: 2000,
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: JSON.stringify(names) },
-      ],
+      system: SYSTEM_PROMPT,
+      messages: [{ role: "user", content: JSON.stringify(names) }],
     }),
   });
 
@@ -188,12 +188,17 @@ async function viaAgentRouter(names) {
     if (res.status === 503 && body.includes("\u65e0\u53ef\u7528\u6e20\u9053")) {
       throw new Error(`HTTP 503 — your AgentRouter group has no channel for "${MODEL}".`);
     }
-    throw new Error(`HTTP ${res.status}: ${body.slice(0, 200)}`);
+    throw new Error(`HTTP ${res.status}: ${body.replace(/\s+/g, " ").slice(0, 200)}`);
   }
   try {
-    return JSON.parse(body).choices?.[0]?.message?.content ?? "";
+    const data = JSON.parse(body);
+    // Anthropic Messages shape, plus the OpenAI-compatible one for safety.
+    const content =
+      (data?.content?.map((c) => c?.text ?? "").join("") ?? "") ||
+      (data?.choices?.[0]?.message?.content ?? "");
+    return content;
   } catch {
-    throw new Error(`Non-JSON response: ${body.slice(0, 200)}`);
+    throw new Error(`Non-JSON response: ${body.replace(/\s+/g, " ").slice(0, 200)}`);
   }
 }
 

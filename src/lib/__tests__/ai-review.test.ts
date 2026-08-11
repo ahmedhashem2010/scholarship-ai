@@ -79,6 +79,15 @@ function mockFetch(routes: Route[]): { url: string; init: RequestInit }[] {
 function agentJson(text: string): Route {
   return {
     url: AGENTROUTER_URL,
+    // The Anthropic Messages shape AgentRouter returns for Claude models.
+    body: JSON.stringify({ content: [{ type: "text", text }] }),
+  };
+}
+
+/** OpenAI-compatible shape — the gateway may proxy non-Claude models with it. */
+function chatCompletionJson(text: string): Route {
+  return {
+    url: AGENTROUTER_URL,
     body: JSON.stringify({ choices: [{ message: { content: text } }] }),
   };
 }
@@ -88,6 +97,11 @@ function bodyOf(call: { init: RequestInit }): {
   messages: { role: string; content: string }[];
 } {
   return JSON.parse(String(call.init.body));
+}
+
+/** A valid review response served with the gateway's real content-type. */
+function agentReview(text: string): Route {
+  return { ...agentJson(text), contentType: "text/plain; charset=utf-8" };
 }
 
 beforeEach(() => {
@@ -143,7 +157,7 @@ describe("calculateAverageScore", () => {
 
 describe("reviewDocument — AgentRouter success path", () => {
   it("returns the parsed review, calling AgentRouter and only AgentRouter", async () => {
-    const calls = mockFetch([agentJson(JSON.stringify(validReview))]);
+    const calls = mockFetch([agentReview(JSON.stringify(validReview))]);
 
     const result = await reviewDocument("Sample CV text", "CV");
 
@@ -155,23 +169,65 @@ describe("reviewDocument — AgentRouter success path", () => {
     expect(calls.some((c) => c.url.includes(GEMINI_URL))).toBe(false);
   });
 
+  it("parses the review even when the gateway serves the JSON as text/plain", async () => {
+    mockFetch([agentReview(JSON.stringify(validReview))]);
+
+    await expect(reviewDocument("Sample CV text", "CV")).resolves.toEqual(
+      validReview
+    );
+  });
+
+  it("joins multiple Anthropic content blocks into one text", async () => {
+    const json = JSON.stringify(validReview);
+    const mid = Math.floor(json.length / 2);
+    mockFetch([
+      {
+        url: AGENTROUTER_URL,
+        body: JSON.stringify({
+          content: [
+            { type: "text", text: json.slice(0, mid) },
+            { type: "text", text: json.slice(mid) },
+          ],
+        }),
+      },
+    ]);
+
+    await expect(reviewDocument("Sample CV text", "CV")).resolves.toEqual(
+      validReview
+    );
+  });
+
+  it("also tolerates the OpenAI-compatible response shape", async () => {
+    mockFetch([chatCompletionJson(JSON.stringify(validReview))]);
+
+    await expect(reviewDocument("Sample CV text", "CV")).resolves.toEqual(
+      validReview
+    );
+  });
+
   it("sends the extracted document text as the real AI input", async () => {
-    const calls = mockFetch([agentJson(JSON.stringify(validReview))]);
+    const calls = mockFetch([agentReview(JSON.stringify(validReview))]);
 
     await reviewDocument("My unique personal statement text", "Statement");
 
     const body = bodyOf(calls[0]!);
     expect(body.messages[0]!.content).toContain("My unique personal statement text");
     expect(body.model).toBe(AGENTROUTER_MODEL);
+    // The verified default model. If this fails, someone changed the default
+    // without re-verifying it through the gateway.
+    expect(AGENTROUTER_MODEL).toBe("claude-opus-4-8");
   });
 
   it("reads the API key from the environment, never hardcodes it", async () => {
-    const calls = mockFetch([agentJson(JSON.stringify(validReview))]);
+    const calls = mockFetch([agentReview(JSON.stringify(validReview))]);
 
     await reviewDocument("Sample CV text", "CV");
 
     const headers = calls[0]!.init.headers as Record<string, string>;
-    expect(headers.Authorization).toBe("Bearer test-agentrouter-key");
+    // Anthropic Messages auth: x-api-key, never a Bearer Authorization header.
+    expect(headers["x-api-key"]).toBe("test-agentrouter-key");
+    expect(headers["anthropic-version"]).toBe("2023-06-01");
+    expect(headers.Authorization).toBeUndefined();
     expect(String(calls[0]!.init.body)).not.toContain("test-agentrouter-key");
     expect(String(calls[0]!.init.body)).not.toContain("sk-");
   });
@@ -260,7 +316,24 @@ describe("reviewDocument — AgentRouter failures are surfaced, never faked", ()
     mockFetch([{ url: AGENTROUTER_URL, status: 200, body: "this is not json" }]);
 
     await expect(reviewDocument("Some CV text", "CV")).rejects.toThrow(
-      /unparseable response body/
+      /non-JSON response/
+    );
+  });
+
+  it("maps a 503 'no available channel' error to the missing model", async () => {
+    mockFetch([
+      {
+        url: AGENTROUTER_URL,
+        status: 503,
+        body: "\u65e0\u53ef\u7528\u6e20\u9053",
+      },
+    ]);
+
+    await expect(reviewDocument("Some CV text", "CV")).rejects.toThrow(
+      /no available channel/
+    );
+    await expect(reviewDocument("Some CV text", "CV")).rejects.toThrow(
+      /AGENTROUTER_MODEL/
     );
   });
 

@@ -73,7 +73,7 @@ Key vars (all in `.env` at project root):
 - `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASSWORD` — Zoho SMTP (`smtp.zoho.com:465`, app password, not login password)
 - `EMAIL_FROM` / `EMAIL_REPLY_TO` — must be the authenticated Zoho mailbox
 - `AGENTROUTER_API_KEY` — the only AI provider (required for document reviews)
-- `AGENTROUTER_MODEL` — model requested through AgentRouter (default `claude-sonnet-4-20250514`)
+- `AGENTROUTER_MODEL` — model requested through AgentRouter (default `claude-opus-4-8`, live-verified through the gateway; if a group lacks a channel for it the API returns HTTP 503 "无可用渠道")
 - `NEXT_PUBLIC_SITE_URL` — canonical public URL, used for email links/OG tags
 - `CRON_SECRET` — shared secret guarding `/api/cron/reminders`
 - `NEXT_PUBLIC_GA_ID` — optional GA4
@@ -113,8 +113,11 @@ Callback route at `src/app/auth/callback/route.ts` — PKCE code exchange (OAuth
 ## AI Providers
 
 `src/lib/ai-review.ts` is the single AI service. It calls only **AgentRouter**
-(`AGENTROUTER_ENDPOINT`, default `https://agentrouter.org/v1/chat/completions`),
-there is **no provider fallback** — a missing key, HTTP error or malformed
+(`AGENTROUTER_ENDPOINT`, default `https://agentrouter.org/v1/messages`),
+speaking the **Anthropic Messages API** for Claude models — the AgentRouter
+key goes in the `x-api-key` header with an `anthropic-version` header (never a
+Bearer `Authorization` header, which AgentRouter answers with 401). There is
+**no provider fallback** — a missing key, HTTP error or malformed
 response surfaces as a structured `AI_REVIEW_FAILED` error, never a fake
 review. `scripts/test-ai.mjs` verifies the connection. Safe pipeline metrics
 (text/prompt lengths, fingerprints, model, HTTP status, response size) are
