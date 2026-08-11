@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Target, Search, ArrowLeft } from "lucide-react";
-import { Header } from "@/components/scholarship/header";
+import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import { ScholarshipCard } from "@/components/ui/scholarship-card";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -63,9 +63,8 @@ export default function MatchesPage() {
   }, [router]);
 
   return (
-    <>
-      <Header />
-      <main className="page-container py-8 space-y-8">
+    <DashboardShell>
+      <div className="space-y-8">
         <Link
           href="/scholarships"
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
@@ -150,7 +149,7 @@ export default function MatchesPage() {
             ))}
           </div>
         )}
-      </main>
-    </>
+      </div>
+    </DashboardShell>
   );
 }

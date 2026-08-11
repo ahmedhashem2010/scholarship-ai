@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 import { useState, useEffect } from "react";
 import { Search } from "lucide-react";
 import { ScholarshipCardList } from "@/components/scholarship-card-list";
-import { Header } from "@/components/scholarship/header";
+import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 
 export default function ScholarshipsPage() {
   const [scholarships, setScholarships] = useState<any[]>([]);
@@ -25,9 +25,8 @@ export default function ScholarshipsPage() {
 
   if (loading) {
     return (
-      <>
-        <Header />
-        <div className="page-container py-8 space-y-8">
+      <DashboardShell>
+        <div className="space-y-8">
           <div className="animate-pulse relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-primary-700 to-primary-900 p-6 sm:p-8 text-white">
             <div className="relative z-10">
               <div className="h-4 w-48 rounded bg-white/20" />
@@ -41,14 +40,13 @@ export default function ScholarshipsPage() {
             ))}
           </div>
         </div>
-      </>
+      </DashboardShell>
     );
   }
 
   return (
-    <>
-      <Header />
-      <div className="page-container py-8 space-y-8">
+    <DashboardShell>
+      <div className="space-y-8">
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-primary-700 to-primary-900 p-6 sm:p-8 text-white">
           <div className="relative z-10">
             <div className="flex items-center gap-2 mb-1">
@@ -64,6 +62,6 @@ export default function ScholarshipsPage() {
 
         <ScholarshipCardList scholarships={scholarships} />
       </div>
-    </>
+    </DashboardShell>
   );
 }

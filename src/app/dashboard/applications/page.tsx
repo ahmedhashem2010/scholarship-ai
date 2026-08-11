@@ -23,7 +23,7 @@ interface Application {
     nameEn: string;
     nameAr: string;
     country: string;
-  };
+  } | null;
   documents: AppDocument[];
 }
 
@@ -102,6 +102,37 @@ export default function ApplicationsPage() {
           {apps.map((app) => {
             const pct = Math.min(Math.max(app.progress || 0, 0), 100);
             const ready = app.documents.filter((d) => d.status === "READY").length;
+
+            // The scholarship this application referenced no longer exists
+            // (removed during the MVP database freeze). Never crash the page —
+            // render a safe "no longer available" card instead.
+            if (!app.scholarship) {
+              return (
+                <div
+                  key={app.id}
+                  className="dash-scale-in rounded-2xl border border-dashed border-border bg-muted/30 p-5"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-muted text-muted-foreground">
+                        <FolderKanban className="h-5 w-5" />
+                      </span>
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-muted-foreground">
+                          Scholarship no longer available
+                        </p>
+                        <p className="mt-0.5 text-xs text-muted-foreground">
+                          This scholarship was removed from the catalog, so this application can&apos;t
+                          be opened.
+                        </p>
+                      </div>
+                    </div>
+                    <StatusBadge status={app.status} />
+                  </div>
+                </div>
+              );
+            }
+
             return (
               <Link
                 key={app.id}

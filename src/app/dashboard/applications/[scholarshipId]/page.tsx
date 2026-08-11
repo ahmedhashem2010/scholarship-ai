@@ -58,7 +58,7 @@ interface Application {
   progress: number;
   startedAt: string;
   submittedAt: string | null;
-  scholarship: Scholarship;
+  scholarship: Scholarship | null;
   documents: ApplicationDoc[];
 }
 
@@ -278,6 +278,36 @@ export default function ApplicationJourneyPage() {
           </p>
           <p className="mb-6 text-sm text-muted-foreground">
             {error ?? "Application not found"}
+          </p>
+          <Button
+            variant="outline"
+            className="gap-2"
+            onClick={() => router.push("/dashboard")}
+          >
+            <ArrowLeft size={16} />
+            Back to Dashboard
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // The scholarship this application referenced was deleted (e.g. during the
+  // MVP 250 → 50 database freeze). The page must not touch app.scholarship.*
+  // and must never crash — show a safe, explicit state instead.
+  if (!app.scholarship) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-slate-50 to-white">
+        <div className="mx-auto max-w-md px-4 text-center">
+          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-amber-100">
+            <AlertCircle size={32} className="text-amber-500" />
+          </div>
+          <p className="mb-2 text-lg font-semibold text-foreground">
+            Scholarship no longer available
+          </p>
+          <p className="mb-6 text-sm text-muted-foreground">
+            This scholarship is no longer in the catalog, so its application
+            details can&apos;t be displayed.
           </p>
           <Button
             variant="outline"

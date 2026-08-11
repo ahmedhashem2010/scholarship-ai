@@ -55,6 +55,19 @@ export async function GET(request: NextRequest) {
       orderBy: { updatedAt: "desc" },
     });
 
+    // Orphan detection: an application whose scholarship no longer exists
+    // (e.g. it was deleted during the MVP 250 → 50 database freeze) resolves
+    // `scholarship` to null. The UI renders these as "no longer available" —
+    // never crash — but the orphan itself must stay visible in server logs so
+    // we can decide whether to clean it up.
+    for (const app of applications) {
+      if (!app.scholarship) {
+        console.warn(
+          `[applications] ORPHANED application "${app.id}" references missing scholarship "${app.scholarshipId}" (user "${app.userId}"). Rendered as no-longer-available.`
+        );
+      }
+    }
+
     return NextResponse.json({ success: true, data: applications });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Failed to fetch applications";
@@ -78,8 +91,14 @@ export async function POST(request: NextRequest) {
 
     const existing = await prisma.application.findUnique({
       where: { userId_scholarshipId: { userId: user.id, scholarshipId } },
+      include: { scholarship: true, documents: true },
     });
     if (existing) {
+      if (!existing.scholarship) {
+        console.warn(
+          `[applications] POST returned an orphaned application "${existing.id}" — scholarship "${scholarshipId}" no longer exists.`
+        );
+      }
       return NextResponse.json({ success: true, data: existing });
     }
 
@@ -103,7 +122,7 @@ export async function POST(request: NextRequest) {
           })),
         },
       },
-      include: { documents: true },
+      include: { scholarship: true, documents: true },
     });
 
     return NextResponse.json({ success: true, data: application }, { status: 201 });

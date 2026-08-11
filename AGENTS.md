@@ -43,7 +43,7 @@ auto-populate the Prisma `User` table — that's handled by the profile API rout
 - **Auth:** Supabase Auth (project kkqh...) — cookies managed by `@supabase/ssr`
 - **Database:** PostgreSQL via pooler + Prisma ORM (`prisma/schema.prisma`)
 - **Emails:** Zoho Mail over SMTP via nodemailer (`src/lib/email.ts`) — mailbox `care@smartscholar.org`. Resend is gone.
-- **AI:** Multi-provider fallback chain — **Groq (primary) → Gemini → BazaarLink → AgentRouter** — in `src/lib/ai-review.ts` (see AI Providers)
+- **AI:** AgentRouter is the **only** AI provider — no fallback chain. Single integration in `src/lib/ai-review.ts` (see AI Providers)
 - **Free model:** everything is free. Document reviews run on a daily quota (see `src/lib/review-quota.ts`) — no credits, no billing, no payments.
 - **Matching:** Custom algorithm in `src/lib/scholarship-matcher.ts` (fit score 0-100)
 - **RTL:** Arabic-first (default `lang="ar" dir="rtl"`), IBM Plex Sans + IBM Plex Sans Arabic, language toggle persisted as `smartscholar.lang` in localStorage
@@ -72,8 +72,8 @@ Key vars (all in `.env` at project root):
 - `SUPABASE_SERVICE_ROLE_KEY` — Auth project service role (admin operations)
 - `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASSWORD` — Zoho SMTP (`smtp.zoho.com:465`, app password, not login password)
 - `EMAIL_FROM` / `EMAIL_REPLY_TO` — must be the authenticated Zoho mailbox
-- `GROQ_API_KEY` — primary AI provider (free tier, no credit card)
-- `GEMINI_API_KEY` / `BAZAARLINK_API_KEY` / `AGENTROUTER_API_KEY` — optional AI fallbacks
+- `AGENTROUTER_API_KEY` — the only AI provider (required for document reviews)
+- `AGENTROUTER_MODEL` — model requested through AgentRouter (default `claude-sonnet-4-20250514`)
 - `NEXT_PUBLIC_SITE_URL` — canonical public URL, used for email links/OG tags
 - `CRON_SECRET` — shared secret guarding `/api/cron/reminders`
 - `NEXT_PUBLIC_GA_ID` — optional GA4
@@ -112,9 +112,13 @@ Callback route at `src/app/auth/callback/route.ts` — PKCE code exchange (OAuth
 
 ## AI Providers
 
-`src/lib/ai-review.ts` tries providers in order: **Groq → Gemini → BazaarLink →
-AgentRouter**, falling through on key-missing or HTTP errors; `scripts/test-ai.mjs`
-verifies the chain. Logging is gated behind
+`src/lib/ai-review.ts` is the single AI service. It calls only **AgentRouter**
+(`AGENTROUTER_ENDPOINT`, default `https://agentrouter.org/v1/chat/completions`),
+there is **no provider fallback** — a missing key, HTTP error or malformed
+response surfaces as a structured `AI_REVIEW_FAILED` error, never a fake
+review. `scripts/test-ai.mjs` verifies the connection. Safe pipeline metrics
+(text/prompt lengths, fingerprints, model, HTTP status, response size) are
+always logged; verbose logging is gated behind
 `AI_DEBUG` — response bodies can contain fragments of student documents, so it
 stays **off in production**.
 
@@ -174,7 +178,7 @@ All `age` fields were renamed to `dateOfBirth` (stored as `DateTime` in DB, `str
 | `src/app/auth/verify/page.tsx` | "Check your email" page with resend button |
 | `src/lib/email.ts` | Zoho SMTP client (nodemailer, pooled) |
 | `src/lib/email-templates.ts` | HTML templates (confirm, reset password, reminders) |
-| `src/lib/ai-review.ts` | AI provider chain (Groq → Gemini → BazaarLink → AgentRouter) |
+| `src/lib/ai-review.ts` | AI service — AgentRouter only, no fallback |
 | `src/lib/review-quota.ts` | Free daily review limit (`DAILY_REVIEW_LIMIT`) |
 | `src/app/onboarding/page.tsx` | 5-step onboarding wizard |
 | `src/app/dashboard/page.tsx` | Dashboard (redirects to onboarding if no profile) |

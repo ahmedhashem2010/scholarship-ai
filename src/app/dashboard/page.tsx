@@ -52,7 +52,7 @@ interface Application {
   status: string;
   progress: number;
   updatedAt: string;
-  scholarship: { nameEn: string; nameAr: string; country: string };
+  scholarship: { nameEn: string; nameAr: string; country: string } | null;
   documents: { documentType: string; status: string }[];
 }
 
@@ -460,6 +460,25 @@ function DeadlineRow({ match }: { match: Match }) {
 
 function AppProgressRow({ app }: { app: Application }) {
   const pct = Math.min(Math.max(app.progress || 0, 0), 100);
+
+  // Orphaned application (its scholarship was deleted in the MVP freeze).
+  // Render a safe card instead of crashing on app.scholarship.nameEn.
+  if (!app.scholarship) {
+    return (
+      <div className="rounded-xl border border-dashed border-border bg-muted/30 p-4">
+        <div className="flex items-center justify-between gap-3">
+          <p className="truncate text-sm font-semibold text-muted-foreground">
+            Scholarship no longer available
+          </p>
+          <StatusBadge status={app.status} />
+        </div>
+        <p className="mt-2 text-xs text-muted-foreground">
+          This scholarship was removed from the catalog.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <Link
       href={`/dashboard/applications/${app.scholarshipId}`}
@@ -682,7 +701,7 @@ export default function DashboardPage() {
       events.push({
         id: `app-${app.id}`,
         icon: FileText,
-        title: `Started application for ${app.scholarship.nameEn}`,
+        title: `Started application for ${app.scholarship?.nameEn ?? "a removed scholarship"}`,
         time: new Date(app.updatedAt).getTime(),
       });
     }

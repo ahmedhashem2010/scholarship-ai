@@ -143,7 +143,7 @@ UI primitives (`ui/`):
 ## AI Modules
 
 Main app:
-- `src/lib/ai-review.ts` — document review + provider fallback chain (Groq → Gemini → BazaarLink → AgentRouter)
+- `src/lib/ai-review.ts` — document review + AI service (AgentRouter only, no fallback chain)
 - `src/lib/review-quota.ts` — free daily AI review limit
 - `src/lib/scholarship-matcher.ts` — deterministic fit-score matching
 - `src/lib/roadmap-generator.ts` — deterministic milestone generation

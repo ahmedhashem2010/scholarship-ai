@@ -157,73 +157,10 @@ Rules:
 
 You will receive a JSON array of English names. Return a JSON array of Arabic names, same length, same order. Return ONLY the JSON array.`;
 
-const GROQ_KEY = process.env.GROQ_API_KEY || "";
-const GROQ_MODEL = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
-const GROQ_URL = process.env.GROQ_ENDPOINT || "https://api.groq.com/openai/v1/chat/completions";
-const GEMINI_KEY = process.env.GEMINI_API_KEY || "";
-const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.0-flash";
-
-/** Groq — same provider the app now uses for reviews. */
-async function viaGroq(names) {
-  const res = await fetch(GROQ_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${GROQ_KEY}` },
-    body: JSON.stringify({
-      model: GROQ_MODEL,
-      // Deterministic: a name is a fact, not a creative task.
-      temperature: 0,
-      max_tokens: 2000,
-      response_format: { type: "json_object" },
-      messages: [
-        // json_object mode requires an object, not a bare array, so the model
-        // is asked for {"names": [...]} and unwrapped below.
-        // The word "json" must appear or Groq rejects json_object mode with a 400.
-        { role: "system", content: `${SYSTEM_PROMPT}\n\nReturn a JSON object of this exact shape: {"names": ["...", "..."]}` },
-        { role: "user", content: JSON.stringify(names) },
-      ],
-    }),
-  });
-  const body = await res.text();
-  if (!res.ok) {
-    if (res.status === 429) throw new Error("HTTP 429 — rate limited. Wait a minute and re-run; only untranslated names are retried.");
-    if (res.status === 404) throw new Error(`Model "${GROQ_MODEL}" not found — set GROQ_MODEL in .env. See https://console.groq.com/docs/models`);
-    throw new Error(`HTTP ${res.status}: ${body.slice(0, 200)}`);
-  }
-  return JSON.parse(body)?.choices?.[0]?.message?.content ?? "";
-}
-
-/** Google Gemini — fallback. */
-async function viaGemini(names) {
-  const url =
-    `https://generativelanguage.googleapis.com/v1beta/models/` +
-    `${encodeURIComponent(GEMINI_MODEL)}:generateContent`;
-
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "x-goog-api-key": GEMINI_KEY },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: `${SYSTEM_PROMPT}\n\n${JSON.stringify(names)}` }] }],
-      generationConfig: {
-        temperature: 0,
-        maxOutputTokens: 2000,
-        responseMimeType: "application/json",
-      },
-    }),
-  });
-
-  const body = await res.text();
-  if (!res.ok) {
-    if (res.status === 429) throw new Error("HTTP 429 — free-tier quota hit. Wait a minute and re-run; the script only retries names it hasn't translated.");
-    throw new Error(`HTTP ${res.status}: ${body.slice(0, 200)}`);
-  }
-  const parts = JSON.parse(body)?.candidates?.[0]?.content?.parts;
-  return Array.isArray(parts) ? parts.map((p) => p?.text ?? "").join("") : "";
-}
-
-/** AgentRouter — kept only as a fallback. */
+/** AgentRouter — the ONLY AI provider (no fallback chain). */
 async function viaAgentRouter(names) {
   const key = process.env.AGENTROUTER_API_KEY;
-  if (!key) throw new Error("Neither GEMINI_API_KEY nor AGENTROUTER_API_KEY is set");
+  if (!key) throw new Error("AGENTROUTER_API_KEY is not set in .env");
 
   const res = await fetch(ENDPOINT, {
     method: "POST",
@@ -249,7 +186,7 @@ async function viaAgentRouter(names) {
       throw new Error("HTTP 401 unauthorized_client — the gateway rejected the CLIENT, not the key.");
     }
     if (res.status === 503 && body.includes("\u65e0\u53ef\u7528\u6e20\u9053")) {
-      throw new Error(`HTTP 503 — your AgentRouter group has no channel for "${MODEL}". Set GEMINI_API_KEY instead.`);
+      throw new Error(`HTTP 503 — your AgentRouter group has no channel for "${MODEL}".`);
     }
     throw new Error(`HTTP ${res.status}: ${body.slice(0, 200)}`);
   }
@@ -261,11 +198,7 @@ async function viaAgentRouter(names) {
 }
 
 async function translateBatch(names) {
-  const content = GROQ_KEY
-    ? await viaGroq(names)
-    : GEMINI_KEY
-      ? await viaGemini(names)
-      : await viaAgentRouter(names);
+  const content = await viaAgentRouter(names);
 
   const cleaned = String(content).replace(/```json\s*/gi, "").replace(/```/g, "").trim();
   let parsed;
@@ -274,7 +207,7 @@ async function translateBatch(names) {
   } catch {
     throw new Error(`Model did not return JSON: ${cleaned.slice(0, 200)}`);
   }
-  // json_object mode wraps the result in an object; accept either shape.
+  // Accept either a bare array or a {"names": [...]} wrapper.
   if (!Array.isArray(parsed) && Array.isArray(parsed?.names)) parsed = parsed.names;
   if (!Array.isArray(parsed)) throw new Error("Model did not return an array");
   if (parsed.length !== names.length) {

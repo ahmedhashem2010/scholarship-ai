@@ -2,7 +2,13 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createApiClient } from "@/lib/supabase/api-auth";
-import { reviewDocument, calculateAverageScore } from "@/lib/ai-review";
+import {
+  reviewDocument,
+  calculateAverageScore,
+  AiConfigError,
+  AiCapacityError,
+  AGENTROUTER_MODEL,
+} from "@/lib/ai-review";
 import type { ReviewScore } from "@/lib/ai-review";
 import { extractTextFromFile } from "@/lib/text-extract";
 import { getVersionChain } from "@/lib/document-versions";
@@ -222,7 +228,7 @@ export async function POST(
       );
     }
 
-    debugLog("[POST] Step 9/12: Calling AI review...");
+    debugLog("[POST] Step 9/12: Calling AI review via AgentRouter...");
     let coaching: ReviewScore;
     try {
       coaching = await reviewDocument(text, document.documentType);
@@ -232,14 +238,26 @@ export async function POST(
       // The daily slot was reserved before the call — release it so a failed
       // review never consumes one of the user's free reviews.
       await releaseDailySlot(user.id, day);
-      const msg = aiErr instanceof Error ? aiErr.message : "";
-      const isCapacity = /quota|rate limit|insufficient|temporarily unavailable/i.test(msg);
+      const technical = aiErr instanceof Error ? aiErr.message : String(aiErr);
+      let message: string;
+      if (aiErr instanceof AiConfigError) {
+        message =
+          "AI review failed. The AI provider is not configured — AGENTROUTER_API_KEY is missing from the server environment.";
+      } else if (
+        aiErr instanceof AiCapacityError ||
+        /quota|rate limit|insufficient|temporarily unavailable|high demand/i.test(technical)
+      ) {
+        message =
+          "AI review failed. Our review service is busy right now. Please try again in a few minutes — you haven't used a review.";
+      } else {
+        const detail = technical.replace(/^AI review failed:\s*/i, "").slice(0, 300);
+        message = `AI review failed. ${detail}`;
+      }
       return NextResponse.json(
         {
           success: false,
-          error: isCapacity
-            ? "Our review service is busy right now. Please try again in a few minutes — you haven't used a review."
-            : "The review couldn't be completed. Please try again — you haven't used a review.",
+          error: "AI_REVIEW_FAILED",
+          message,
         },
         { status: 502 }
       );
@@ -271,6 +289,7 @@ export async function POST(
           documentId: document.id,
           userId: user.id,
           score: mainScore,
+          modelUsed: AGENTROUTER_MODEL,
           strengths: JSON.stringify(scoresData),
           weaknesses: JSON.stringify([]),
           suggestions: JSON.stringify(coaching.topImprovements ?? []),
@@ -316,7 +335,7 @@ export async function POST(
       topImprovements: safeArray(review.suggestions),
       quickWins: safeArray(review.grammarIssues),
       overallAssessment: review.overallFeedback,
-      modelUsed: review.modelUsed,
+      modelUsed: review.modelUsed || AGENTROUTER_MODEL,
       createdAt: review.createdAt,
     };
 

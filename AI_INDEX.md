@@ -4,14 +4,14 @@ Inventory of AI-related modules. Facts only.
 
 ## AI Providers
 
+AgentRouter is the **only** AI provider in the active SmartScholar app. There is
+no fallback chain.
+
 | Provider | File | Purpose |
 |----------|------|---------|
-| Groq | `src/lib/ai-review.ts` | Primary provider for document review (OpenAI-compatible) |
-| Google Gemini | `src/lib/ai-review.ts` | Fallback provider for document review (Google REST API) |
-| BazaarLink | `src/lib/ai-review.ts` | Fallback provider (OpenAI-compatible gateway) |
-| AgentRouter | `src/lib/ai-review.ts` | Final fallback provider (OpenAI-compatible gateway) |
-| Embedding provider | `smartscholar-backend/scripts/generateEmbeddings.ts` | Generates scholarship vector embeddings |
-| Deep-extract AI | `smartscholar-backend/src/deep-extract/ai.ts` | AI extraction for the ingestion pipeline |
+| AgentRouter | `src/lib/ai-review.ts` | The ONLY AI provider for document review (OpenAI-compatible gateway) |
+| Embedding provider | `smartscholar-backend/scripts/generateEmbeddings.ts` | Generates scholarship vector embeddings (backend) |
+| Deep-extract AI | `smartscholar-backend/src/deep-extract/ai.ts` | AI extraction for the ingestion pipeline (backend) |
 
 ## AI API Routes
 
@@ -23,7 +23,7 @@ Inventory of AI-related modules. Facts only.
 
 | File | Function |
 |------|----------|
-| `src/lib/ai-review.ts` | `reviewDocument`, `callAI`, `callGemini`, `callOpenAICompatible`, `calculateAverageScore` |
+| `src/lib/ai-review.ts` | `reviewDocument`, `callAgentRouter`, `buildReviewPrompt`, `calculateAverageScore`, `fingerprint` |
 | `src/lib/scholarship-matcher.ts` | `matchScholarshipsToUser` (deterministic matching) |
 | `src/lib/roadmap-generator.ts` | roadmap milestone generation (deterministic) |
 | `smartscholar-backend/src/deep-extract/ai.ts` | AI-assisted field extraction |
@@ -40,14 +40,9 @@ Inventory of AI-related modules. Facts only.
 
 | Variable | Module |
 |----------|--------|
-| `GROQ_API_KEY` | `src/lib/ai-review.ts` |
-| `GROQ_MODEL` | `src/lib/ai-review.ts` |
-| `GROQ_ENDPOINT` | `src/lib/ai-review.ts` |
-| `GEMINI_API_KEY` | `src/lib/ai-review.ts` |
-| `GEMINI_MODEL` | `src/lib/ai-review.ts` |
-| `BAZAARLINK_API_KEY` | `src/lib/ai-review.ts` |
-| `BAZAARLINK_ENDPOINT` | `src/lib/ai-review.ts` |
 | `AGENTROUTER_API_KEY` | `src/lib/ai-review.ts` |
+| `AGENTROUTER_MODEL` | `src/lib/ai-review.ts` |
+| `AGENTROUTER_ENDPOINT` | `src/lib/ai-review.ts` |
 | `AGENTROUTER_ORIGINATOR` | `src/lib/ai-review.ts` |
 | `AGENTROUTER_USER_AGENT` | `src/lib/ai-review.ts` |
 | `AGENTROUTER_VERSION` | `src/lib/ai-review.ts` |
@@ -65,7 +60,7 @@ Review API (/api/documents/[id]/review)
         ↓
 AI Service (reviewDocument → callAI)
         ↓
-AI Provider (Groq → Gemini → BazaarLink → AgentRouter)
+AI Provider (AgentRouter — the only provider, no fallback)
         ↓
 Database (Review record, review quota updated)
         ↓

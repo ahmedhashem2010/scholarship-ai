@@ -161,8 +161,8 @@ export default function DocumentsPage() {
       if (!ct.includes("application/json")) {
         const text = await res.text().catch(() => "");
         console.error("Non-JSON response from review POST:", text.slice(0, 200));
-        setError("Review failed. Server returned an unexpected response.");
-        addToast("error", "Review failed. Server error.");
+        setError("AI review failed. Server returned an unexpected response.");
+        addToast("error", "AI review failed. Server error.");
         setReviewingId(null);
         fetchQuota();
         return;
@@ -170,18 +170,18 @@ export default function DocumentsPage() {
       const json = await res.json();
       if (json.success && json.data) {
         setReviews((prev) => ({ ...prev, [docId]: json.data }));
-        addToast("success", `Review complete! Score: ${json.data.score}/10`);
+        addToast("success", `AI review completed. Score: ${json.data.score}/10`);
         router.push(`/dashboard/reviews/${docId}`);
       } else if (json.limitReached) {
-        setError(json.error ?? "You've reached your daily review limit");
-        addToast("error", json.error ?? "You've reached your daily review limit");
+        setError(json.message ?? json.error ?? "You've reached your daily review limit");
+        addToast("error", json.message ?? json.error ?? "You've reached your daily review limit");
       } else {
-        setError(json.error ?? "Review failed");
-        addToast("error", json.error ?? "Review failed");
+        setError(json.message ?? json.error ?? "AI review failed");
+        addToast("error", json.message ?? json.error ?? "AI review failed");
       }
     } catch {
-      setError("Review failed. Please try again.");
-      addToast("error", "Review failed. Please try again.");
+      setError("AI review failed. Please try again.");
+      addToast("error", "AI review failed. Please try again.");
     } finally {
       setReviewingId(null);
       fetchQuota();

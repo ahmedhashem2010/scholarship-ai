@@ -1,7 +1,3 @@
-const BAZAARLINK_ENDPOINT =
-  process.env.BAZAARLINK_ENDPOINT || "https://bazaarlink.ai/api/v1/chat/completions";
-const BAZAARLINK_KEY = process.env.BAZAARLINK_API_KEY || "";
-
 /**
  * Client identification AgentRouter requires. Exported so scripts send exactly
  * the same values as the app — when these drifted apart, the app 401'd while
@@ -13,7 +9,35 @@ export const AGENTROUTER_CLIENT = {
   version: process.env.AGENTROUTER_VERSION || "0.101.0",
 } as const;
 
-const REVIEW_MODELS = ['claude-sonnet-4-20250514']; // Only Claude for reviews
+/**
+ * AgentRouter is the ONLY AI provider. Every AI request in SmartScholar goes
+ * through this gateway — there is deliberately no fallback provider, so a
+ * failure is a real failure and never a silent switch to another vendor.
+ *
+ * Endpoint overridable with AGENTROUTER_ENDPOINT, model overridable with
+ * AGENTROUTER_MODEL. Both read once at module load.
+ */
+export const AGENTROUTER_URL =
+  process.env.AGENTROUTER_ENDPOINT || "https://agentrouter.org/v1/chat/completions";
+
+export const AGENTROUTER_MODEL =
+  process.env.AGENTROUTER_MODEL || "claude-sonnet-4-20250514";
+
+/** AI service not configured — e.g. AGENTROUTER_API_KEY missing. */
+export class AiConfigError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "AiConfigError";
+  }
+}
+
+/** Provider reachable but overloaded / out of quota. */
+export class AiCapacityError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "AiCapacityError";
+  }
+}
 
 export interface ReviewScore {
   overallQuality: {
@@ -71,6 +95,28 @@ Return ONLY JSON (no other text):
 }`;
 
 /**
+ * Build the review prompt for a document. Pure and exported so tests can prove
+ * that two different documents produce two different prompts (and that the
+ * extracted text genuinely reaches the model input).
+ *
+ * The document is truncated to 15k chars here — long enough to review real
+ * CVs/statements, short enough to stay inside the provider context window.
+ */
+export function buildReviewPrompt(documentType: string, text: string): string {
+  const typeLabel = documentType.replace(/_/g, " ").toLowerCase();
+  return REVIEW_PROMPT
+    .replace("{documentType}", typeLabel)
+    .replace("{documentText}", text.slice(0, 15000));
+}
+
+/** Max chars of an error message we'll surface to the client. */
+const MAX_CLIENT_ERROR = 300;
+function truncateForClient(message: string): string {
+  const single = message.replace(/\s+/g, " ").trim();
+  return single.length > MAX_CLIENT_ERROR ? single.slice(0, MAX_CLIENT_ERROR) + "…" : single;
+}
+
+/**
  * Verbose provider logging. Off by default: the response body can contain
  * fragments of the user's uploaded document, which should not sit in
  * production logs.
@@ -81,330 +127,169 @@ function debugLog(...args: unknown[]) {
 }
 
 /**
- * Generic OpenAI-compatible chat completion.
- *
- * Groq, OpenRouter, Together, DeepInfra, BazaarLink and AgentRouter all speak
- * this same shape, so a dead vendor becomes two env-var changes rather than a
- * code change. This project has now been blocked by three separate provider
- * outages; that's the reason this is generic.
- *
- * Returns null on failure so callAI can fall through to the next provider.
- * Throws only for conditions the user must be told about (rate limits).
+ * Structured, production-safe pipeline metadata. Numbers, model names and
+ * fingerprints only — never user ids, file URLs, response bodies or document
+ * previews.
  */
-async function callOpenAICompatible(opts: {
-  name: string;
-  url: string;
-  key: string;
-  model: string;
-  prompt: string;
-  headers?: Record<string, string>;
-}): Promise<string | null> {
-  const { name, url, key, model, prompt, headers = {} } = opts;
+function infoLog(...args: unknown[]) {
+  console.info("[ai-review]", ...args);
+}
+
+/**
+ * Stable short fingerprint of a string (FNV-1a, hex). Used in logs so two
+ * requests can be compared for "same input?" without ever printing the
+ * document or prompt content. Not cryptographic — it exists to spot identical
+ * inputs, not for security.
+ */
+export function fingerprint(input: string): string {
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < input.length; i++) {
+    hash ^= input.charCodeAt(i);
+    hash = (hash * 0x01000193) >>> 0;
+  }
+  return hash.toString(16).padStart(8, "0");
+}
+
+/**
+ * Send the prompt to AgentRouter and return the model's text.
+ *
+ * Single-provider by design: no fallback chain, no generic canned reply.
+ * Every failure throws:
+ *   - AiConfigError    — AGENTROUTER_API_KEY missing
+ *   - AiCapacityError  — 429 / quota / rate-limit
+ *   - Error            — auth failure, non-JSON body, empty completion, network
+ *
+ * The caller surfaces the error to the user; a successful review is never
+ * fabricated.
+ */
+async function callAgentRouter(prompt: string): Promise<string> {
+  const key = process.env.AGENTROUTER_API_KEY;
   if (!key) {
-    debugLog(`[${name}] skipped — no API key configured`);
-    return null;
+    infoLog("AgentRouter config error — AGENTROUTER_API_KEY not set");
+    throw new AiConfigError(
+      "AgentRouter is not configured: AGENTROUTER_API_KEY is missing."
+    );
   }
 
+  debugLog(
+    `[AgentRouter] POST ${AGENTROUTER_URL} (model: ${AGENTROUTER_MODEL}, max_tokens: 2000)`
+  );
+
+  let response: Response;
   try {
-    const response = await fetch(url, {
+    response = await fetch(AGENTROUTER_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${key}`,
-        ...headers,
+        // AgentRouter fingerprints the calling client and rejects requests it
+        // doesn't recognise with HTTP 401 "unauthorized client detected" —
+        // which looks exactly like a bad API key. Without these three headers
+        // every review fails, no matter how valid the key is.
+        Originator: AGENTROUTER_CLIENT.originator,
+        "User-Agent": AGENTROUTER_CLIENT.userAgent,
+        Version: AGENTROUTER_CLIENT.version,
       },
       body: JSON.stringify({
-        model,
-        max_tokens: 2000,
-        temperature: 0.4,
-        // Groq (and OpenAI) reject json_object mode unless the messages
-        // literally contain the word "json" — a 400, not a soft failure. Only
-        // request the mode when the prompt satisfies that, so a provider that
-        // doesn't support response_format at all still works.
-        ...(/json/i.test(prompt) ? { response_format: { type: "json_object" } } : {}),
-        messages: [{ role: "user", content: prompt }],
-      }),
-    });
-
-    const body = await response.text().catch(() => "");
-    debugLog(`[${name}] status: ${response.status}`);
-    debugLog(`[${name}] body (500 chars): ${body.slice(0, 500)}`);
-
-    if (!response.ok) {
-      if (response.status === 429) {
-        throw new Error(
-          "AI review is temporarily rate-limited. Please try again in a few minutes."
-        );
-      }
-      console.error(`[${name}] FAILED ${response.status}: ${body.slice(0, 200)}`);
-      return null;
-    }
-
-    const text = JSON.parse(body)?.choices?.[0]?.message?.content ?? "";
-    if (!text.trim()) {
-      console.error(`[${name}] empty response`);
-      return null;
-    }
-    return text;
-  } catch (e) {
-    if (e instanceof Error && e.message.includes("rate-limited")) throw e;
-    console.error(`[${name}] error:`, e);
-    return null;
-  }
-}
-
-/**
- * Groq — the primary provider. Free tier, no card, and fast.
- * Override GROQ_MODEL if the named model is retired.
- */
-const GROQ_KEY = process.env.GROQ_API_KEY || "";
-const GROQ_MODEL = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
-const GROQ_URL = process.env.GROQ_ENDPOINT || "https://api.groq.com/openai/v1/chat/completions";
-
-/**
- * Google Gemini — the primary provider.
- *
- * Uses Google's own REST API rather than an OpenAI-compatible gateway, so
- * there is no third party between us and the model that can silently lose a
- * routing channel. The free tier at aistudio.google.com needs no card and is
- * comfortably above what this product will use.
- *
- * Note the different shape: `contents[].parts[].text` in, and the response is
- * `candidates[0].content.parts[].text` — not `choices[0].message.content`.
- */
-const GEMINI_KEY = process.env.GEMINI_API_KEY || "";
-const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.0-flash";
-
-async function callGemini(prompt: string): Promise<string | null> {
-  if (!GEMINI_KEY) {
-    debugLog("[Gemini] skipped — GEMINI_API_KEY not set");
-    return null;
-  }
-
-  const url =
-    `https://generativelanguage.googleapis.com/v1beta/models/` +
-    `${encodeURIComponent(GEMINI_MODEL)}:generateContent`;
-
-  try {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // Header, not a query param — a key in the URL ends up in access logs.
-        "x-goog-api-key": GEMINI_KEY,
-      },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: 0.4,
-          maxOutputTokens: 2000,
-          responseMimeType: "application/json",
-        },
-      }),
-    });
-
-    const body = await response.text().catch(() => "");
-    debugLog(`[Gemini] status: ${response.status}`);
-    debugLog(`[Gemini] body (500 chars): ${body.slice(0, 500)}`);
-
-    if (!response.ok) {
-      // 429 = free-tier quota. Worth surfacing distinctly so the caller can
-      // free the user's daily review slot and tell them to retry rather than
-      // blaming them.
-      if (response.status === 429) {
-        throw new Error(
-          "AI review is temporarily rate-limited. Please try again in a few minutes."
-        );
-      }
-      console.error(`[Gemini] FAILED ${response.status}: ${body.slice(0, 200)}`);
-      return null;
-    }
-
-    const data = JSON.parse(body);
-    const parts = data?.candidates?.[0]?.content?.parts;
-    const text = Array.isArray(parts)
-      ? parts.map((p: { text?: string }) => p?.text ?? "").join("")
-      : "";
-
-    if (!text.trim()) {
-      // A blocked prompt returns 200 with no candidate text.
-      const reason = data?.promptFeedback?.blockReason ?? data?.candidates?.[0]?.finishReason;
-      console.error(`[Gemini] empty response${reason ? ` (${reason})` : ""}`);
-      return null;
-    }
-    return text;
-  } catch (e) {
-    if (e instanceof Error && e.message.includes("rate-limited")) throw e;
-    console.error("[Gemini] fetch error:", e);
-    return null;
-  }
-}
-
-async function callAI(prompt: string): Promise<string> {
-  // Gemini first. The OpenAI-compatible gateways below are kept as fallbacks,
-  // but both proved unreliable in practice: AgentRouter rejected the app as an
-  // "unauthorized client", and once that was fixed reported no available
-  // channel for the configured model.
-  const groq = await callOpenAICompatible({
-    name: "Groq", url: GROQ_URL, key: GROQ_KEY, model: GROQ_MODEL, prompt,
-  });
-  if (groq) return groq;
-
-  const gemini = await callGemini(prompt);
-  if (gemini) return gemini;
-
-  // Then BazaarLink (free OpenAI-compatible gateway).
-  // Skipped entirely when no key is configured — fall straight through to AgentRouter.
-  if (!BAZAARLINK_KEY) {
-    debugLog("[BazaarLink] skipped — BAZAARLINK_API_KEY not set");
-  } else try {
-    const url = BAZAARLINK_ENDPOINT;
-    debugLog(`[BazaarLink] POST ${url} (model: auto:free, max_tokens: 2000)`);
-
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${BAZAARLINK_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "auto:free",
+        model: AGENTROUTER_MODEL,
         max_tokens: 2000,
         temperature: 0.4,
         messages: [{ role: "user", content: prompt }],
       }),
     });
-
-    const ct = response.headers.get("content-type") || "";
-    const body = await response.text().catch(() => "");
-    debugLog(`[BazaarLink] status: ${response.status}, content-type: ${ct}`);
-    debugLog(`[BazaarLink] body (500 chars): ${body.slice(0, 500)}`);
-
-    if (response.ok && ct.includes("application/json")) {
-      const data = JSON.parse(body);
-      return data.choices?.[0]?.message?.content ?? "";
-    }
-
-    console.error(`[BazaarLink] FAILED — non-JSON or error response`);
   } catch (e) {
-    console.error(`[BazaarLink] fetch error:`, e);
+    throw new Error(
+      `AgentRouter network error: ${e instanceof Error ? e.message : String(e)}`
+    );
   }
 
-  let lastError: string | null = null;
-
-  for (const model of REVIEW_MODELS) {
-    try {
-      const url = "https://agentrouter.org/v1/chat/completions";
-      const key = process.env.AGENTROUTER_API_KEY;
-      if (!key) {
-        lastError = "AGENTROUTER_API_KEY not set";
-        console.error("[AgentRouter] AGENTROUTER_API_KEY not set — skipping");
-        break;
-      }
-      debugLog(`[AgentRouter] POST ${url} (model: ${model}, max_tokens: 2000)`);
-
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${key}`,
-          // AgentRouter fingerprints the calling client and rejects requests it
-          // doesn't recognise with HTTP 401 "unauthorized client detected" —
-          // which looks exactly like a bad API key. Without these three headers
-          // every review fails, no matter how valid the key is.
-          // scripts/test-agentrouter.mjs already sent them; the app did not.
-          Originator: AGENTROUTER_CLIENT.originator,
-          "User-Agent": AGENTROUTER_CLIENT.userAgent,
-          Version: AGENTROUTER_CLIENT.version,
-        },
-        body: JSON.stringify({
-          model,
-          max_tokens: 2000,
-          temperature: 0.4,
-          messages: [{ role: "user", content: prompt }],
-        }),
-      });
-
-      const ct = response.headers.get("content-type") || "";
-      const body = await response.text().catch(() => "");
-      const msg = body.toLowerCase();
-      debugLog(`[AgentRouter] status: ${response.status}, content-type: ${ct}`);
-      debugLog(`[AgentRouter] body (500 chars): ${body.slice(0, 500)}`);
-
-      if (response.ok && ct.includes("application/json")) {
-        const data = JSON.parse(body);
-        return data.choices?.[0]?.message?.content ?? "";
-      }
-
-      if (response.status === 429 || msg.includes("quota") || msg.includes("rate limit") || msg.includes("insufficient")) {
-        throw new Error("AI review service is temporarily unavailable due to high demand. Please try again in a few minutes.");
-      }
-      if (response.status === 403 && model === REVIEW_MODELS[REVIEW_MODELS.length - 1]) {
-        throw new Error(`AgentRouter authentication failed (HTTP ${response.status}). Please verify your API key at https://agentrouter.org/console/token and ensure it has credits. Response: ${body.slice(0, 150)}`);
-      }
-      lastError = `Model "${model}" failed (${response.status}, ${ct})`;
-    } catch (e) {
-      if (e instanceof Error && (e.message.includes("quota") || e.message.includes("rate limit") || e.message.includes("insufficient") || e.message.includes("authentication failed"))) {
-        throw e;
-      }
-      console.error(`[AgentRouter] model "${model}" error:`, e);
-      lastError = `Model "${model}" threw: ${e instanceof Error ? e.message : String(e)}`;
-    }
-  }
-
-  throw new Error(
-    `No AI provider is available. Set GROQ_API_KEY in .env (free key, no ` +
-    `card, at https://console.groq.com/keys). Last gateway error: ${lastError}`
+  const ct = response.headers.get("content-type") || "";
+  const body = await response.text().catch(() => "");
+  infoLog(
+    `AgentRouter request finished ok=${response.ok} status=${response.status} ` +
+      `contentType=${ct} responseChars=${body.length} model=${AGENTROUTER_MODEL}`
   );
+  debugLog(`[AgentRouter] body (500 chars): ${body.slice(0, 500)}`);
+
+  if (!response.ok) {
+    const msg = body.toLowerCase();
+    if (
+      response.status === 429 ||
+      msg.includes("quota") ||
+      msg.includes("rate limit") ||
+      msg.includes("insufficient")
+    ) {
+      throw new AiCapacityError(
+        "AI review service is temporarily unavailable due to high demand. Please try again in a few minutes."
+      );
+    }
+    if (response.status === 401 || response.status === 403) {
+      throw new Error(
+        "AgentRouter authentication failed (HTTP " +
+          response.status +
+          "). Please verify your API key at https://agentrouter.org/console/token and ensure it has credits."
+      );
+    }
+    throw new Error(`AgentRouter request failed (HTTP ${response.status}, ${ct}).`);
+  }
+
+  if (!ct.includes("application/json")) {
+    throw new Error(
+      `AgentRouter returned a non-JSON response (content-type: ${ct}).`
+    );
+  }
+
+  let data: unknown;
+  try {
+    data = JSON.parse(body);
+  } catch {
+    throw new Error("AgentRouter returned an unparseable response body.");
+  }
+
+  const content =
+    (data as { choices?: { message?: { content?: string } }[] } | null)
+      ?.choices?.[0]?.message?.content ?? "";
+  if (!content.trim()) {
+    throw new Error("AgentRouter returned an empty completion for the review request.");
+  }
+  return content;
 }
 
-const FALLBACK: ReviewScore = {
-  overallQuality: {
-    score: 5,
-    strengthsSummary: "Shows relevant experience and interest in the field",
-    weaknessesSummary: "Needs more specific evidence and quantifiable achievements",
-  },
-  atsCompatibility: {
-    score: 5,
-    missingKeywords: ["scholarship focus areas", "quantifiable results"],
-    improvements: ["Add section headers", "Include relevant keywords"],
-  },
-  competitiveness: {
-    score: 5,
-    uniqueStrengths: "Demonstrates basic qualifications",
-    differentiation: "Add unique achievements and a compelling personal story to stand out",
-  },
-  topImprovements: [
-    "Add specific quantifiable achievements with numbers and outcomes",
-    "Strengthen the opening paragraph to grab attention",
-    "Tailor content specifically to this scholarship's criteria",
-    "Remove generic phrases and clichés throughout",
-    "Proofread carefully for grammar and consistency",
-  ],
-  quickWins: [
-    "Review comma usage in longer sentences",
-    "Replace passive voice with active constructions",
-  ],
-  overallAssessment: "The document covers relevant experience but needs more specific, quantifiable achievements and better tailoring to the scholarship criteria. The main priority is adding concrete metrics and outcomes.",
-};
-
+/**
+ * Review a document's extracted text.
+ *
+ * THROWS on any provider failure — it never fabricates a successful review.
+ * A thrown error is a real failure the caller must surface to the user.
+ */
 export async function reviewDocument(
   text: string,
   documentType: string
 ): Promise<ReviewScore> {
-  const typeLabel = documentType.replace(/_/g, " ").toLowerCase();
+  if (!text || text.trim().length === 0) {
+    const err = new Error("The document contains no extractable text to review.");
+    infoLog(`rejected empty text for documentType=${documentType}`);
+    throw err;
+  }
 
-  const prompt = REVIEW_PROMPT
-    .replace("{documentType}", typeLabel)
-    .replace("{documentText}", text.slice(0, 15000));
+  const prompt = buildReviewPrompt(documentType, text);
+  infoLog(
+    `review started documentType=${documentType} textChars=${text.length} ` +
+      `promptChars=${prompt.length} model=${AGENTROUTER_MODEL} ` +
+      `textFingerprint=${fingerprint(text)} promptFingerprint=${fingerprint(prompt)}`
+  );
+  debugLog(`[review] text preview (300 chars): ${text.slice(0, 300).replace(/\s+/g, " ")}`);
 
   let responseText: string;
   try {
-    responseText = await callAI(prompt);
+    responseText = await callAgentRouter(prompt);
   } catch (e) {
-    console.error("callAI threw:", e);
-    return { ...FALLBACK };
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error("[ai-review] AgentRouter failed:", msg);
+    if (e instanceof AiConfigError || e instanceof AiCapacityError) throw e;
+    throw new Error(`AI review failed: ${truncateForClient(msg)}`);
   }
+
+  infoLog(`review received provider text responseChars=${responseText.length}`);
 
   try {
     const cleaned = responseText
@@ -412,17 +297,36 @@ export async function reviewDocument(
       .replace(/```\s*/g, "")
       .trim();
     const parsed: ReviewScore = JSON.parse(cleaned);
-    if (typeof parsed.overallQuality?.score !== "number" || parsed.overallQuality.score < 1 || parsed.overallQuality.score > 10) {
-      throw new Error("Invalid score");
+    if (!parsed || typeof parsed !== "object") {
+      throw new Error("response was not a JSON object");
+    }
+    if (
+      typeof parsed.overallQuality?.score !== "number" ||
+      typeof parsed.atsCompatibility?.score !== "number" ||
+      typeof parsed.competitiveness?.score !== "number"
+    ) {
+      throw new Error("missing required score fields");
+    }
+    if (
+      parsed.overallQuality.score < 1 ||
+      parsed.overallQuality.score > 10 ||
+      parsed.atsCompatibility.score < 1 ||
+      parsed.atsCompatibility.score > 10 ||
+      parsed.competitiveness.score < 1 ||
+      parsed.competitiveness.score > 10
+    ) {
+      throw new Error("score out of the 1-10 range");
     }
     return parsed;
   } catch {
-    const preview = responseText.length > 200 ? responseText.slice(0, 200) + "..." : responseText;
-    console.error("AI review parsing failed. Raw response:", preview);
-    const score = Math.max(1, Math.min(10, parseInt(responseText.match(/\d+/)?.[0] || "5")));
-    return {
-      ...FALLBACK,
-      overallQuality: { ...FALLBACK.overallQuality, score },
-    };
+    const preview =
+      responseText.length > 300 ? responseText.slice(0, 300) + "..." : responseText;
+    console.error(
+      `[ai-review] malformed AgentRouter response (${responseText.length} chars). Preview:`,
+      preview
+    );
+    throw new Error(
+      `AI review failed: AgentRouter returned a malformed response (${responseText.length} characters) that could not be parsed as a review.`
+    );
   }
 }
