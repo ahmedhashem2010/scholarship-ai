@@ -3,11 +3,11 @@
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
-import { Fragment, useEffect, useRef, useState, type CSSProperties } from "react";
+import { Fragment, useEffect, useState, type CSSProperties } from "react";
 import {
   ArrowLeft, ArrowRight, ArrowUp, ArrowUpRight, BadgeCheck, CalendarClock, Check,
   ChevronDown, ClipboardList, FileCheck2, Flag, GraduationCap, MapPin, MessageSquare,
-  Quote, Route, ScanSearch, ShieldCheck, Sparkles, Star, UserCheck, Wallet, X,
+  Route, ScanSearch, ShieldCheck, Sparkles, UserCheck, Wallet, X,
 } from "lucide-react";
 import { AnimatePresence, motion, MotionConfig } from "framer-motion";
 import { Nav } from "@/components/nav";
@@ -43,13 +43,6 @@ import { cn } from "@/lib/utils";
 export default function Home() {
   const { t, pick, num, isRTL } = useLanguage();
   const Arrow = isRTL ? ArrowLeft : ArrowRight;
-
-  const stats = [
-    { object: "cap" as const, value: 250, plus: true, suffix: "", label: t("stats.scholarships") },
-    { object: "globe" as const, value: 120, plus: true, suffix: "", label: t("stats.countries") },
-    { object: "star" as const, value: 95, plus: false, suffix: "%", label: t("stats.accuracy") },
-    { object: "letter" as const, value: 4000, plus: true, suffix: "", label: t("stats.reviewed") },
-  ];
 
   return (
     <>
@@ -160,83 +153,6 @@ export default function Home() {
                 </div>
               </div>
             </div>
-          </div>
-        </section>
-
-        {/* 2. Trust strip --------------------------------------------------- */}
-        <section className="border-b border-border bg-background">
-          <div className="page-container py-10 sm:py-12">
-            <Reveal>
-              <div className="flex flex-col items-center gap-6 lg:flex-row lg:justify-between">
-                <div className="flex flex-col items-center gap-3 sm:flex-row sm:gap-5">
-                  <div className="flex -space-x-2.5" aria-hidden="true">
-                    {AVATARS.map((a) => (
-                      <span
-                        key={a.ini}
-                        className={cn(
-                          "flex h-10 w-10 items-center justify-center rounded-full text-[11px] font-bold ring-2 ring-background",
-                          a.cls
-                        )}
-                      >
-                        {a.ini}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="flex flex-col items-center sm:items-start">
-                    <div className="flex gap-0.5" aria-label="4.9 out of 5">
-                      {Array.from({ length: 5 }).map((_, s) => (
-                        <Star key={s} className="h-4 w-4 fill-secondary-500 text-secondary-500" />
-                      ))}
-                    </div>
-                    <p className="mt-1 text-xs font-medium text-muted-foreground">{t("trust.rating")}</p>
-                  </div>
-                </div>
-
-                <div className="flex flex-col items-center gap-2 lg:items-end">
-                  <h2 className="font-display text-center text-xl font-extrabold tracking-tight text-foreground sm:text-2xl lg:text-end">
-                    {t("trust.title")}
-                  </h2>
-                  <p className="text-xs font-semibold uppercase tracking-widest text-secondary-600">
-                    {t("trust.from")}
-                  </p>
-                  <div className="flex max-w-xl flex-wrap justify-center gap-2 lg:justify-end">
-                    {COUNTRIES.map((c) => (
-                      <span
-                        key={c.en}
-                        className="rounded-full border border-secondary-200 bg-secondary-50 px-3.5 py-1.5 text-xs font-semibold text-secondary-800 transition-colors hover:border-secondary-400"
-                      >
-                        {pick(c.ar, c.en)}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </Reveal>
-          </div>
-        </section>
-
-        {/* 3. Statistics ------------------------------------------------------ */}
-        <section className="border-b border-border bg-muted/40">
-          <div className="page-container py-16 sm:py-20">
-            <Reveal>
-              <SectionHead overline={t("stats.overline")} title={t("stats.title")} sub={t("stats.sub")} />
-            </Reveal>
-
-            <Reveal delay={120}>
-              <dl className="mx-auto mt-12 grid max-w-5xl grid-cols-2 gap-x-6 gap-y-10 text-center lg:grid-cols-4">
-                {stats.map((s) => (
-                  <div key={s.label} className="group flex flex-col items-center">
-                    <span className="flex h-20 w-20 items-center justify-center rounded-2xl border border-secondary-100 bg-card shadow-soft transition-all duration-300 group-hover:-translate-y-1 group-hover:border-secondary-300 group-hover:shadow-elevated">
-                      <ThreeDObject variant={s.object} className="h-12 w-12" />
-                    </span>
-                    <dd className="mt-4 text-4xl font-extrabold tabular-nums tracking-tight text-foreground sm:text-5xl">
-                      <StatValue value={s.value} suffix={s.suffix} plus={s.plus} />
-                    </dd>
-                    <dt className="mt-1.5 max-w-[10rem] text-sm text-muted-foreground">{s.label}</dt>
-                  </div>
-                ))}
-              </dl>
-            </Reveal>
           </div>
         </section>
 
@@ -567,85 +483,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 10. Student success ------------------------------------------------- */}
-        <section className="border-y border-border bg-muted/40">
-          <div className="page-container py-20 sm:py-24">
-            <Reveal>
-              <SectionHead overline={t("succ.overline")} title={t("succ.title")} sub={t("succ.sub")} />
-            </Reveal>
-
-            <div className="mt-12 grid gap-5 md:grid-cols-3">
-              {SUCCESS.map((s, i) => (
-                <Reveal key={s.titleEn} delay={i * 90}>
-                  <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card p-7 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-secondary-300 hover:shadow-elevated">
-                    <span
-                      aria-hidden="true"
-                      className="absolute inset-x-0 top-0 h-0.5 origin-left scale-x-0 bg-gradient-to-r from-secondary-400 to-secondary-600 transition-transform duration-300 group-hover:scale-x-100 rtl:origin-right"
-                    />
-                    <div className="flex items-start justify-between gap-3">
-                      <Float3D variant={s.object} className="h-16 w-16" float={false} shadow={false} />
-                      <span className="shrink-0 rounded-full bg-secondary-50 px-3 py-1 text-xs font-bold text-secondary-800 ring-1 ring-inset ring-secondary-200">
-                        {pick(s.outcomeAr, s.outcomeEn)}
-                      </span>
-                    </div>
-                    <h3 className="mt-5 text-lg font-bold tracking-tight text-foreground">
-                      {pick(s.titleAr, s.titleEn)}
-                    </h3>
-                    <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">{pick(s.bodyAr, s.bodyEn)}</p>
-                    <p className="mt-5 flex items-center gap-2.5 border-t border-border pt-4 text-xs font-semibold text-foreground">
-                      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#12294b] text-[10px] font-bold text-white">
-                        {s.initials}
-                      </span>
-                      {pick(s.metaAr, s.metaEn)}
-                    </p>
-                  </article>
-                </Reveal>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* 11. Testimonials ----------------------------------------------------- */}
-        <section className="bg-background">
-          <div className="page-container py-20 sm:py-24">
-            <Reveal>
-              <SectionHead overline={t("testi.overline")} title={t("testi.title")} sub={t("testi.sub")} />
-            </Reveal>
-
-            <div className="mt-12 grid gap-5 md:grid-cols-3">
-              {TESTIMONIALS.map((item, i) => (
-                <Reveal key={item.nameEn} delay={i * 90}>
-                  <figure className="flex h-full flex-col rounded-2xl border border-border bg-card p-7 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-secondary-300 hover:shadow-elevated">
-                    <div className="flex items-center justify-between">
-                      <div className="flex gap-0.5" aria-label="5 out of 5">
-                        {Array.from({ length: 5 }).map((_, s) => (
-                          <Star key={s} className="h-4 w-4 fill-secondary-500 text-secondary-500" />
-                        ))}
-                      </div>
-                      <Quote className="h-7 w-7 text-secondary-200" />
-                    </div>
-                    <blockquote className="mt-5 flex-1 text-sm leading-relaxed text-foreground">
-                      {pick(item.quoteAr, item.quoteEn)}
-                    </blockquote>
-                    <figcaption className="mt-6 flex items-center gap-3 border-t border-border pt-5">
-                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#12294b] text-xs font-bold text-white">
-                        {item.initials}
-                      </span>
-                      <div className="min-w-0">
-                        <p className="text-sm font-semibold text-foreground">{pick(item.nameAr, item.nameEn)}</p>
-                        <p className="truncate text-xs text-muted-foreground">{pick(item.roleAr, item.roleEn)}</p>
-                      </div>
-                      <span className="ms-auto shrink-0 rounded-full bg-secondary-50 px-2.5 py-1 text-[11px] font-semibold text-secondary-700 ring-1 ring-inset ring-secondary-200">
-                        {pick(item.tagAr, item.tagEn)}
-                      </span>
-                    </figcaption>
-                  </figure>
-                </Reveal>
-              ))}
-            </div>
-          </div>
-        </section>
-
         {/* 12. FAQ -------------------------------------------------------------- */}
         <section className="border-t border-border bg-muted/40">
           <div className="page-container py-20 sm:py-24">
@@ -751,53 +588,6 @@ export default function Home() {
 /* ---------------------------------------------------------------------------
    Sub-components
 --------------------------------------------------------------------------- */
-
-/** Animated stat number — counts up when scrolled into view. */
-function StatValue({ value, suffix = "", plus = false }: { value: number; suffix?: string; plus?: boolean }) {
-  const { num } = useLanguage();
-  const ref = useRef<HTMLSpanElement>(null);
-  const [display, setDisplay] = useState(0);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    if (!("IntersectionObserver" in window)) {
-      setDisplay(value);
-      return;
-    }
-    let raf = 0;
-    const obs = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0];
-        if (!entry?.isIntersecting) return;
-        obs.disconnect();
-        const duration = 1400;
-        const start = performance.now();
-        const tick = (now: number) => {
-          const p = Math.min((now - start) / duration, 1);
-          const eased = 1 - Math.pow(1 - p, 3);
-          setDisplay(Math.round(value * eased));
-          if (p < 1) raf = requestAnimationFrame(tick);
-        };
-        raf = requestAnimationFrame(tick);
-      },
-      { threshold: 0.4 }
-    );
-    obs.observe(el);
-    return () => {
-      obs.disconnect();
-      cancelAnimationFrame(raf);
-    };
-  }, [value]);
-
-  return (
-    <span ref={ref} dir="ltr" style={{ unicodeBidi: "isolate" }}>
-      {num(display)}
-      {plus && "+"}
-      {suffix && <span className="text-secondary-600">{suffix}</span>}
-    </span>
-  );
-}
 
 function SectionHead({
   overline,
@@ -1247,24 +1037,6 @@ const SPARKLES = [
   { top: 14, start: 58, delay: 2.6 },
 ];
 
-const AVATARS = [
-  { ini: "AH", cls: "bg-primary text-primary-foreground" },
-  { ini: "SR", cls: "bg-secondary text-secondary-foreground" },
-  { ini: "OM", cls: "bg-primary-300 text-primary-900" },
-  { ini: "LY", cls: "bg-secondary-300 text-secondary-900" },
-  { ini: "KM", cls: "bg-primary-500 text-white" },
-];
-
-const COUNTRIES = [
-  { ar: "مصر", en: "Egypt" },
-  { ar: "الأردن", en: "Jordan" },
-  { ar: "المغرب", en: "Morocco" },
-  { ar: "السعودية", en: "Saudi Arabia" },
-  { ar: "الجزائر", en: "Algeria" },
-  { ar: "العراق", en: "Iraq" },
-  { ar: "+٢٠ دولة", en: "+20 more" },
-];
-
 const STEPS = [
   { key: "profile", object: "passport" as const },
   { key: "match", object: "star" as const },
@@ -1428,66 +1200,6 @@ const UNIVERSITIES = [
   { mono: "UoT", name: "Toronto", country: "Canada" },
   { mono: "MEL", name: "Melbourne", country: "Australia" },
   { mono: "UvA", name: "Amsterdam", country: "Netherlands" },
-];
-
-const SUCCESS = [
-  {
-    object: "medal" as const,
-    initials: "AH",
-    outcomeAr: "مقابلة تشيفنينغ", outcomeEn: "Chevening interview",
-    titleAr: "أحمد وصل لمقابلة تشيفنينغ",
-    titleEn: "Ahmed reached a Chevening interview",
-    bodyAr: "المنحة التي حضّر لها سنتين — لم يكن مؤهلاً لها أصلاً. المطابقة أعادت ترتيب أولوياته خلال أسبوع.",
-    bodyEn: "The scholarship he'd prepared for two years — he wasn't eligible. The matcher reordered his priorities in a week.",
-    metaAr: "أحمد · القاهرة، مصر", metaEn: "Ahmed · Cairo, Egypt",
-  },
-  {
-    object: "diploma" as const,
-    initials: "SR",
-    outcomeAr: "من ٥٫٥ إلى ٨٫٩", outcomeEn: "5.5 → 8.9",
-    titleAr: "خطاب سارة قفز ثلاث درجات",
-    titleEn: "Sara's statement jumped three grades",
-    bodyAr: "المراجعة غيّرت خطاب الدوافع بالكامل. من ٥٫٥ إلى ٨٫٩، ثم أول تقديم بثقة حقيقية.",
-    bodyEn: "The review transformed her statement. 5.5 to 8.9, then her first genuinely confident submission.",
-    metaAr: "سارة · عمّان، الأردن", metaEn: "Sara · Amman, Jordan",
-  },
-  {
-    object: "plane" as const,
-    initials: "OM",
-    outcomeAr: "قبل الموعد بأسبوعين", outcomeEn: "Two weeks early",
-    titleAr: "عمر قدّم على DAAD في الوقت المناسب",
-    titleEn: "Omar submitted DAAD on time",
-    bodyAr: "الخطة أخبرته متى يحجز الآيلتس ومتى يطلب التوصيات. طلب مكتمل قبل الموعد النهائي بأسبوعين.",
-    bodyEn: "The roadmap told him when to book IELTS and ask for letters. A complete application, two weeks early.",
-    metaAr: "عمر · الدار البيضاء، المغرب", metaEn: "Omar · Casablanca, Morocco",
-  },
-];
-
-const TESTIMONIALS = [
-  {
-    initials: "YR",
-    nameAr: "يارا", nameEn: "Yara",
-    roleAr: "الرياض، السعودية", roleEn: "Riyadh, Saudi Arabia",
-    tagAr: "تطابق فولبرايت", tagEn: "Fulbright fit",
-    quoteAr: "لم أكن أعتقد أن فولبرايت في متناولي حتى أظهر لي تطابق ٧١٪ وقال لي ماذا أفعل أولاً. كل شيء بعدها سار بترتيب واضح.",
-    quoteEn: "I didn't think Fulbright was in reach until it showed 71% fit and told me what to do first. Everything after that had a clear order.",
-  },
-  {
-    initials: "KH",
-    nameAr: "خالد", nameEn: "Khaled",
-    roleAr: "تونس، تونس", roleEn: "Tunis, Tunisia",
-    tagAr: "حسّم ٣ منح", tagEn: "3 disqualified",
-    quoteAr: "أوقف ثلاث منح كنت على وشك التقديم لها دون تدقيق. ذلك وفّر لي شهوراً ووجّهني إلى خيارات أنسب فعلاً.",
-    quoteEn: "It blocked three scholarships I was about to apply to blind. That saved me months and pointed me somewhere better.",
-  },
-  {
-    initials: "LN",
-    nameAr: "لينا", nameEn: "Lina",
-    roleAr: "بغداد، العراق", roleEn: "Baghdad, Iraq",
-    tagAr: "مراجعة ٧٫٢ → ٩٫٠", tagEn: "Review 7.2 → 9.0",
-    quoteAr: "المراجعة التقطت تناقضاً في سيرتي لم ألحظه أبداً. عشر دقائق من التعديلات، ثم ضغطت أخيراً على إرسال.",
-    quoteEn: "The review caught an inconsistency in my CV I'd never have noticed. Ten minutes of edits, and I finally hit send.",
-  },
 ];
 
 const FAQS = [
