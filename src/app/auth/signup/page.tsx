@@ -10,6 +10,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { GraduationCap, Mail, Lock, Eye, EyeOff, User } from "lucide-react";
 import { ConversionEvents } from "@/lib/analytics";
 
+/**
+ * Reads the site's own language preference (same localStorage key
+ * LanguageContext uses) so the verification email matches the language the
+ * visitor was actually using — without wiring this page's own text into the
+ * bilingual system, which the page intentionally doesn't do.
+ */
+function currentSiteLang(): "en" | "ar" {
+  if (typeof window === "undefined") return "en";
+  return window.localStorage.getItem("smartscholar.lang") === "ar" ? "ar" : "en";
+}
+
 export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -33,7 +44,7 @@ export default function SignupPage() {
     const res = await fetch("/api/auth/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password, name }),
+      body: JSON.stringify({ email, password, name, lang: currentSiteLang() }),
     });
 
     const data = await res.json().catch(() => ({}));

@@ -9,6 +9,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Mail, CheckCircle2 } from "lucide-react";
 
+/** Same localStorage key LanguageContext uses — see signup/page.tsx for why this reads it directly. */
+function currentSiteLang(): "en" | "ar" {
+  if (typeof window === "undefined") return "en";
+  return window.localStorage.getItem("smartscholar.lang") === "ar" ? "ar" : "en";
+}
+
 /**
  * "Check your inbox" screen.
  *
@@ -34,7 +40,7 @@ function VerifyPageContent() {
       const res = await fetch("/api/auth/resend-verification", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, lang: currentSiteLang() }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -83,8 +89,8 @@ function VerifyPageContent() {
                 <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-medium text-foreground">
                   2
                 </span>
-                Tap <strong className="text-foreground">تفعيل الحساب</strong> — you&apos;ll be
-                signed in automatically.
+                Tap the <strong className="text-foreground">confirmation button</strong> in the
+                email — you&apos;ll be signed in automatically.
               </li>
               <li className="flex gap-3">
                 <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-medium text-foreground">

@@ -35,11 +35,13 @@ const okResponse = () =>
 
 export async function POST(req: NextRequest) {
   let email: unknown;
+  let lang: unknown;
   try {
-    ({ email } = await req.json());
+    ({ email, lang } = await req.json());
   } catch {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
+  const emailLang: "en" | "ar" = lang === "en" ? "en" : "ar";
 
   if (typeof email !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return NextResponse.json({ error: "Please enter a valid email address" }, { status: 400 });
@@ -105,12 +107,16 @@ export async function POST(req: NextRequest) {
     `&type=email&next=${encodeURIComponent("/onboarding")}`;
 
   const name =
-    (typeof data.user?.user_metadata?.name === "string" && data.user.user_metadata.name) || "بك";
+    (typeof data.user?.user_metadata?.name === "string" && data.user.user_metadata.name) ||
+    (emailLang === "en" ? "there" : "بك");
 
   const result = await sendEmail({
     to: cleanEmail,
-    subject: "رابط تفعيل جديد · Your new SmartScholar confirmation link",
-    html: confirmSignupHtml(name, confirmUrl),
+    subject:
+      emailLang === "en"
+        ? "Your new SmartScholar confirmation link"
+        : "رابط تفعيل جديد · Your new SmartScholar confirmation link",
+    html: confirmSignupHtml(name, confirmUrl, emailLang),
   });
 
   if (!result.sent) {

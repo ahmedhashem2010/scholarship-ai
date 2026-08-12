@@ -23,6 +23,12 @@ function safeRedirect(raw: string | null): string {
   return raw;
 }
 
+/** Same localStorage key LanguageContext uses — see signup/page.tsx for why this reads it directly. */
+function currentSiteLang(): "en" | "ar" {
+  if (typeof window === "undefined") return "en";
+  return window.localStorage.getItem("smartscholar.lang") === "ar" ? "ar" : "en";
+}
+
 function LoginPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -48,7 +54,7 @@ function LoginPageContent() {
     const res = await fetch("/api/auth/resend-verification", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email, lang: currentSiteLang() }),
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {

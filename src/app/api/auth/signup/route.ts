@@ -29,7 +29,12 @@ export const runtime = "nodejs";
  * documented SSR pattern and it means the student lands already signed in.
  */
 export async function POST(req: NextRequest) {
-  const { email, password, name } = await req.json();
+  const { email, password, name, lang } = await req.json();
+  // Whichever language the visitor was actually using on the site — read
+  // client-side from the same localStorage key LanguageContext uses, and
+  // sent along with the signup request. Defaults to Arabic (the product's
+  // default) if the client didn't send one.
+  const emailLang: "en" | "ar" = lang === "en" ? "en" : "ar";
 
   if (!email || !password) {
     return NextResponse.json({ error: "Email and password required" }, { status: 400 });
@@ -95,8 +100,15 @@ export async function POST(req: NextRequest) {
 
   const emailResult = await sendEmail({
     to: cleanEmail,
-    subject: "أكّد بريدك الإلكتروني · Confirm your SmartScholar account",
-    html: confirmSignupHtml(cleanName || "بك", confirmUrl),
+    subject:
+      emailLang === "en"
+        ? "Confirm your SmartScholar account"
+        : "أكّد بريدك الإلكتروني · Confirm your SmartScholar account",
+    html: confirmSignupHtml(
+      cleanName || (emailLang === "en" ? "there" : "بك"),
+      confirmUrl,
+      emailLang
+    ),
   });
 
   if (!emailResult.sent) {
