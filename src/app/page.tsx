@@ -3,7 +3,7 @@
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
-import { Fragment, useEffect, useState, type CSSProperties } from "react";
+import { Fragment, useEffect, useState } from "react";
 import {
   ArrowLeft, ArrowRight, ArrowUp, ArrowUpRight, BadgeCheck, CalendarClock, Check,
   ChevronDown, ClipboardList, FileCheck2, Flag, GraduationCap, MapPin, MessageSquare,
@@ -449,37 +449,6 @@ export default function Home() {
                 </div>
               </Reveal>
             </div>
-          </div>
-        </section>
-
-        {/* 9. Universities ---------------------------------------------------- */}
-        <section className="bg-background">
-          <div className="page-container py-20 sm:py-24">
-            <Reveal>
-              <SectionHead overline={t("uni.overline")} title={t("uni.title")} sub={t("uni.sub")} />
-            </Reveal>
-
-            <Reveal delay={100}>
-              <div dir="ltr" className="marquee-mask mt-12 overflow-hidden">
-                <div
-                  className="marquee-track flex w-max gap-4"
-                  style={{ "--marquee-dur": "42s" } as CSSProperties}
-                >
-                  {[...UNIVERSITIES, ...UNIVERSITIES].map((u, i) => (
-                    <div
-                      key={`${u.name}-${i}`}
-                      className="flex w-44 shrink-0 flex-col items-center gap-3 rounded-2xl border border-border bg-card p-5 shadow-soft transition-colors duration-300 hover:border-secondary-300 hover:shadow-elevated"
-                    >
-                      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[#12294b] text-sm font-extrabold text-white shadow-[0_8px_18px_-8px_rgb(11_31_58/0.7)]">
-                        {u.mono}
-                      </span>
-                      <span className="text-center text-sm font-semibold text-foreground">{u.name}</span>
-                      <span className="text-center text-[11px] text-muted-foreground">{u.country}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </Reveal>
           </div>
         </section>
 
@@ -1185,21 +1154,6 @@ const NEW_WAY = [
   { ar: "خطة زمنية محسوبة بالعكس من كل موعد نهائي", en: "A dated roadmap worked back from every deadline" },
   { ar: "مراجعة بالدرجات وتعديلات مرتبة بالأولوية", en: "Scored reviews with prioritised, specific fixes" },
   { ar: "مصادر رسمية مرتبطة لكل منحة، تتحقق منها بنفسك", en: "Official sources linked on every listing — verify yourself" },
-];
-
-const UNIVERSITIES = [
-  { mono: "OX", name: "Oxford", country: "UK" },
-  { mono: "CAM", name: "Cambridge", country: "UK" },
-  { mono: "ICL", name: "Imperial", country: "UK" },
-  { mono: "ETH", name: "ETH Zürich", country: "Switzerland" },
-  { mono: "TUM", name: "TU Munich", country: "Germany" },
-  { mono: "MIT", name: "MIT", country: "USA" },
-  { mono: "STF", name: "Stanford", country: "USA" },
-  { mono: "LSE", name: "LSE", country: "UK" },
-  { mono: "SOR", name: "Sorbonne", country: "France" },
-  { mono: "UoT", name: "Toronto", country: "Canada" },
-  { mono: "MEL", name: "Melbourne", country: "Australia" },
-  { mono: "UvA", name: "Amsterdam", country: "Netherlands" },
 ];
 
 const FAQS = [
