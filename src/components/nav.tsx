@@ -3,13 +3,13 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
-import { Globe, Menu, X, User } from 'lucide-react';
+import { Globe, Menu, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { BRAND } from '@/lib/brand';
 import { cn } from '@/lib/utils';
 
 export function Nav() {
-  const { t, isRTL, toggleLanguage } = useLanguage();
+  const { isRTL, toggleLanguage } = useLanguage();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
