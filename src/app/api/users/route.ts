@@ -22,8 +22,11 @@ export async function GET(request: NextRequest) {
     if (!adminEmail) {
       return NextResponse.json({ success: false, error: "Server misconfigured: ADMIN_EMAIL not set" }, { status: 500 });
     }
-    const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
-    if (!dbUser?.email || dbUser.email !== adminEmail) {
+    // Authorize with the authenticated session email. The DB `User.email`
+    // column was previously client-writable via the profile API (spoofing the
+    // admin address escalated this route to a full user-email dump), so it
+    // must never be consulted for an authorization decision.
+    if (!user.email || user.email !== adminEmail) {
       return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
     }
 

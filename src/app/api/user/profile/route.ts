@@ -51,7 +51,7 @@ export async function GET() {
   }
 }
 
-async function upsertProfile(userId: string, body: Record<string, unknown>) {
+async function upsertProfile(userId: string, userEmail: string | undefined, body: Record<string, unknown>) {
   const data = {
     displayName: (body.displayName as string) || "",
     dateOfBirth: body.dateOfBirth ? new Date(body.dateOfBirth as string) : new Date(),
@@ -89,11 +89,19 @@ async function upsertProfile(userId: string, body: Record<string, unknown>) {
     budget: (body.budget as string) || null,
   }
 
-  // Ensure User record exists before creating UserProfile (FK constraint)
+  // Ensure User record exists before creating UserProfile (FK constraint).
+  // The email is ALWAYS derived from the authenticated Supabase session — the
+  // client-supplied value is ignored. Accepting body.email let any user write
+  // the admin's address into the DB and escalate the /api/users admin gate,
+  // so the DB column is never trusted for authorization.
   await prisma.user.upsert({
     where: { id: userId },
-    create: { id: userId, email: (body.email as string) || null, name: body.displayName as string || null },
-    update: { name: body.displayName as string || undefined },
+    create: { id: userId, email: userEmail || null, name: body.displayName as string || null },
+    update: {
+      name: body.displayName as string || undefined,
+      // Self-heal legacy rows toward the authoritative session email.
+      email: userEmail || undefined,
+    },
   })
 
   await prisma.userProfile.upsert({
@@ -113,7 +121,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    await upsertProfile(user.id, body)
+    await upsertProfile(user.id, user.email, body)
     return NextResponse.json({ success: true })
   } catch (error) {
     return NextResponse.json({ success: false, error: "Failed to create profile" }, { status: 500 })
@@ -129,7 +137,7 @@ export async function PUT(request: Request) {
     }
 
     const body = await request.json()
-    await upsertProfile(user.id, body)
+    await upsertProfile(user.id, user.email, body)
     return NextResponse.json({ success: true })
   } catch (error) {
     return NextResponse.json({ success: false, error: "Failed to update profile" }, { status: 500 })
