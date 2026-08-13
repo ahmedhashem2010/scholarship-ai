@@ -206,7 +206,7 @@ All `age` fields were renamed to `dateOfBirth` (stored as `DateTime` in DB, `str
 | Image formats + compression | `next.config.mjs` | AVIF/WebP image output, gzip compression, SWC minifier |
 | IBM Plex Sans + Arabic weights | `src/app/layout.tsx` | Paired Latin/Arabic face, only 400-700 weights loaded |
 | `memo()` on cards | `src/app/dashboard/page.tsx` | `ScholarshipCard` won't re-render on unrelated state changes |
-| `dynamic()` imports | `src/app/dashboard/reviews/[id]/page.tsx` | `PDFViewer` + `ReviewDisplay` lazy-loaded with skeleton fallbacks |
+| Inline `ReviewSkeleton` | `src/app/dashboard/reviews/[id]/page.tsx` | Loading skeleton for the review results page |
 | Pagination on documents API | `src/app/api/documents/route.ts` | `page`/`pageSize` query params with `skip`/`take` |
 | Match results limited to 100 | `src/app/api/scholarships/match/route.ts` | `take: 100` on scholarship query |
 | Bundle analyzer | `package.json` | `npm run analyze` via `@next/bundle-analyzer` |

@@ -50,22 +50,3 @@ export function withVisibility(
 ): Prisma.ScholarshipWhereInput {
   return { AND: [visibleScholarshipWhere(now), where] };
 }
-
-/** Stricter filter for "verified only" browsing. */
-export function verifiedScholarshipWhere(
-  now: Date = new Date()
-): Prisma.ScholarshipWhereInput {
-  return { ...visibleScholarshipWhere(now), isVerified: true };
-}
-
-/** True when a deadline has passed beyond the grace period. */
-export function isExpired(deadline: Date | null, now: Date = new Date()): boolean {
-  if (!deadline) return false;
-  return deadline.getTime() < deadlineCutoff(now).getTime();
-}
-
-/** Whole days until a deadline. Negative when passed, null when unknown. */
-export function daysUntil(deadline: Date | null, now: Date = new Date()): number | null {
-  if (!deadline) return null;
-  return Math.ceil((deadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-}
