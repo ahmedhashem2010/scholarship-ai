@@ -1,17 +1,26 @@
 import { NextRequest } from "next/server";
+import type { NextResponse } from "next/server";
+import type { Scholarship } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { scholarshipUpdateSchema } from "@/lib/validations/scholarship";
-import { successResponse, errorResponse, handleApiError, unauthorized } from "@/lib/api-utils";
-import { getAuthenticatedUser } from "@/lib/api-auth";
+import { successResponse, errorResponse, handleApiError } from "@/lib/api-utils";
+import { requireAdmin } from "@/lib/api-auth";
 
 export const dynamic = "force-dynamic";
 
-async function getOrNotFound(id: string) {
+/**
+ * Explicit return type so `"error" in result` narrows correctly. TypeScript
+ * does not narrow an *inferred* union of `as const` object literals returned
+ * by an async helper, which leaves the callers' return types `| undefined`.
+ */
+async function getOrNotFound(
+  id: string
+): Promise<{ error: NextResponse } | { data: Scholarship }> {
   const scholarship = await prisma.scholarship.findUnique({ where: { id } });
   if (!scholarship) {
-    return { error: errorResponse("Scholarship not found", 404) } as const;
+    return { error: errorResponse("Scholarship not found", 404) };
   }
-  return { data: scholarship } as const;
+  return { data: scholarship };
 }
 
 export async function GET(
@@ -32,8 +41,8 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const user = await getAuthenticatedUser(request);
-    if (!user) return unauthorized();
+    const gate = await requireAdmin(request);
+    if ("response" in gate) return gate.response;
 
     const result = await getOrNotFound(params.id);
     if ("error" in result) return result.error;
@@ -75,8 +84,8 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const user = await getAuthenticatedUser(request);
-    if (!user) return unauthorized();
+    const gate = await requireAdmin(request);
+    if ("response" in gate) return gate.response;
 
     const result = await getOrNotFound(params.id);
     if ("error" in result) return result.error;

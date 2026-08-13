@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { scholarshipCreateSchema, scholarshipQuerySchema } from "@/lib/validations/scholarship";
-import { successResponse, handleApiError, unauthorized } from "@/lib/api-utils";
-import { getAuthenticatedUser } from "@/lib/api-auth";
+import { successResponse, handleApiError } from "@/lib/api-utils";
+import { requireAdmin } from "@/lib/api-auth";
 import { withVisibility } from "@/lib/scholarship-filters";
 import { parseCompareIds } from "@/lib/compare-ids";
 import type { Prisma } from "@prisma/client";
@@ -83,8 +83,8 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await getAuthenticatedUser(request);
-    if (!user) return unauthorized();
+    const gate = await requireAdmin(request);
+    if ("response" in gate) return gate.response;
 
     const ct = request.headers.get("content-type") ?? "";
     if (!ct.includes("application/json")) {
