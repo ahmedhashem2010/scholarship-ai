@@ -13,6 +13,7 @@ import type { ReviewScore } from "@/lib/ai-review";
 import { extractTextFromFile } from "@/lib/text-extract";
 import { getVersionChain } from "@/lib/document-versions";
 import { DAILY_REVIEW_LIMIT, currentDayKey } from "@/lib/review-quota";
+import { documentFileUrl } from "@/lib/document-access";
 
 
 /**
@@ -433,7 +434,7 @@ export async function GET(
       document: {
         id: document.id,
         fileName: document.fileName,
-        fileUrl: document.fileUrl,
+        fileUrl: documentFileUrl(document),
         fileType: document.fileType,
         documentType: document.documentType,
         version: document.version ?? 1,

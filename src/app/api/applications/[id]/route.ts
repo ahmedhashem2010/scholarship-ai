@@ -3,6 +3,7 @@ export const runtime = "nodejs";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createApiClient } from "@/lib/supabase/api-auth";
+import { documentFileUrl } from "@/lib/document-access";
 
 export async function GET(
   request: NextRequest,
@@ -35,7 +36,19 @@ export async function GET(
       return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
     }
 
-    return NextResponse.json({ success: true, data: application });
+    // Never expose the uploaded document's raw storage URL — map it to the
+    // authenticated, ownership-checked file route (same rule as /api/documents).
+    const data = {
+      ...application,
+      documents: application.documents.map((d) => ({
+        ...d,
+        uploadedDocument: d.uploadedDocument
+          ? { ...d.uploadedDocument, fileUrl: documentFileUrl(d.uploadedDocument) }
+          : null,
+      })),
+    };
+
+    return NextResponse.json({ success: true, data });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Failed to fetch application";
     console.error("Application GET error:", err);

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createApiClient } from "@/lib/supabase/api-auth";
 import { deleteFile } from "@/lib/supabase/storage";
+import { documentFileUrl } from "@/lib/document-access";
 
 export async function GET(
   request: NextRequest,
@@ -33,7 +34,7 @@ export async function GET(
         id: document.id,
         userId: document.userId,
         fileName: document.fileName,
-        fileUrl: document.fileUrl,
+        fileUrl: documentFileUrl(document),
         fileType: document.fileType,
         fileSize: document.fileSize,
         documentType: document.documentType,

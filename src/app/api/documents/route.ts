@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { uploadFile, ensureUserRecord } from "@/lib/supabase/storage";
 import { createApiClient } from "@/lib/supabase/api-auth";
 import { createNewVersion } from "@/lib/document-versions";
+import { documentFileUrl } from "@/lib/document-access";
 
 export async function GET(request: NextRequest) {
   try {
@@ -32,9 +33,13 @@ export async function GET(request: NextRequest) {
       }),
     ]);
 
+    // Never expose the raw storage path/URL — map it to the authenticated,
+    // ownership-checked file route so the private bucket stays private.
+    const data = documents.map((doc) => ({ ...doc, fileUrl: documentFileUrl(doc) }));
+
     return NextResponse.json({
       success: true,
-      data: documents,
+      data,
       metadata: { total, page, pageSize, totalPages: Math.ceil(total / pageSize) },
     });
   } catch (err) {

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createApiClient } from "@/lib/supabase/api-auth";
 import { createClient } from "@supabase/supabase-js";
+import { resolveStoragePath } from "@/lib/supabase/storage-paths";
 
 export async function GET(
   request: NextRequest,
@@ -27,7 +28,7 @@ export async function GET(
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const filePath = document.fileUrl.split("/documents/")[1];
+    const filePath = resolveStoragePath(document.fileUrl);
     if (!filePath) {
       return NextResponse.json({ error: "Could not resolve file path" }, { status: 400 });
     }

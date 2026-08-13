@@ -1,7 +1,6 @@
 import { createClient as createServerClient } from "./server";
 import { createClient } from "@supabase/supabase-js";
-
-const BUCKET = "documents";
+import { DOCUMENTS_BUCKET, resolveStoragePath } from "./storage-paths";
 
 function createAdminClient() {
   return createClient(
@@ -17,20 +16,30 @@ async function ensureBucket() {
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return;
   const supabase = createAdminClient();
   const { data: buckets } = await supabase.storage.listBuckets();
-  if (buckets?.some((b) => b.name === BUCKET)) return;
-  // PRIVATE. These are CVs, personal statements and recommendation letters —
-  // documents containing a student's full name, address, grades and referees.
-  // A public bucket means anyone who ever sees the URL keeps read access
-  // forever, with no auth and no expiry. Files are served instead through
-  // /api/documents/[id]/file, which checks ownership on every request.
-  await supabase.storage.createBucket(BUCKET, {
-    public: false,
-    allowedMimeTypes: [
-      "application/pdf",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      "text/plain",
-    ],
-  });
+  const existing = buckets?.find((b) => b.name === DOCUMENTS_BUCKET);
+  if (!existing) {
+    // PRIVATE. These are CVs, personal statements and recommendation letters —
+    // documents containing a student's full name, address, grades and referees.
+    // A public bucket means anyone who ever sees the URL keeps read access
+    // forever, with no auth and no expiry. Files are served instead through
+    // /api/documents/[id]/file, which checks ownership on every request.
+    await supabase.storage.createBucket(DOCUMENTS_BUCKET, {
+      public: false,
+      allowedMimeTypes: [
+        "application/pdf",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "text/plain",
+      ],
+    });
+    return;
+  }
+  // A bucket created before the privacy hardening may still be public. Enforce
+  // privacy on every upload, not just at creation time — creation config alone
+  // is not a guarantee the bucket stayed private.
+  if (existing.public) {
+    const { error } = await supabase.storage.updateBucket(DOCUMENTS_BUCKET, { public: false });
+    if (error) throw new Error(`Failed to enforce private bucket: ${error.message}`);
+  }
 }
 
 export async function uploadFile(
@@ -52,7 +61,7 @@ export async function uploadFile(
   await ensureBucket();
 
   const { error } = await supabase.storage
-    .from(BUCKET)
+    .from(DOCUMENTS_BUCKET)
     .upload(filePath, file, {
       cacheControl: "3600",
       upsert: false,
@@ -72,15 +81,15 @@ export async function uploadFile(
     throw new Error(`Upload failed: ${error.message}`);
   }
 
-  const { data: urlData } = supabase.storage
-    .from(BUCKET)
-    .getPublicUrl(filePath);
-
-  return urlData.publicUrl;
+  // Return the raw object path, never a public URL. A public storage URL would
+  // bypass the ownership check in /api/documents/[id]/file and let anyone with
+  // the link read the file. resolveStoragePath() keeps legacy rows (full URLs)
+  // working for download/delete.
+  return filePath;
 }
 
 export async function deleteFile(fileUrl: string): Promise<void> {
-  const path = fileUrl.split(`/${BUCKET}/`)[1];
+  const path = resolveStoragePath(fileUrl);
   if (!path) return;
 
   let supabase;
@@ -91,12 +100,12 @@ export async function deleteFile(fileUrl: string): Promise<void> {
     supabase = createServerClient();
   }
 
-  const { error } = await supabase.storage.from(BUCKET).remove([path]);
+  const { error } = await supabase.storage.from(DOCUMENTS_BUCKET).remove([path]);
   if (error) throw new Error(`Delete failed: ${error.message}`);
 }
 
 export async function downloadFileAsBuffer(fileUrl: string): Promise<Buffer> {
-  const path = fileUrl.split(`/${BUCKET}/`)[1];
+  const path = resolveStoragePath(fileUrl);
   if (!path) throw new Error("Could not extract file path from URL");
 
   let supabase;
@@ -106,7 +115,7 @@ export async function downloadFileAsBuffer(fileUrl: string): Promise<Buffer> {
     supabase = createServerClient();
   }
 
-  const { data, error } = await supabase.storage.from(BUCKET).download(path);
+  const { data, error } = await supabase.storage.from(DOCUMENTS_BUCKET).download(path);
   if (error) throw new Error(`Download failed: ${error.message}`);
 
   const arrayBuffer = await data.arrayBuffer();
