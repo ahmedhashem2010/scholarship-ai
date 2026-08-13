@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { getAuthenticatedUser } from "@/lib/api-auth";
 import { unauthorized, forbidden } from "@/lib/api-utils";
 import { calculateProgress } from "@/lib/application-progress";
+import { updateApplicationSchema } from "@/lib/validations/application";
 
 export async function PATCH(
   request: NextRequest,
@@ -22,7 +23,11 @@ export async function PATCH(
       return forbidden();
     }
 
-    const { status } = await request.json();
+    const body: unknown = await request.json().catch(() => null);
+    const parsed = updateApplicationSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ success: false, error: "Invalid application status" }, { status: 400 });
+    }
     const data: Record<string, unknown> = {};
 
     // Always recalculate progress from documents
@@ -31,8 +36,8 @@ export async function PATCH(
     });
     data.progress = calculateProgress(allDocs);
 
-    if (status) data.status = status;
-    if (status === "SUBMITTED") data.submittedAt = new Date();
+    if (parsed.data.status) data.status = parsed.data.status;
+    if (parsed.data.status === "SUBMITTED") data.submittedAt = new Date();
 
     const application = await prisma.application.update({
       where: { id: params.id },

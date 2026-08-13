@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { getAuthenticatedUser } from "@/lib/api-auth";
 import { unauthorized, forbidden } from "@/lib/api-utils";
 import { autoUpdateDocStatus, calculateProgress } from "@/lib/application-progress";
+import { updateApplicationDocumentSchema } from "@/lib/validations/application";
 
 export async function PATCH(
   request: NextRequest,
@@ -22,11 +23,16 @@ export async function PATCH(
       return forbidden();
     }
 
-    const { status, aiScore, uploadedDocumentId, feedback, markFinal } = await request.json();
+    const body: unknown = await request.json().catch(() => null);
+    const parsed = updateApplicationDocumentSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ success: false, error: "Invalid document update" }, { status: 400 });
+    }
+    const { status, aiScore, uploadedDocumentId, feedback, markFinal } = parsed.data;
     const data: Record<string, unknown> = {};
 
     // Auto-calculate status from AI score if provided
-    if (typeof aiScore === "number") {
+    if (aiScore !== null && aiScore !== undefined) {
       data.aiScore = aiScore;
       if (markFinal) {
         data.status = "READY";

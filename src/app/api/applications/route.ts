@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthenticatedUser } from "@/lib/api-auth";
 import { unauthorized } from "@/lib/api-utils";
+import { createApplicationSchema } from "@/lib/validations/application";
 
 const DEFAULT_DOC_TYPES = ["CV", "PERSONAL_STATEMENT", "TRANSCRIPT"];
 
@@ -79,10 +80,12 @@ export async function POST(request: NextRequest) {
     const user = await getAuthenticatedUser(request);
     if (!user) return unauthorized();
 
-    const { scholarshipId } = await request.json();
-    if (!scholarshipId) {
+    const body: unknown = await request.json().catch(() => null);
+    const parsed = createApplicationSchema.safeParse(body);
+    if (!parsed.success) {
       return NextResponse.json({ success: false, error: "Missing scholarshipId" }, { status: 400 });
     }
+    const { scholarshipId } = parsed.data;
 
     const existing = await prisma.application.findUnique({
       where: { userId_scholarshipId: { userId: user.id, scholarshipId } },
