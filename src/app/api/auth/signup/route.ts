@@ -70,16 +70,21 @@ export async function POST(req: NextRequest) {
   });
 
   if (error) {
-    // Supabase phrases this several ways depending on version. Normalise it,
-    // and point the user at the resend path rather than leaving them stuck.
+    // Supabase phrases this several ways depending on version. We must NOT let
+    // an anonymous caller learn whether an address is already registered: the
+    // old 409 + `code: "email_exists"` response was an enumeration oracle, so
+    // we reply with exactly the same success payload a fresh signup returns.
+    //
+    // No email is sent on this path. Sending one would both burn Zoho's daily
+    // quota for address probes and turn delivery timing into an oracle. A user
+    // who genuinely owns the address recovers through the login/verify resend
+    // flow (see /api/auth/resend-verification), which is anti-enumeration by
+    // design and returns an identical success response for every address.
     if (/already been registered|already registered|email_exists/i.test(error.message)) {
-      return NextResponse.json(
-        {
-          error: "An account with this email already exists. Try signing in instead.",
-          code: "email_exists",
-        },
-        { status: 409 }
+      console.warn(
+        `[signup] Address already registered — replying as success (anti-enumeration): ${cleanEmail}`
       );
+      return NextResponse.json({ success: true, email: cleanEmail });
     }
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
