@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { createApiClient } from "@/lib/supabase/api-auth";
+import { getAuthenticatedUser } from "@/lib/api-auth";
+import { unauthorized, forbidden } from "@/lib/api-utils";
 import {
   reviewDocument,
   calculateAverageScore,
@@ -92,12 +93,11 @@ export async function POST(
       return NextResponse.json({ success: false, error: "Document ID is required" }, { status: 400 });
     }
 
-    debugLog("[POST] Step 2/12: Creating API client and authenticating user...");
-    const supabase = createApiClient(request);
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      debugLog("[POST] Auth failed:", authError?.message ?? "No user");
-      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+    debugLog("[POST] Step 2/12: Authenticating user...");
+    const user = await getAuthenticatedUser(request);
+    if (!user) {
+      debugLog("[POST] Auth failed: no user");
+      return unauthorized();
     }
     debugLog("[POST] Authenticated as user:", user.id);
 
@@ -112,7 +112,7 @@ export async function POST(
     }
     if (document.userId !== user.id) {
       debugLog("[POST] Forbidden: user", user.id, "does not own document", id);
-      return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
+      return forbidden();
     }
     debugLog("[POST] Document found:", document.id, "type:", document.documentType, "fileUrl:", document.fileUrl?.slice(0, 80) ?? "none");
 
@@ -370,11 +370,10 @@ export async function GET(
     }
 
     debugLog("[GET] Step 2/6: Authenticating...");
-    const supabase = createApiClient(request);
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      debugLog("[GET] Auth failed:", authError?.message ?? "No user");
-      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+    const user = await getAuthenticatedUser(request);
+    if (!user) {
+      debugLog("[GET] Auth failed: no user");
+      return unauthorized();
     }
     debugLog("[GET] Authenticated as user:", user.id);
 
@@ -393,7 +392,7 @@ export async function GET(
     }
     if (document.userId !== user.id) {
       debugLog("[GET] Forbidden: user", user.id, "does not own document", id);
-      return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
+      return forbidden();
     }
     debugLog("[GET] Document found:", document.id, "version:", document.version);
 

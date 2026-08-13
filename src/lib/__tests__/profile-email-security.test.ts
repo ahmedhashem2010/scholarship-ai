@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { createClient } = vi.hoisted(() => ({ createClient: vi.fn() }));
+const { createApiClient } = vi.hoisted(() => ({ createApiClient: vi.fn() }));
 
 const { prisma } = vi.hoisted(() => ({
   prisma: {
@@ -14,15 +14,16 @@ const { prisma } = vi.hoisted(() => ({
   },
 }));
 
-vi.mock("@/lib/supabase/server", () => ({ createClient }));
+vi.mock("@/lib/supabase/api-auth", () => ({ createApiClient }));
 vi.mock("@/lib/prisma", () => ({ prisma }));
 
+import { NextRequest } from "next/server";
 import { POST } from "@/app/api/user/profile/route";
 
 const ADMIN_EMAIL = "admin@smartscholar.org";
 
 function mockSession(email: string, id = "user-1") {
-  createClient.mockReturnValue({
+  createApiClient.mockReturnValue({
     auth: {
       getUser: vi.fn().mockResolvedValue({
         data: { user: { id, email } },
@@ -33,7 +34,7 @@ function mockSession(email: string, id = "user-1") {
 }
 
 function mockNoSession() {
-  createClient.mockReturnValue({
+  createApiClient.mockReturnValue({
     auth: {
       getUser: vi.fn().mockResolvedValue({
         data: { user: null },
@@ -56,7 +57,7 @@ function profileBody(overrides: Record<string, unknown> = {}) {
 
 async function postProfile(body: Record<string, unknown>) {
   return POST(
-    new Request("http://localhost/api/user/profile", {
+    new NextRequest("http://localhost/api/user/profile", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify(body),

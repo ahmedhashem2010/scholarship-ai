@@ -2,7 +2,8 @@ export const runtime = "nodejs";
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { createApiClient } from "@/lib/supabase/api-auth";
+import { getAuthenticatedUser } from "@/lib/api-auth";
+import { unauthorized, forbidden } from "@/lib/api-utils";
 import { documentFileUrl } from "@/lib/document-access";
 
 export async function GET(
@@ -10,11 +11,8 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = createApiClient(request);
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-    }
+    const user = await getAuthenticatedUser(request);
+    if (!user) return unauthorized();
 
     const application = await prisma.application.findUnique({
       where: { id: params.id },
@@ -33,7 +31,7 @@ export async function GET(
       return NextResponse.json({ success: false, error: "Application not found" }, { status: 404 });
     }
     if (application.userId !== user.id) {
-      return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
+      return forbidden();
     }
 
     // Never expose the uploaded document's raw storage URL — map it to the

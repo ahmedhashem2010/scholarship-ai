@@ -1,17 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { createApiClient } from "@/lib/supabase/api-auth";
+import { getAuthenticatedUser } from "@/lib/api-auth";
+import { unauthorized } from "@/lib/api-utils";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = createApiClient(request);
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-    }
+    const user = await getAuthenticatedUser(request);
+    if (!user) return unauthorized();
 
     const review = await prisma.review.findFirst({
       where: { documentId: params.id, userId: user.id },

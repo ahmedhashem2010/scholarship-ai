@@ -2,7 +2,8 @@ export const runtime = "nodejs";
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { createApiClient } from "@/lib/supabase/api-auth";
+import { getAuthenticatedUser } from "@/lib/api-auth";
+import { unauthorized } from "@/lib/api-utils";
 
 /**
  * Saved roadmaps.
@@ -19,19 +20,10 @@ import { createApiClient } from "@/lib/supabase/api-auth";
 
 const MAX_MILESTONES = 40;
 
-async function requireUser(request: NextRequest) {
-  const supabase = createApiClient(request);
-  const { data: { user }, error } = await supabase.auth.getUser();
-  if (error || !user) return null;
-  return user;
-}
-
 export async function GET(request: NextRequest) {
   try {
-    const user = await requireUser(request);
-    if (!user) {
-      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-    }
+    const user = await getAuthenticatedUser(request);
+    if (!user) return unauthorized();
 
     const milestones = await prisma.roadmapMilestone.findMany({
       where: { userId: user.id },
@@ -55,10 +47,8 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await requireUser(request);
-    if (!user) {
-      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-    }
+    const user = await getAuthenticatedUser(request);
+    if (!user) return unauthorized();
 
     const body = await request.json().catch(() => null);
     const scholarshipId = typeof body?.scholarshipId === "string" ? body.scholarshipId : null;
@@ -144,10 +134,8 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const user = await requireUser(request);
-    if (!user) {
-      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-    }
+    const user = await getAuthenticatedUser(request);
+    if (!user) return unauthorized();
 
     const scholarshipId = request.nextUrl.searchParams.get("scholarshipId");
     if (!scholarshipId) {

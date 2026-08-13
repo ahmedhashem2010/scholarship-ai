@@ -2,7 +2,8 @@ export const runtime = "nodejs";
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { createApiClient } from "@/lib/supabase/api-auth";
+import { getAuthenticatedUser } from "@/lib/api-auth";
+import { unauthorized, forbidden } from "@/lib/api-utils";
 import { autoUpdateDocStatus, calculateProgress } from "@/lib/application-progress";
 
 export async function PATCH(
@@ -10,18 +11,15 @@ export async function PATCH(
   { params }: { params: { id: string; docId: string } }
 ) {
   try {
-    const supabase = createApiClient(request);
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-    }
+    const user = await getAuthenticatedUser(request);
+    if (!user) return unauthorized();
 
     const appDoc = await prisma.applicationDocument.findUnique({
       where: { id: params.docId },
       include: { application: true },
     });
     if (!appDoc || appDoc.application.userId !== user.id) {
-      return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
+      return forbidden();
     }
 
     const { status, aiScore, uploadedDocumentId, feedback, markFinal } = await request.json();
@@ -48,7 +46,7 @@ export async function PATCH(
         return NextResponse.json({ success: false, error: "Document not found" }, { status: 404 });
       }
       if (doc.userId !== user.id) {
-        return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
+        return forbidden();
       }
       data.uploadedDocumentId = uploadedDocumentId;
     }

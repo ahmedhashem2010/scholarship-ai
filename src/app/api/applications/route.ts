@@ -2,7 +2,8 @@ export const runtime = "nodejs";
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { createApiClient } from "@/lib/supabase/api-auth";
+import { getAuthenticatedUser } from "@/lib/api-auth";
+import { unauthorized } from "@/lib/api-utils";
 
 const DEFAULT_DOC_TYPES = ["CV", "PERSONAL_STATEMENT", "TRANSCRIPT"];
 
@@ -40,11 +41,8 @@ function getRequiredDocTypes(requiredDocuments: string | string[], requirements:
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createApiClient(request);
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-    }
+    const user = await getAuthenticatedUser(request);
+    if (!user) return unauthorized();
 
     const applications = await prisma.application.findMany({
       where: { userId: user.id },
@@ -78,11 +76,8 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createApiClient(request);
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-    }
+    const user = await getAuthenticatedUser(request);
+    if (!user) return unauthorized();
 
     const { scholarshipId } = await request.json();
     if (!scholarshipId) {

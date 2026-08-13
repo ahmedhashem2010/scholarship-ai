@@ -14,6 +14,16 @@ export function errorResponse(
   return NextResponse.json({ success: false, error, details }, { status });
 }
 
+/** Consistent 401 — every protected route uses this exact shape. */
+export function unauthorized(): NextResponse<ApiResponse<never>> {
+  return errorResponse("Unauthorized", 401);
+}
+
+/** Consistent 403 for a resource the session user does not own. */
+export function forbidden(): NextResponse<ApiResponse<never>> {
+  return errorResponse("Forbidden", 403);
+}
+
 export function handleApiError(err: unknown): NextResponse<ApiResponse<never>> {
   if (err instanceof ZodError) {
     const details: Record<string, string[]> = {};

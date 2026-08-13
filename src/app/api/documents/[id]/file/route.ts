@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { createApiClient } from "@/lib/supabase/api-auth";
+import { getAuthenticatedUser } from "@/lib/api-auth";
+import { unauthorized, forbidden } from "@/lib/api-utils";
 import { createClient } from "@supabase/supabase-js";
 import { resolveStoragePath } from "@/lib/supabase/storage-paths";
 
@@ -14,18 +15,15 @@ export async function GET(
       return NextResponse.json({ error: "Document ID is required" }, { status: 400 });
     }
 
-    const supabase = createApiClient(request);
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const user = await getAuthenticatedUser(request);
+    if (!user) return unauthorized();
 
     const document = await prisma.document.findUnique({ where: { id } });
     if (!document) {
       return NextResponse.json({ error: "Document not found" }, { status: 404 });
     }
     if (document.userId !== user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return forbidden();
     }
 
     const filePath = resolveStoragePath(document.fileUrl);

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { scholarshipCreateSchema, scholarshipQuerySchema } from "@/lib/validations/scholarship";
-import { successResponse, handleApiError } from "@/lib/api-utils";
-import { createApiClient } from "@/lib/supabase/api-auth";
+import { successResponse, handleApiError, unauthorized } from "@/lib/api-utils";
+import { getAuthenticatedUser } from "@/lib/api-auth";
 import { withVisibility } from "@/lib/scholarship-filters";
 import { parseCompareIds } from "@/lib/compare-ids";
 import type { Prisma } from "@prisma/client";
@@ -83,11 +83,8 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createApiClient(request);
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-    }
+    const user = await getAuthenticatedUser(request);
+    if (!user) return unauthorized();
 
     const ct = request.headers.get("content-type") ?? "";
     if (!ct.includes("application/json")) {

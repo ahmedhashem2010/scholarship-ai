@@ -1,14 +1,12 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { createClient } from "@/lib/supabase/server"
+import { getAuthenticatedUser } from "@/lib/api-auth"
+import { unauthorized } from "@/lib/api-utils"
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
-    }
+    const user = await getAuthenticatedUser(request)
+    if (!user) return unauthorized()
 
     // No try/catch around the Prisma call on purpose. A DB failure must surface
     // as an error (500), NOT as an empty profile — otherwise the dashboard
@@ -125,13 +123,10 @@ async function upsertProfile(userId: string, userEmail: string | undefined, body
 
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
-    }
+    const user = await getAuthenticatedUser(request)
+    if (!user) return unauthorized()
 
     const body = await request.json()
     await upsertProfile(user.id, user.email, body)
@@ -141,13 +136,10 @@ export async function POST(request: Request) {
   }
 }
 
-export async function PUT(request: Request) {
+export async function PUT(request: NextRequest) {
   try {
-    const supabase = createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
-    }
+    const user = await getAuthenticatedUser(request)
+    if (!user) return unauthorized()
 
     const body = await request.json()
     await upsertProfile(user.id, user.email, body)

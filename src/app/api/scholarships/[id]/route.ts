@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { scholarshipUpdateSchema } from "@/lib/validations/scholarship";
-import { successResponse, errorResponse, handleApiError } from "@/lib/api-utils";
-import { createApiClient } from "@/lib/supabase/api-auth";
+import { successResponse, errorResponse, handleApiError, unauthorized } from "@/lib/api-utils";
+import { getAuthenticatedUser } from "@/lib/api-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -32,11 +32,8 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = createApiClient(request);
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-    }
+    const user = await getAuthenticatedUser(request);
+    if (!user) return unauthorized();
 
     const result = await getOrNotFound(params.id);
     if ("error" in result) return result.error;
@@ -78,11 +75,8 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = createApiClient(request);
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-    }
+    const user = await getAuthenticatedUser(request);
+    if (!user) return unauthorized();
 
     const result = await getOrNotFound(params.id);
     if ("error" in result) return result.error;

@@ -8,7 +8,8 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { createApiClient } from "@/lib/supabase/api-auth";
+import { getAuthenticatedUser } from "@/lib/api-auth";
+import { unauthorized } from "@/lib/api-utils";
 import { matchScholarshipsToUser } from "@/lib/scholarship-matcher";
 import { visibleScholarshipWhere } from "@/lib/scholarship-filters";
 
@@ -37,11 +38,8 @@ function setCache(key: string, value: { data: unknown; expiresAt: number; profil
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createApiClient(request);
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-    }
+    const user = await getAuthenticatedUser(request);
+    if (!user) return unauthorized();
 
     const profile = await prisma.userProfile.findUnique({ where: { userId: user.id } });
     if (!profile) {

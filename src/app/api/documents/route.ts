@@ -1,18 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { uploadFile, ensureUserRecord } from "@/lib/supabase/storage";
-import { createApiClient } from "@/lib/supabase/api-auth";
+import { getAuthenticatedUser } from "@/lib/api-auth";
+import { unauthorized, forbidden } from "@/lib/api-utils";
 import { createNewVersion } from "@/lib/document-versions";
 import { documentFileUrl } from "@/lib/document-access";
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createApiClient(request);
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-    }
+    const user = await getAuthenticatedUser(request);
+    if (!user) return unauthorized();
 
     const url = new URL(request.url);
     const page = Math.max(1, parseInt(url.searchParams.get("page") ?? "1"));
@@ -50,12 +47,8 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createApiClient(request);
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-    }
+    const user = await getAuthenticatedUser(request);
+    if (!user) return unauthorized();
 
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
@@ -88,7 +81,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: false, error: "Parent document not found" }, { status: 404 });
       }
       if (parent.userId !== user.id) {
-        return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
+        return forbidden();
       }
 
       const fileUrl = await uploadFile(user.id, file);

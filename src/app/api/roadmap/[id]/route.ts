@@ -2,7 +2,8 @@ export const runtime = "nodejs";
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { createApiClient } from "@/lib/supabase/api-auth";
+import { getAuthenticatedUser } from "@/lib/api-auth";
+import { unauthorized } from "@/lib/api-utils";
 
 /**
  * PATCH /api/roadmap/[id]  — tick a milestone off, or un-tick it.
@@ -19,11 +20,8 @@ export async function PATCH(
       return NextResponse.json({ success: false, error: "Milestone ID is required" }, { status: 400 });
     }
 
-    const supabase = createApiClient(request);
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-    }
+    const user = await getAuthenticatedUser(request);
+    if (!user) return unauthorized();
 
     const body = await request.json().catch(() => null);
     if (typeof body?.isDone !== "boolean") {
