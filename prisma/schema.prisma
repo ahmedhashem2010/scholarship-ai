@@ -32,7 +32,7 @@ model UserProfile {
   major              String?
   targetDegree       String
   englishLevel       String
-  englishScore       Int?
+  englishScore       Float?
   gpa                Float?
   hasWorkExperience  Boolean   @default(false)
   workYears          Int?

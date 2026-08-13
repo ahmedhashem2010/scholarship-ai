@@ -122,7 +122,7 @@ export default function EditProfilePage() {
       major: form.major || null,
       targetDegree: form.targetDegree,
       englishLevel: form.englishLevel,
-      ...(form.englishScore ? { englishScore: parseInt(form.englishScore) } : {}),
+      ...(form.englishScore ? { englishScore: parseFloat(form.englishScore) } : {}),
       ...(form.gpa ? { gpa: parseFloat(form.gpa) } : {}),
       hasWorkExperience: form.hasWorkExperience,
       ...(form.hasWorkExperience && form.workYears ? { workYears: parseInt(form.workYears) } : {}),

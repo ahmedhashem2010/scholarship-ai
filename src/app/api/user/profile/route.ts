@@ -60,7 +60,8 @@ async function upsertProfile(userId: string, userEmail: string | undefined, body
     major: (body.major as string) || null,
     targetDegree: (body.targetDegree as string) || "",
     englishLevel: (body.englishLevel as string) || "",
-    englishScore: body.englishScore ? parseInt(body.englishScore as string) : null,
+    // IELTS scores are half-points (6.5), so parse as float, never int.
+    englishScore: body.englishScore ? parseFloat(body.englishScore as string) : null,
 
     // --- English testing ----------------------------------------------------
     // The question that actually decides eligibility isn't "how good is your
@@ -104,10 +105,22 @@ async function upsertProfile(userId: string, userEmail: string | undefined, body
     },
   })
 
+  // The update branch must NOT clobber fields the request didn't send. The
+  // profile edit page submits a partial body (it has no controls for
+  // hasEnglishTest / englishTestType / englishTestDate / testTimeframe, and
+  // only sends englishScore when it's non-empty), so a one-field edit used to
+  // null every English-test answer out of the profile. Omitting a key from the
+  // update leaves the stored value untouched; sending a value (even null)
+  // still clears it.
+  const updateData = { ...data }
+  for (const key of ["hasEnglishTest", "englishTestType", "englishTestDate", "testTimeframe", "englishScore"] as const) {
+    if (body[key] === undefined) delete updateData[key]
+  }
+
   await prisma.userProfile.upsert({
     where: { userId },
     create: { userId, ...data } as any,
-    update: data as any,
+    update: updateData as any,
   })
 
 }
