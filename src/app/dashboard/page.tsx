@@ -138,10 +138,9 @@ function StatCard({
   decimals?: number;
   loading?: boolean;
 }) {
-  const { isRTL } = useLanguage();
   return (
     <div
-      className="dash-scale-in rounded-2xl border border-border bg-card p-4 shadow-[0_14px_36px_-18px_rgb(22_44_76_/_0.35)] sm:p-5"
+      className="dash-scale-in rounded-2xl border border-border bg-card p-3 sm:p-5 shadow-[0_14px_36px_-18px_rgb(22_44_76_/_0.35)]"
       style={{ "--dash-delay": "80ms" } as React.CSSProperties}
     >
       <div className="flex items-center justify-between gap-2">
@@ -157,10 +156,10 @@ function StatCard({
       ) : (
         <>
           <p className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-            <CountUp value={value} decimals={decimals} locale={isRTL ? "ar-EG" : "en-US"} />
+            <CountUp value={value} decimals={decimals} />
           </p>
-          <p className="mt-1 text-sm font-medium text-foreground">{label}</p>
-          <p className="text-xs text-muted-foreground">{caption}</p>
+<p className="mt-1 text-xs sm:text-sm font-medium leading-tight text-foreground">{label}</p>
+          <p className="text-[10px] leading-tight text-muted-foreground sm:text-xs">{caption}</p>
         </>
       )}
     </div>
@@ -341,7 +340,7 @@ function JourneyHero({
 
             {/* Compact stats inside the panel — mobile gets these instead of the
                 floating cards. */}
-            <div className="mt-7 grid max-w-lg grid-cols-3 gap-3 border-t border-white/15 pt-5">
+            <div className="mt-7 grid max-w-lg grid-cols-3 gap-2 border-t border-white/15 pt-5 sm:gap-3">
               {[
                 { label: pick("التطابقات", "Matches"), value: loading ? "…" : num(matchCount) },
                 {
@@ -354,8 +353,8 @@ function JourneyHero({
                 },
               ].map((s) => (
                 <div key={s.label}>
-                  <p className="text-2xl font-bold tabular-nums text-secondary-200">{s.value}</p>
-                  <p className="text-[11px] font-medium uppercase tracking-wide text-white/60">
+<p className="text-xl font-bold leading-tight tabular-nums text-secondary-200 sm:text-2xl">{s.value}</p>
+                  <p className="text-[9px] font-medium leading-tight uppercase tracking-wide text-white/60 sm:text-[11px]">
                     {s.label}
                   </p>
                 </div>
@@ -420,7 +419,7 @@ function RecommendedCard({ match, index }: { match: Match; index: number }) {
   return (
     <Link
       href={`/scholarships/${match.id}`}
-      className="dash-scale-in group flex items-center gap-4 rounded-2xl border border-border bg-card p-4 shadow-[0_14px_34px_-18px_rgb(22_44_76_/_0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_20px_44px_-18px_rgb(22_44_76_/_0.42)]"
+      className="dash-scale-in group flex items-center gap-3 rounded-2xl border border-border bg-card p-3 shadow-[0_14px_34px_-18px_rgb(22_44_76_/_0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_20px_44px_-18px_rgb(22_44_76_/_0.42)] sm:gap-4 sm:p-4"
       style={{ "--dash-delay": `${index * 90}ms` } as React.CSSProperties}
     >
       <span className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-secondary-500/12 text-secondary-700 dark:text-secondary-400 sm:flex">
@@ -438,7 +437,7 @@ function RecommendedCard({ match, index }: { match: Match; index: number }) {
             </span>
           )}
         </p>
-        <div className="mt-2 h-1.5 w-full max-w-[220px] overflow-hidden rounded-full bg-muted">
+        <div className="mt-2 h-1.5 w-full max-w-[140px] overflow-hidden rounded-full bg-muted sm:max-w-[220px]">
           <div
             className={cn(
               "dash-grow h-full rounded-full",
@@ -450,9 +449,9 @@ function RecommendedCard({ match, index }: { match: Match; index: number }) {
           />
         </div>
       </div>
-      <div className="shrink-0 text-end">
-        <p className={cn("text-2xl font-bold tabular-nums", fitColor(pct))}>{num(pct)}%</p>
-        <p className="text-[11px] font-medium text-muted-foreground">
+<div className="min-w-[60px] shrink-0 text-end">
+        <p className={cn("text-xl font-bold tabular-nums sm:text-2xl", fitColor(pct))}>{num(pct)}%</p>
+        <p className="text-[10px] font-medium leading-tight text-muted-foreground sm:text-[11px]">
           {pick("نسبة التطابق", "fit score")}
         </p>
       </div>
@@ -840,7 +839,7 @@ export default function DashboardPage() {
       />
 
       {/* Cozy statistics --------------------------------------------------- */}
-      <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <section className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <StatCard
           icon={Target}
           label={pick("منح منسّقة", "Curated matches")}
