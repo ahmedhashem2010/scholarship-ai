@@ -2,12 +2,13 @@
 
 import { useState, useRef, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const DOCUMENT_TYPES = [
-  { value: "PERSONAL_STATEMENT", label: "Personal Statement" },
-  { value: "CV", label: "CV / Resume" },
-  { value: "MOTIVATION_LETTER", label: "Motivation Letter" },
-  { value: "OTHER", label: "Other" },
+  { value: "PERSONAL_STATEMENT", labelAr: "البيان الشخصي", labelEn: "Personal Statement" },
+  { value: "CV", labelAr: "السيرة الذاتية", labelEn: "CV / Resume" },
+  { value: "MOTIVATION_LETTER", labelAr: "خطاب الدوافع", labelEn: "Motivation Letter" },
+  { value: "OTHER", labelAr: "أخرى", labelEn: "Other" },
 ];
 
 function formatSize(bytes: number): string {
@@ -21,6 +22,7 @@ export function UploadDropzone({
 }: {
   onUploadComplete: () => void;
 }) {
+  const { pick } = useLanguage();
   const [file, setFile] = useState<File | null>(null);
   const [type, setType] = useState("PERSONAL_STATEMENT");
   const [uploading, setUploading] = useState(false);
@@ -46,11 +48,11 @@ export function UploadDropzone({
       "text/plain",
     ];
     if (!allowed.includes(f.type)) {
-      setError("Only PDF, DOCX, and TXT files are allowed");
+      setError(pick("يُسمح فقط بملفات PDF و DOCX و TXT", "Only PDF, DOCX, and TXT files are allowed"));
       return;
     }
     if (f.size > 10 * 1024 * 1024) {
-      setError("File exceeds 10MB limit");
+      setError(pick("الملف يتجاوز حد 10MB", "File exceeds 10MB limit"));
       return;
     }
     setFile(f);
@@ -72,14 +74,14 @@ export function UploadDropzone({
       const json = await res.json();
 
       if (!json.success) {
-        setError(json.error ?? "Upload failed");
+        setError(json.error ?? pick("فشل الرفع", "Upload failed"));
       } else {
         setFile(null);
         setType("PERSONAL_STATEMENT");
         onUploadComplete();
       }
     } catch {
-      setError("Upload failed. Please try again.");
+      setError(pick("فشل الرفع. حاول مرة أخرى.", "Upload failed. Please try again."));
     } finally {
       setUploading(false);
     }
@@ -88,14 +90,14 @@ export function UploadDropzone({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-sm font-medium text-foreground mb-1">Document Type</label>
+        <label className="block text-sm font-medium text-foreground mb-1">{pick("نوع المستند", "Document Type")}</label>
         <select
           value={type}
           onChange={(e) => setType(e.target.value)}
           className="block w-full rounded-lg border border-input bg-background px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
         >
           {DOCUMENT_TYPES.map((dt) => (
-            <option key={dt.value} value={dt.value}>{dt.label}</option>
+            <option key={dt.value} value={dt.value}>{pick(dt.labelAr, dt.labelEn)}</option>
           ))}
         </select>
       </div>
@@ -123,13 +125,13 @@ export function UploadDropzone({
               onClick={(e) => { e.stopPropagation(); setFile(null); }}
               className="text-sm text-red-600 hover:underline"
             >
-              Remove
+              {pick("إزالة", "Remove")}
             </button>
           </div>
         ) : (
           <>
-            <p className="font-medium text-foreground">Drop your file here</p>
-            <p className="mt-1 text-sm text-muted-foreground">or click to browse (PDF, DOCX, TXT &middot; max 10MB)</p>
+            <p className="font-medium text-foreground">{pick("أفلت ملفك هنا", "Drop your file here")}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{pick("أو انقر للتصفح (PDF، DOCX، TXT بحد أقصى 10MB)", "or click to browse (PDF, DOCX, TXT · max 10MB)")}</p>
           </>
         )}
       </div>
@@ -141,7 +143,7 @@ export function UploadDropzone({
       )}
 
       <Button type="submit" disabled={!file || uploading} className="w-full">
-        {uploading ? "Uploading..." : "Upload Document"}
+        {uploading ? pick("جارٍ الرفع…", "Uploading...") : pick("رفع المستند", "Upload Document")}
       </Button>
     </form>
   );

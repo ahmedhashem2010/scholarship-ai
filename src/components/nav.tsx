@@ -50,7 +50,7 @@ function Logo({ href, onDark }: { href: string; onDark?: boolean }) {
           className="h-[22px] w-[22px]"
         />
       </span>
-      <span className="whitespace-nowrap text-[15px] tracking-tight">
+      <span className="hidden whitespace-nowrap text-[15px] tracking-tight xs:block">
         {pick(BRAND.nameAr, BRAND.name)}
       </span>
     </Link>
@@ -384,7 +384,7 @@ export function Nav() {
     <header className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur-md">
       <div className="page-container flex h-14 items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-1">
-          <div className="me-4">
+          <div className="me-1 sm:me-4">
             <Logo href="/dashboard" />
           </div>
           <nav className="hidden items-center gap-1 lg:flex">
@@ -395,7 +395,7 @@ export function Nav() {
           </nav>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
           <ThemeToggle />
           <LanguageToggle />
 

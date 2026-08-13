@@ -8,6 +8,13 @@ import {
 } from "@/lib/scholarship-matcher";
 import { personas } from "../../../scripts/matching-audit/personas";
 import { ScholarshipCard } from "@/components/ui/scholarship-card";
+import { LanguageProvider } from "@/contexts/LanguageContext";
+import type { ReactElement } from "react";
+
+/** ScholarshipCard reads the active language via context — tests render it standalone. */
+function renderCard(ui: ReactElement) {
+  return render(<LanguageProvider>{ui}</LanguageProvider>);
+}
 
 /* ------------------------------------------------------------------ */
 /* Task 3C — matching safety regression tests.                         */
@@ -274,14 +281,14 @@ function buildMatch(scholarship: ScholarshipData, isEligible: boolean) {
 describe("BUG 3 — card must not present ineligible scholarships as application opportunities", () => {
   it("does not render Start Application for an ineligible match", () => {
     const sch = makeScholarship({ id: "x", nameEn: "Ineligible Scholarship" });
-    render(<ScholarshipCard match={buildMatch(sch, false)} index={0} />);
+    renderCard(<ScholarshipCard match={buildMatch(sch, false)} index={0} />);
     expect(screen.queryByRole("link", { name: /start application/i })).toBeNull();
     expect(screen.getByRole("link", { name: /details/i })).toBeTruthy();
   });
 
   it("renders Start Application only for an eligible match", () => {
     const sch = makeScholarship({ id: "y", nameEn: "Eligible Scholarship" });
-    render(<ScholarshipCard match={buildMatch(sch, true)} index={0} />);
+    renderCard(<ScholarshipCard match={buildMatch(sch, true)} index={0} />);
     expect(screen.getByRole("link", { name: /start application/i })).toBeTruthy();
   });
 });
@@ -544,7 +551,7 @@ describe("Task 3E — match card renders reasons with progressive disclosure", (
         "✓ Fully funded for tuition and living",
       ],
     };
-    render(<ScholarshipCard match={match} index={0} />);
+    renderCard(<ScholarshipCard match={match} index={0} />);
     expect(screen.getByText("Age 23 is within the accepted range")).toBeTruthy();
     expect(screen.getByText("Fully funded for tuition and living")).toBeTruthy();
     expect(screen.queryByText("✓ Age 23 is within the accepted range")).toBeNull();
@@ -553,7 +560,7 @@ describe("Task 3E — match card renders reasons with progressive disclosure", (
   it("shows at most 3 reasons by default and offers a disclosure toggle", () => {
     const reasons = Array.from({ length: 5 }, (_, i) => `✓ Reason number ${i + 1}`);
     const match = { ...buildMatch(sch, true), reasons };
-    render(<ScholarshipCard match={match} index={0} />);
+    renderCard(<ScholarshipCard match={match} index={0} />);
     expect(screen.getByText("Reason number 1")).toBeTruthy();
     expect(screen.getByText("Reason number 3")).toBeTruthy();
     expect(screen.queryByText("Reason number 4")).toBeNull();
@@ -563,7 +570,7 @@ describe("Task 3E — match card renders reasons with progressive disclosure", (
   it("expanding reveals every reason (mobile-friendly progressive disclosure)", () => {
     const reasons = Array.from({ length: 5 }, (_, i) => `✓ Reason number ${i + 1}`);
     const match = { ...buildMatch(sch, true), reasons };
-    render(<ScholarshipCard match={match} index={0} />);
+    renderCard(<ScholarshipCard match={match} index={0} />);
     fireEvent.click(screen.getByRole("button", { name: /show all reasons/i }));
     expect(screen.getByText("Reason number 4")).toBeTruthy();
     expect(screen.getByText("Reason number 5")).toBeTruthy();
@@ -572,7 +579,7 @@ describe("Task 3E — match card renders reasons with progressive disclosure", (
 
   it("does not render a disclosure toggle when there are few reasons", () => {
     const match = { ...buildMatch(sch, true), reasons: ["✓ Age 23 is within the accepted range"] };
-    render(<ScholarshipCard match={match} index={0} />);
+    renderCard(<ScholarshipCard match={match} index={0} />);
     expect(screen.queryByRole("button", { name: /show all reasons/i })).toBeNull();
   });
 });

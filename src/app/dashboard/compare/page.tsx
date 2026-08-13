@@ -29,6 +29,7 @@ import { FitScore } from "@/components/ui/fit-score";
 import { DeadlineIndicator } from "@/components/ui/deadline-indicator";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   COMPARE_MAX_SELECTIONS,
   encodeCompareIds,
@@ -78,10 +79,21 @@ function daysLeft(d: string | null): number | null {
   return Math.max(0, Math.ceil(diff / 86400000));
 }
 
-function fmtDate(d: string | null): string {
-  if (!d) return "No deadline";
-  return new Date(d).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+function fmtDate(d: string | null, isRTL: boolean): string {
+  if (!d) return isRTL ? "لا يوجد موعد نهائي" : "No deadline";
+  return new Date(d).toLocaleDateString(isRTL ? "ar-EG" : "en-US", { year: "numeric", month: "short", day: "numeric" });
 }
+
+const DOC_LABELS: Record<string, { ar: string; en: string }> = {
+  PERSONAL_STATEMENT: { ar: "خطاب الدوافع", en: "Personal Statement" },
+  CV: { ar: "السيرة الذاتية", en: "CV" },
+  MOTIVATION_LETTER: { ar: "خطاب التحفيز", en: "Motivation Letter" },
+  RESEARCH_PROPOSAL: { ar: "المقترح البحثي", en: "Research Proposal" },
+  RECOMMENDATION_LETTER: { ar: "خطاب التوصية", en: "Recommendation Letter" },
+  TRANSCRIPT: { ar: "كشف الدرجات", en: "Transcript" },
+  MEDICAL_CERTIFICATE: { ar: "شهادة طبية", en: "Medical Certificate" },
+  OTHER: { ar: "مستند آخر", en: "Other" },
+};
 
 function parseJSON(s: string | null): Record<string, unknown> {
   if (!s) return {};
@@ -105,6 +117,7 @@ function getCompetitionColor(level: string): "red" | "yellow" | "green" {
 
 function ComparePageContent() {
   const searchParams = useSearchParams();
+  const { pick, num, isRTL } = useLanguage();
   const ids = parseCompareIds(searchParams.get("ids"));
 
   const [scholarships, setScholarships] = useState<Scholarship[]>([]);
@@ -175,14 +188,17 @@ function ComparePageContent() {
           <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-primary-50">
             <GanttChart className="h-10 w-10 text-primary" />
           </div>
-          <h2 className="mb-2 text-xl font-semibold">Select scholarships to compare</h2>
+          <h2 className="mb-2 text-xl font-semibold">{pick("اختر منحاً للمقارنة", "Select scholarships to compare")}</h2>
           <p className="mb-8 text-sm text-muted-foreground">
-            Go to your dashboard, check two or more scholarships, and click <strong>Compare Selected</strong> to see them side by side.
+            {pick(
+              <>انتقل إلى لوحتك، وحدّد منحتين أو أكثر، ثم اضغط <strong>قارن المحدد</strong> لرؤيتها جنباً إلى جنب.</>,
+              <>Go to your dashboard, check two or more scholarships, and click <strong>Compare Selected</strong> to see them side by side.</>
+            )}
           </p>
           <Link href="/dashboard">
             <Button>
-              <ArrowLeft className="h-4 w-4" />
-              Back to Dashboard
+              <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
+              {pick("العودة إلى لوحة التحكم", "Back to Dashboard")}
             </Button>
           </Link>
         </div>
@@ -212,7 +228,7 @@ function ComparePageContent() {
   }, scholarships[0]!);
   const bestChance = matches.length > 0 ? matches.reduce((a, b) => a.successProbability > b.successProbability ? a : b) : null;
 
-  const deadlines = scholarships.map((s) => ({ id: s.id, name: s.nameEn, dl: daysLeft(s.deadline) }));
+  const deadlines = scholarships.map((s) => ({ id: s.id, name: s.nameEn, nameAr: s.nameAr, dl: daysLeft(s.deadline) }));
   const closeDeadlines = deadlines.filter((d) => d.dl !== null && d.dl <= 60);
   const hasDeadlineConflict = closeDeadlines.length >= 2;
 
@@ -231,24 +247,24 @@ function ComparePageContent() {
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-1">
             <Sparkles className="h-4 w-4 text-yellow-300" />
-            <span className="text-xs font-medium text-white/80 uppercase tracking-wider">Side-by-Side Analysis</span>
+            <span className="text-xs font-medium text-white/80 uppercase tracking-wider">{pick("تحليل جنب إلى جنب", "Side-by-Side Analysis")}</span>
           </div>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Compare Scholarships</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{pick("قارن المنح", "Compare Scholarships")}</h1>
               <p className="mt-1 text-sm text-white/70">
-                {scholarships.length} scholarships selected &middot; Detailed comparison below
+                {pick(`${num(scholarships.length)} منحة محددة · مقارنة مفصّلة بالأسفل`, `${scholarships.length} scholarships selected · Detailed comparison below`)}
               </p>
             </div>
             <div className="flex gap-2">
               <Button variant="secondary" size="sm" onClick={() => window.print()}>
                 <FileText className="h-4 w-4" />
-                Export
+                {pick("تصدير", "Export")}
               </Button>
               <Link href="/dashboard">
                 <Button variant="secondary" size="sm">
-                  <ArrowLeft className="h-4 w-4" />
-                  Dashboard
+                  <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
+                  {pick("لوحة التحكم", "Dashboard")}
                 </Button>
               </Link>
             </div>
@@ -264,10 +280,13 @@ function ComparePageContent() {
               <FileText className="h-5 w-5 text-success" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-success-800">Documents can be reused</p>
+              <p className="text-sm font-semibold text-success-800">{pick("يمكن إعادة استخدام المستندات", "Documents can be reused")}</p>
               <p className="mt-0.5 text-sm text-success-700">
-                Your <strong>{uniqueReusable.map((t) => getDocTypeIcon(t) + " " + t.replace(/_/g, " ")).join(", ")}</strong>{" "}
-                can be reused across multiple scholarships with minor edits &mdash; saving you time and effort.
+                {pick(
+                  <>يمكن إعادة استخدام <strong>{uniqueReusable.map((t) => getDocTypeIcon(t) + " " + (DOC_LABELS[t] ? (isRTL ? DOC_LABELS[t].ar : DOC_LABELS[t].en) : t.replace(/_/g, " "))).join(", ")}</strong> في أكثر من منحة مع تعديلات بسيطة &mdash; مما يوفّر وقتك وجهدك.</>,
+                  <>Your <strong>{uniqueReusable.map((t) => getDocTypeIcon(t) + " " + (DOC_LABELS[t] ? (isRTL ? DOC_LABELS[t].ar : DOC_LABELS[t].en) : t.replace(/_/g, " "))).join(", ")}</strong>{" "}
+                  can be reused across multiple scholarships with minor edits &mdash; saving you time and effort.</>
+                )}
               </p>
             </div>
           </div>
@@ -284,13 +303,13 @@ function ComparePageContent() {
               </div>
               {bestOverall && <Badge variant="green" className="shrink-0">{bestOverall.fitScore}%</Badge>}
             </div>
-            <p className="mt-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Best Overall Fit</p>
+            <p className="mt-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">{pick("أفضل تطابق عام", "Best Overall Fit")}</p>
             <p className="mt-1 text-sm font-semibold text-foreground">
-              {bestOverall ? fmtName(bestOverall.scholarship.nameEn) : "—"}
+              {bestOverall ? fmtName(pick(bestOverall.scholarship.nameAr, bestOverall.scholarship.nameEn)) : "—"}
             </p>
             {bestOverall && (
               <p className="mt-0.5 text-xs text-muted-foreground">
-                Highest match with your profile
+                {pick("أعلى تطابق مع ملفك الشخصي", "Highest match with your profile")}
               </p>
             )}
           </CardContent>
@@ -302,12 +321,12 @@ function ComparePageContent() {
               <div className="rounded-lg bg-success-50 p-2">
                 <Award className="h-5 w-5 text-success" />
               </div>
-              <Badge variant="green" className="shrink-0">Best</Badge>
+              <Badge variant="green" className="shrink-0">{pick("الأفضل", "Best")}</Badge>
             </div>
-            <p className="mt-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Best Benefits</p>
-            <p className="mt-1 text-sm font-semibold text-foreground">{fmtName(bestBenefits.nameEn)}</p>
+            <p className="mt-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">{pick("أفضل المزايا", "Best Benefits")}</p>
+            <p className="mt-1 text-sm font-semibold text-foreground">{fmtName(pick(bestBenefits.nameAr, bestBenefits.nameEn))}</p>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              Comprehensive coverage including tuition, stipend, and housing
+              {pick("تغطية شاملة تشمل الرسوم الدراسية والمنحة والسكن", "Comprehensive coverage including tuition, stipend, and housing")}
             </p>
           </CardContent>
         </Card>
@@ -321,20 +340,20 @@ function ComparePageContent() {
               {(() => {
                 const dl = daysLeft(mostUrgent.deadline);
                 return dl !== null ? (
-                  <Badge variant={dl <= 30 ? "red" : "yellow"} className="shrink-0">{dl}d left</Badge>
+                  <Badge variant={dl <= 30 ? "red" : "yellow"} className="shrink-0">{pick(`${num(dl)} يوم متبقي`, `${dl}d left`)}</Badge>
                 ) : null;
               })()}
             </div>
-            <p className="mt-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Most Urgent</p>
-            <p className="mt-1 text-sm font-semibold text-foreground">{fmtName(mostUrgent.nameEn)}</p>
+            <p className="mt-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">{pick("الأكثر إلحاحاً", "Most Urgent")}</p>
+            <p className="mt-1 text-sm font-semibold text-foreground">{fmtName(pick(mostUrgent.nameAr, mostUrgent.nameEn))}</p>
             {(() => {
               const dl = daysLeft(mostUrgent.deadline);
               return dl !== null ? (
                 <p className="mt-0.5 text-xs text-muted-foreground">
-                  Deadline: {fmtDate(mostUrgent.deadline)}
+                  {pick(`الموعد النهائي: ${fmtDate(mostUrgent.deadline, isRTL)}`, `Deadline: ${fmtDate(mostUrgent.deadline, isRTL)}`)}
                 </p>
               ) : (
-                <p className="mt-0.5 text-xs text-muted-foreground">No deadline set</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">{pick("لا يوجد موعد نهائي محدد", "No deadline set")}</p>
               );
             })()}
           </CardContent>
@@ -348,13 +367,13 @@ function ComparePageContent() {
               </div>
               {bestChance && <Badge variant="green" className="shrink-0">{bestChance.successProbability}%</Badge>}
             </div>
-            <p className="mt-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Best Chance</p>
+            <p className="mt-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">{pick("أفضل فرصة", "Best Chance")}</p>
             <p className="mt-1 text-sm font-semibold text-foreground">
-              {bestChance ? fmtName(bestChance.scholarship.nameEn) : "—"}
+              {bestChance ? fmtName(pick(bestChance.scholarship.nameAr, bestChance.scholarship.nameEn)) : "—"}
             </p>
             {bestChance && (
               <p className="mt-0.5 text-xs text-muted-foreground">
-                {bestChance.successProbability}% success probability
+                {pick(`${num(bestChance.successProbability)}% احتمال النجاح`, `${bestChance.successProbability}% success probability`)}
               </p>
             )}
           </CardContent>
@@ -366,7 +385,7 @@ function ComparePageContent() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <GanttChart className="h-4 w-4 text-primary" />
-            Detailed Comparison
+            {pick("مقارنة تفصيلية", "Detailed Comparison")}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
@@ -375,16 +394,16 @@ function ComparePageContent() {
               <thead>
                 <tr className="border-b border-border bg-muted">
                   <th className="sticky start-0 z-10 bg-muted text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3.5 w-44">
-                    Category
+                    {pick("الفئة", "Category")}
                   </th>
                   {scholarships.map((s) => {
                     const m = getMatch(s.id);
                     return (
-                      <th key={s.id} className="text-center px-4 py-3.5 border-l border-border min-w-[200px]">
+                      <th key={s.id} className="text-center px-4 py-3.5 border-s border-border min-w-[200px]">
                         <div className="flex flex-col items-center gap-1.5">
                           <div className="flex items-center gap-1.5">
                             <span className="text-lg">{getFlag(s.country)}</span>
-                            <span className="text-xs font-semibold leading-tight">{fmtName(s.nameEn)}</span>
+                            <span className="text-xs font-semibold leading-tight">{fmtName(pick(s.nameAr, s.nameEn))}</span>
                           </div>
                           {m && (
                             <FitScore score={m.fitScore} size="sm" showLabel={false} />
@@ -399,15 +418,15 @@ function ComparePageContent() {
                 {/* Basic Info */}
                 <tr className="border-b border-border">
                   <td colSpan={scholarships.length + 1} className="bg-primary-50/40 px-4 py-2 text-xs font-semibold text-primary">
-                    Basic Information
+                    {pick("المعلومات الأساسية", "Basic Information")}
                   </td>
                 </tr>
                 <tr className="border-b border-border even:bg-muted/50">
                   <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
-                    Country
+                    {pick("البلد", "Country")}
                   </td>
                   {scholarships.map((s) => (
-                    <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
+                    <td key={s.id} className="px-4 py-3 text-sm border-s border-border align-top">
                       <span className="inline-flex items-center gap-1.5">
                         <span className="text-base">{getFlag(s.country)}</span>
                         <span>{s.country}</span>
@@ -417,20 +436,20 @@ function ComparePageContent() {
                 </tr>
                 <tr className="border-b border-border even:bg-muted/50">
                   <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
-                    University
+                    {pick("الجامعة", "University")}
                   </td>
                   {scholarships.map((s) => (
-                    <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
-                      {s.university ?? <span className="text-muted-foreground">Various</span>}
+                    <td key={s.id} className="px-4 py-3 text-sm border-s border-border align-top">
+                      {s.university ?? <span className="text-muted-foreground">{pick("متنوعة", "Various")}</span>}
                     </td>
                   ))}
                 </tr>
                 <tr className="border-b border-border even:bg-muted/50">
                   <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
-                    Degree
+                    {pick("الدرجة العلمية", "Degree")}
                   </td>
                   {scholarships.map((s) => (
-                    <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
+                    <td key={s.id} className="px-4 py-3 text-sm border-s border-border align-top">
                       {s.degree}
                     </td>
                   ))}
@@ -439,57 +458,57 @@ function ComparePageContent() {
                 {/* Requirements */}
                 <tr className="border-b border-border">
                   <td colSpan={scholarships.length + 1} className="bg-primary-50/40 px-4 py-2 text-xs font-semibold text-primary">
-                    Requirements
+                    {pick("المتطلبات", "Requirements")}
                   </td>
                 </tr>
                 <tr className="border-b border-border even:bg-muted/50">
                   <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
-                    Education Level
+                    {pick("مستوى التعليم", "Education Level")}
                   </td>
                   {scholarships.map((s) => (
-                    <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
-                      {parseArr(s.eligibleEducation).length > 0 ? parseArr(s.eligibleEducation).join(", ") : "Open to all"}
+                    <td key={s.id} className="px-4 py-3 text-sm border-s border-border align-top">
+                      {parseArr(s.eligibleEducation).length > 0 ? parseArr(s.eligibleEducation).join(", ") : pick("مفتوح للجميع", "Open to all")}
                     </td>
                   ))}
                 </tr>
                 <tr className="border-b border-border even:bg-muted/50">
                   <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
-                    Age Limit
+                    {pick("الحد الأقصى للعمر", "Age Limit")}
                   </td>
                   {scholarships.map((s) => (
-                    <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
-                      {s.minimumAge || s.maximumAge ? <Badge variant="gray">{s.minimumAge ?? 0}–{s.maximumAge ?? "No limit"}</Badge> : <span className="text-muted-foreground">No limit</span>}
+                    <td key={s.id} className="px-4 py-3 text-sm border-s border-border align-top">
+                      {s.minimumAge || s.maximumAge ? <Badge variant="gray">{s.minimumAge ?? 0}–{s.maximumAge ?? pick("بدون حد", "No limit")}</Badge> : <span className="text-muted-foreground">{pick("بدون حد", "No limit")}</span>}
                     </td>
                   ))}
                 </tr>
                 <tr className="border-b border-border even:bg-muted/50">
                   <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
-                    English Level
+                    {pick("مستوى اللغة الإنجليزية", "English Level")}
                   </td>
                   {scholarships.map((s) => (
-                    <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
-                      {s.englishRequirement ?? "Not specified"}
+                    <td key={s.id} className="px-4 py-3 text-sm border-s border-border align-top">
+                      {s.englishRequirement ?? pick("غير محدد", "Not specified")}
                     </td>
                   ))}
                 </tr>
                 <tr className="border-b border-border even:bg-muted/50">
                   <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
-                    Documents
+                    {pick("المستندات", "Documents")}
                   </td>
                   {scholarships.map((s) => {
                     const req = parseJSON(s.requirements);
                     const docs = (req.documents as string[]) ?? [];
                     return (
-                      <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
+                      <td key={s.id} className="px-4 py-3 text-sm border-s border-border align-top">
                         <ul className="space-y-1">
                           {docs.slice(0, 4).map((d: string, i: number) => (
                             <li key={i} className="flex items-center gap-1.5 text-xs text-muted-foreground">
                               <span>{getDocTypeIcon(d)}</span>
-                              <span>{d.replace(/_/g, " ")}</span>
+                              <span>{DOC_LABELS[d] ? (isRTL ? DOC_LABELS[d].ar : DOC_LABELS[d].en) : d.replace(/_/g, " ")}</span>
                             </li>
                           ))}
                           {docs.length > 4 && (
-                            <li className="text-xs text-muted-foreground">+{docs.length - 4} more</li>
+                            <li className="text-xs text-muted-foreground">{pick(`+${num(docs.length - 4)} إضافية`, `+${docs.length - 4} more`)}</li>
                           )}
                         </ul>
                       </td>
@@ -500,20 +519,20 @@ function ComparePageContent() {
                 {/* Benefits */}
                 <tr className="border-b border-border">
                   <td colSpan={scholarships.length + 1} className="bg-primary-50/40 px-4 py-2 text-xs font-semibold text-primary">
-                    Benefits
+                    {pick("المزايا", "Benefits")}
                   </td>
                 </tr>
                 <tr className="border-b border-border even:bg-muted/50">
                   <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
-                    Tuition
+                    {pick("الرسوم الدراسية", "Tuition")}
                   </td>
                   {scholarships.map((s) => {
                     const b = parseJSON(s.benefits);
                     return (
-                      <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
+                      <td key={s.id} className="px-4 py-3 text-sm border-s border-border align-top">
                         <span className="inline-flex items-center gap-1 text-success-700">
                           <CheckCircle2 className="h-3.5 w-3.5" />
-                          {(b.tuition as string) ?? "Covered"}
+                          {(b.tuition as string) ?? pick("مشمول", "Covered")}
                         </span>
                       </td>
                     );
@@ -521,12 +540,12 @@ function ComparePageContent() {
                 </tr>
                 <tr className="border-b border-border even:bg-muted/50">
                   <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
-                    Stipend
+                    {pick("المنحة الشهرية", "Stipend")}
                   </td>
                   {scholarships.map((s) => {
                     const b = parseJSON(s.benefits);
                     return (
-                      <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
+                      <td key={s.id} className="px-4 py-3 text-sm border-s border-border align-top">
                         {(b.allowance as string) ?? <span className="text-muted-foreground">&mdash;</span>}
                       </td>
                     );
@@ -534,12 +553,12 @@ function ComparePageContent() {
                 </tr>
                 <tr className="border-b border-border even:bg-muted/50">
                   <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
-                    Housing
+                    {pick("السكن", "Housing")}
                   </td>
                   {scholarships.map((s) => {
                     const b = parseJSON(s.benefits);
                     return (
-                      <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
+                      <td key={s.id} className="px-4 py-3 text-sm border-s border-border align-top">
                         {(b.housing as string) ?? <span className="text-muted-foreground">&mdash;</span>}
                       </td>
                     );
@@ -547,13 +566,13 @@ function ComparePageContent() {
                 </tr>
                 <tr className="border-b border-border even:bg-muted/50">
                   <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
-                    Travel
+                    {pick("السفر", "Travel")}
                   </td>
                   {scholarships.map((s) => {
                     const b = parseJSON(s.benefits);
                     const val = (b.travel as string) ?? "\u2014";
                     return (
-                      <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
+                      <td key={s.id} className="px-4 py-3 text-sm border-s border-border align-top">
                         {val.includes("airfare") || val.includes("travel") ? (
                           <span className="inline-flex items-center gap-1 text-success-700">
                             <CheckCircle2 className="h-3.5 w-3.5" />
@@ -566,12 +585,12 @@ function ComparePageContent() {
                 </tr>
                 <tr className="border-b border-border even:bg-muted/50">
                   <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
-                    Insurance
+                    {pick("التأمين الصحي", "Insurance")}
                   </td>
                   {scholarships.map((s) => {
                     const b = parseJSON(s.benefits);
                     return (
-                      <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
+                      <td key={s.id} className="px-4 py-3 text-sm border-s border-border align-top">
                         {(b.insurance as string) ?? <span className="text-muted-foreground">&mdash;</span>}
                       </td>
                     );
@@ -581,50 +600,50 @@ function ComparePageContent() {
                 {/* Application */}
                 <tr className="border-b border-border">
                   <td colSpan={scholarships.length + 1} className="bg-primary-50/40 px-4 py-2 text-xs font-semibold text-primary">
-                    Application Status
+                    {pick("حالة التقديم", "Application Status")}
                   </td>
                 </tr>
                 <tr className="border-b border-border even:bg-muted/50">
                   <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
-                    Deadline
+                    {pick("الموعد النهائي", "Deadline")}
                   </td>
                   {scholarships.map((s) => (
-                    <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
+                    <td key={s.id} className="px-4 py-3 text-sm border-s border-border align-top">
                       <DeadlineIndicator deadline={s.deadline} showDate size="sm" />
                     </td>
                   ))}
                 </tr>
                 <tr className="border-b border-border even:bg-muted/50">
                   <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
-                    Competition
+                    {pick("المنافسة", "Competition")}
                   </td>
                   {scholarships.map((s) => (
-                    <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
+                    <td key={s.id} className="px-4 py-3 text-sm border-s border-border align-top">
                       <Badge variant={getCompetitionColor(s.competitionLevel)}>
-                        {s.competitionLevel === "high" ? "Hard" : s.competitionLevel === "medium" ? "Medium" : "Easy"}
+                        {s.competitionLevel === "high" ? pick("صعب", "Hard") : s.competitionLevel === "medium" ? pick("متوسط", "Medium") : pick("سهل", "Easy")}
                       </Badge>
                     </td>
                   ))}
                 </tr>
                 <tr className="border-b border-border even:bg-muted/50">
                   <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
-                    Your Progress
+                    {pick("تقدمك", "Your Progress")}
                   </td>
                   {scholarships.map((s) => {
                     const [ready, total] = getDocReadyCount(s.id);
                     const app = getApp(s.id);
                     return (
-                      <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
+                      <td key={s.id} className="px-4 py-3 text-sm border-s border-border align-top">
                         {app ? (
                           <div className="space-y-1.5">
                             <div className="flex items-center justify-between text-xs">
-                              <span className="text-muted-foreground">{ready}/{total} docs ready</span>
+                              <span className="text-muted-foreground">{pick(`${num(ready)}/${num(total)} مستند جاهز`, `${ready}/${total} docs ready`)}</span>
                               <StatusBadge status={app.progress >= 80 ? "IN_PROGRESS" : app.progress > 0 ? "DRAFT" : "NOT_STARTED"} />
                             </div>
                             <ProgressBar value={app.progress} size="sm" animated />
                           </div>
                         ) : (
-                          <span className="text-muted-foreground text-xs">Not started</span>
+                          <span className="text-muted-foreground text-xs">{pick("لم يبدأ", "Not started")}</span>
                         )}
                       </td>
                     );
@@ -634,17 +653,17 @@ function ComparePageContent() {
                 {/* Fit & Chances */}
                 <tr className="border-b border-border">
                   <td colSpan={scholarships.length + 1} className="bg-primary-50/40 px-4 py-2 text-xs font-semibold text-primary">
-                    Your Chances
+                    {pick("فرصك", "Your Chances")}
                   </td>
                 </tr>
                 <tr className="border-b border-border even:bg-muted/50">
                   <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
-                    Fit Score
+                    {pick("نسبة التطابق", "Fit Score")}
                   </td>
                   {scholarships.map((s) => {
                     const m = getMatch(s.id);
                     return (
-                      <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
+                      <td key={s.id} className="px-4 py-3 text-sm border-s border-border align-top">
                         <div className="flex items-center justify-center">
                           {m ? <FitScore score={m.fitScore} size="md" /> : <span className="text-muted-foreground">&mdash;</span>}
                         </div>
@@ -654,12 +673,12 @@ function ComparePageContent() {
                 </tr>
                 <tr className="border-b border-border even:bg-muted/50">
                   <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
-                    Success Probability
+                    {pick("احتمال النجاح", "Success Probability")}
                   </td>
                   {scholarships.map((s) => {
                     const m = getMatch(s.id);
                     return (
-                      <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
+                      <td key={s.id} className="px-4 py-3 text-sm border-s border-border align-top">
                         {m ? (
                           <div className="flex flex-col items-center gap-1">
                             <span className="text-lg font-bold tabular-nums text-primary">{m.successProbability}%</span>
@@ -674,12 +693,12 @@ function ComparePageContent() {
                 </tr>
                 <tr className="border-b border-border even:bg-muted/50">
                   <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
-                    Strengths
+                    {pick("نقاط القوة", "Strengths")}
                   </td>
                   {scholarships.map((s) => {
                     const m = getMatch(s.id);
                     return (
-                      <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
+                      <td key={s.id} className="px-4 py-3 text-sm border-s border-border align-top">
                         {m ? (
                           <ul className="space-y-1">
                             {m.reasons.filter((r) => !r.toLowerCase().includes("may not") && !r.toLowerCase().includes("over")).slice(0, 2).map((r, i) => (
@@ -696,13 +715,13 @@ function ComparePageContent() {
                 </tr>
                 <tr className="even:bg-muted/50">
                   <td className="text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 pe-4 whitespace-nowrap w-44 align-top px-4">
-                    Weaknesses
+                    {pick("نقاط الضعف", "Weaknesses")}
                   </td>
                   {scholarships.map((s) => {
                     const m = getMatch(s.id);
                     const weaknesses = m?.reasons.filter((r) => r.toLowerCase().includes("may not") || r.toLowerCase().includes("over")) ?? [];
                     return (
-                      <td key={s.id} className="px-4 py-3 text-sm border-l border-border align-top">
+                      <td key={s.id} className="px-4 py-3 text-sm border-s border-border align-top">
                         {m ? (
                           weaknesses.length > 0 ? (
                             <ul className="space-y-1">
@@ -716,7 +735,7 @@ function ComparePageContent() {
                           ) : (
                             <span className="inline-flex items-center gap-1 text-xs text-success">
                               <CheckCircle2 className="h-3 w-3" />
-                              No major weaknesses
+                              {pick("لا توجد نقاط ضعف كبيرة", "No major weaknesses")}
                             </span>
                           )
                         ) : <span className="text-muted-foreground">&mdash;</span>}
@@ -737,7 +756,7 @@ function ComparePageContent() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-primary" />
-              Comparison Analysis
+              {pick("تحليل المقارنة", "Comparison Analysis")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
@@ -747,9 +766,12 @@ function ComparePageContent() {
                   <Trophy className="h-4 w-4 text-primary" />
                 </div>
                 <div>
-                  <p className="font-semibold text-primary-900">Best Overall Fit</p>
+                  <p className="font-semibold text-primary-900">{pick("أفضل تطابق عام", "Best Overall Fit")}</p>
                   <p className="mt-0.5 text-primary-700">
-                    <strong>{fmtName(bestOverall.scholarship.nameEn)}</strong> &mdash; {bestOverall.fitScore}% fit score, highest match with your profile.
+                    {pick(
+                      <><strong>{fmtName(bestOverall.scholarship.nameAr)}</strong> &mdash; نسبة تطابق {num(bestOverall.fitScore)}%، الأعلى مع ملفك الشخصي.</>,
+                      <><strong>{fmtName(bestOverall.scholarship.nameEn)}</strong> &mdash; {bestOverall.fitScore}% fit score, highest match with your profile.</>
+                    )}
                   </p>
                 </div>
               </div>
@@ -758,12 +780,15 @@ function ComparePageContent() {
               <div className="shrink-0 rounded-full bg-success-100 p-1.5">
                 <Award className="h-4 w-4 text-success" />
               </div>
-              <div>
-                <p className="font-semibold text-success-900">Best Benefits</p>
-                <p className="mt-0.5 text-success-700">
-                  <strong>{fmtName(bestBenefits.nameEn)}</strong> offers comprehensive coverage including tuition, stipend, and housing.
-                </p>
-              </div>
+                <div>
+                  <p className="font-semibold text-success-900">{pick("أفضل المزايا", "Best Benefits")}</p>
+                  <p className="mt-0.5 text-success-700">
+                    {pick(
+                      <><strong>{fmtName(bestBenefits.nameAr)}</strong> يقدّم تغطية شاملة تشمل الرسوم الدراسية والمنحة والسكن.</>,
+                      <><strong>{fmtName(bestBenefits.nameEn)}</strong> offers comprehensive coverage including tuition, stipend, and housing.</>
+                    )}
+                  </p>
+                </div>
             </div>
             {(() => {
               const dl = daysLeft(mostUrgent.deadline);
@@ -773,9 +798,12 @@ function ComparePageContent() {
                     <Timer className="h-4 w-4 text-warning" />
                   </div>
                   <div>
-                    <p className="font-semibold text-warning-900">Most Urgent</p>
+                    <p className="font-semibold text-warning-900">{pick("الأكثر إلحاحاً", "Most Urgent")}</p>
                     <p className="mt-0.5 text-warning-700">
-                      <strong>{fmtName(mostUrgent.nameEn)}</strong> &mdash; only {dl} days remaining!
+                      {pick(
+                        <><strong>{fmtName(mostUrgent.nameAr)}</strong> &mdash; {num(dl)} يوم متبقٍ فقط!</>,
+                        <><strong>{fmtName(mostUrgent.nameEn)}</strong> &mdash; only {dl} days remaining!</>
+                      )}
                     </p>
                   </div>
                 </div>
@@ -787,9 +815,12 @@ function ComparePageContent() {
                   <Target className="h-4 w-4 text-primary" />
                 </div>
                 <div>
-                  <p className="font-semibold text-primary-900">Best Chance of Success</p>
+                  <p className="font-semibold text-primary-900">{pick("أفضل فرصة للنجاح", "Best Chance of Success")}</p>
                   <p className="mt-0.5 text-primary-700">
-                    <strong>{fmtName(bestChance.scholarship.nameEn)}</strong> &mdash; {bestChance.successProbability}% probability.
+                    {pick(
+                      <><strong>{fmtName(bestChance.scholarship.nameAr)}</strong> &mdash; احتمالية {num(bestChance.successProbability)}%.</>,
+                      <><strong>{fmtName(bestChance.scholarship.nameEn)}</strong> &mdash; {bestChance.successProbability}% probability.</>
+                    )}
                   </p>
                 </div>
               </div>
@@ -802,7 +833,7 @@ function ComparePageContent() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Lightbulb className="h-4 w-4 text-warning" />
-              My Recommendation
+              {pick("توصيتي", "My Recommendation")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
@@ -815,8 +846,8 @@ function ComparePageContent() {
                     <div className="flex items-start gap-2">
                       <Zap className="mt-0.5 h-4 w-4 shrink-0 text-success" />
                       <div>
-                        <p className="font-medium text-success-900">Focus on <strong>{fmtName(top.scholarship.nameEn)}</strong> first</p>
-                        <p className="mt-0.5 text-xs text-success-700">It&apos;s your best match with strong success odds.</p>
+                        <p className="font-medium text-success-900">{pick("ركّز على", "Focus on")} <strong>{fmtName(pick(top.scholarship.nameAr, top.scholarship.nameEn))}</strong> {pick("أولاً", "first")}</p>
+                        <p className="mt-0.5 text-xs text-success-700">{pick("إنه أفضل تطابق لديك مع فرص نجاح قوية.", "It's your best match with strong success odds.")}</p>
                       </div>
                     </div>
                   </div>
@@ -825,8 +856,8 @@ function ComparePageContent() {
                       <div className="flex items-start gap-2">
                         <ArrowUpRight className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                         <div>
-                          <p className="font-medium text-primary-900">Backup option: <strong>{fmtName(second.scholarship.nameEn)}</strong></p>
-                          <p className="mt-0.5 text-xs text-primary-700">{second.fitScore}% fit score.</p>
+                          <p className="font-medium text-primary-900">{pick("خيار احتياطي:", "Backup option:")} <strong>{fmtName(pick(second.scholarship.nameAr, second.scholarship.nameEn))}</strong></p>
+                          <p className="mt-0.5 text-xs text-primary-700">{pick(`نسبة تطابق ${num(second.fitScore)}%.`, `${second.fitScore}% fit score.`)}</p>
                         </div>
                       </div>
                     </div>
@@ -836,8 +867,8 @@ function ComparePageContent() {
                       <div className="flex items-start gap-2">
                         <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-warning" />
                         <div>
-                          <p className="font-medium text-warning-900">{fmtName(m.scholarship.nameEn)} may not be worth the effort</p>
-                          <p className="mt-0.5 text-xs text-warning-700">Only {m.fitScore}% fit.</p>
+                          <p className="font-medium text-warning-900">{fmtName(pick(m.scholarship.nameAr, m.scholarship.nameEn))} {pick("قد لا يستحق الجهد", "may not be worth the effort")}</p>
+                          <p className="mt-0.5 text-xs text-warning-700">{pick(`تطابق ${num(m.fitScore)}% فقط.`, `Only ${m.fitScore}% fit.`)}</p>
                         </div>
                       </div>
                     </div>
@@ -851,9 +882,12 @@ function ComparePageContent() {
                 <div className="flex items-start gap-2">
                   <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-danger" />
                   <div>
-                    <p className="font-medium text-danger-900">Deadline Conflict Warning</p>
+                    <p className="font-medium text-danger-900">{pick("تحذير تعارض المواعيد", "Deadline Conflict Warning")}</p>
                     <p className="mt-0.5 text-xs text-danger-700">
-                      {closeDeadlines.map((d) => fmtName(d.name)).join(" and ")} have deadlines within 60 days. Prioritize these!
+                      {pick(
+                        <>تتزامن مواعيد <strong>{closeDeadlines.map((d) => fmtName(d.nameAr)).join(" و")}</strong> خلال 60 يوماً. أولوِ هذه المنح!</>,
+                        <>{closeDeadlines.map((d) => fmtName(d.name)).join(" and ")} have deadlines within 60 days. Prioritize these!</>
+                      )}
                     </p>
                   </div>
                 </div>
@@ -865,9 +899,12 @@ function ComparePageContent() {
                 <div className="flex items-start gap-2">
                   <FileText className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
                   <div>
-                    <p className="font-medium text-muted-foreground">Different document requirements</p>
+                    <p className="font-medium text-muted-foreground">{pick("متطلبات مستندات مختلفة", "Different document requirements")}</p>
                     <p className="mt-0.5 text-xs text-muted-foreground">
-                      These scholarships have different document requirements. Plan your document strategy carefully to avoid last-minute scrambling.
+                      {pick(
+                        "تختلف مستندات هذه المنح. خطّط لاستراتيجية مستنداتك بعناية لتجنّب التسرّع في اللحظة الأخيرة.",
+                        "These scholarships have different document requirements. Plan your document strategy carefully to avoid last-minute scrambling."
+                      )}
                     </p>
                   </div>
                 </div>
@@ -877,7 +914,7 @@ function ComparePageContent() {
             {!bestOverall && !bestChance && (
               <div className="rounded-lg border border-border bg-muted p-4 text-center">
                 <BadgePercent className="mx-auto h-6 w-6 text-muted-foreground" />
-                <p className="mt-2 text-sm text-muted-foreground">Complete your profile to get AI-powered match analysis.</p>
+                <p className="mt-2 text-sm text-muted-foreground">{pick("أكمل ملفك الشخصي للحصول على تحليل تطابق بالذكاء الاصطناعي.", "Complete your profile to get AI-powered match analysis.")}</p>
               </div>
             )}
           </CardContent>
@@ -888,12 +925,12 @@ function ComparePageContent() {
       <div className="flex items-center justify-between gap-4 rounded-xl border border-border bg-muted p-4">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <CheckCircle2 className="h-4 w-4 text-primary" />
-          <span>Compare up to {COMPARE_MAX_SELECTIONS} scholarships at once</span>
+          <span>{pick(`قارن حتى ${num(COMPARE_MAX_SELECTIONS)} منح في آن واحد`, `Compare up to ${COMPARE_MAX_SELECTIONS} scholarships at once`)}</span>
         </div>
         <Link href="/dashboard">
           <Button variant="outline" size="sm">
-            <ArrowLeft className="h-4 w-4" />
-            Back to Dashboard
+            <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
+            {pick("العودة إلى لوحة التحكم", "Back to Dashboard")}
           </Button>
         </Link>
       </div>
@@ -902,8 +939,9 @@ function ComparePageContent() {
 }
 
 export default function ComparePage() {
+  const { t } = useLanguage();
   return (
-    <Suspense fallback={<div className="page-container py-16 text-center text-muted-foreground">Loading...</div>}>
+    <Suspense fallback={<div className="page-container py-16 text-center text-muted-foreground">{t("common.loading")}</div>}>
       <ComparePageContent />
     </Suspense>
   );

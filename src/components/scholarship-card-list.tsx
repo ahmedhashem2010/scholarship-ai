@@ -26,6 +26,7 @@ import {
   Calendar,
 } from "lucide-react";
 import { useProfile } from "@/lib/profile-context";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { COMPARE_MAX_SELECTIONS, encodeCompareIds } from "@/lib/compare-ids";
 
 interface ScholarshipCardData {
@@ -81,6 +82,7 @@ export function ScholarshipCardList({ scholarships }: { scholarships: Scholarshi
   const [showFilters, setShowFilters] = useState(false);
   const { profile } = useProfile();
   const router = useRouter();
+  const { pick, num } = useLanguage();
 
   const profileDegree = profile?.targetDegree ?? null;
 
@@ -184,7 +186,7 @@ export function ScholarshipCardList({ scholarships }: { scholarships: Scholarshi
           <div className="relative flex-1">
             <Search className="absolute start-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search by name, country, university..."
+              placeholder={pick("ابحث بالاسم، الدولة، الجامعة…", "Search by name, country, university...")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="ps-11 pe-10 h-12 rounded-xl border-primary/10 bg-card"
@@ -201,7 +203,7 @@ export function ScholarshipCardList({ scholarships }: { scholarships: Scholarshi
             className="gap-2 shrink-0 h-12 rounded-xl border-primary/10 hover:bg-primary/5 hover:border-primary/20"
           >
             <SlidersHorizontal className="h-4 w-4" />
-            Filters
+            {pick("الفلاتر", "Filters")}
             {activeFilterCount > 0 && (
               <span className="ms-1 inline-flex items-center justify-center h-5 min-w-5 rounded-full bg-primary text-white text-xs font-medium px-1">
                 {activeFilterCount}
@@ -214,10 +216,10 @@ export function ScholarshipCardList({ scholarships }: { scholarships: Scholarshi
           <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 p-5 rounded-2xl border border-primary/10 bg-gradient-to-br from-card to-primary/[0.02]">
             <div className="space-y-2">
               <label className="text-xs font-semibold text-primary flex items-center gap-1">
-                <MapPin className="h-3 w-3" /> Country
+                <MapPin className="h-3 w-3" /> {pick("الدولة", "Country")}
               </label>
               <Select value={countryFilter} onValueChange={setCountryFilter}>
-                <SelectItem key="all" value="all">All Countries</SelectItem>
+                <SelectItem key="all" value="all">{pick("كل الدول", "All Countries")}</SelectItem>
                 {countries.map((c) => (
                   <SelectItem key={c} value={c}>{c}</SelectItem>
                 ))}
@@ -226,44 +228,44 @@ export function ScholarshipCardList({ scholarships }: { scholarships: Scholarshi
 
             <div className="space-y-2">
               <label className="text-xs font-semibold text-primary flex items-center gap-1">
-                <GraduationCap className="h-3 w-3" /> Degree
+                <GraduationCap className="h-3 w-3" /> {pick("الدرجة", "Degree")}
               </label>
               <Select value={degreeFilter} onValueChange={setDegreeFilter}>
-                <SelectItem key="all" value="all">All Degrees</SelectItem>
-                <SelectItem key="Bachelor" value="Bachelor">Bachelor</SelectItem>
-                <SelectItem key="Master" value="Master">Master</SelectItem>
-                <SelectItem key="PhD" value="PhD">PhD</SelectItem>
+                <SelectItem key="all" value="all">{pick("كل الدرجات", "All Degrees")}</SelectItem>
+                <SelectItem key="Bachelor" value="Bachelor">{pick("بكالوريوس", "Bachelor")}</SelectItem>
+                <SelectItem key="Master" value="Master">{pick("ماجستير", "Master")}</SelectItem>
+                <SelectItem key="PhD" value="PhD">{pick("دكتوراه", "PhD")}</SelectItem>
               </Select>
             </div>
 
             <div className="space-y-2">
               <label className="text-xs font-semibold text-primary flex items-center gap-1">
-                <Sparkles className="h-3 w-3" /> Competition
+                <Sparkles className="h-3 w-3" /> {pick("المنافسة", "Competition")}
               </label>
               <Select value={competitionFilter} onValueChange={setCompetitionFilter}>
-                <SelectItem key="all" value="all">All Levels</SelectItem>
-                <SelectItem key="low" value="low">Low</SelectItem>
-                <SelectItem key="medium" value="medium">Medium</SelectItem>
-                <SelectItem key="high" value="high">High</SelectItem>
+                <SelectItem key="all" value="all">{pick("كل المستويات", "All Levels")}</SelectItem>
+                <SelectItem key="low" value="low">{pick("منخفضة", "Low")}</SelectItem>
+                <SelectItem key="medium" value="medium">{pick("متوسطة", "Medium")}</SelectItem>
+                <SelectItem key="high" value="high">{pick("عالية", "High")}</SelectItem>
               </Select>
             </div>
 
             <div className="space-y-2">
               <label className="text-xs font-semibold text-primary flex items-center gap-1">
-                <Calendar className="h-3 w-3" /> Sort by
+                <Calendar className="h-3 w-3" /> {pick("ترتيب حسب", "Sort by")}
               </label>
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectItem key="deadline_asc" value="deadline_asc">Deadline (Soonest)</SelectItem>
-                <SelectItem key="deadline_desc" value="deadline_desc">Deadline (Latest)</SelectItem>
-                <SelectItem key="name_asc" value="name_asc">Name (A-Z)</SelectItem>
-                <SelectItem key="name_desc" value="name_desc">Name (Z-A)</SelectItem>
+                <SelectItem key="deadline_asc" value="deadline_asc">{pick("الموعد النهائي (الأقرب)", "Deadline (Soonest)")}</SelectItem>
+                <SelectItem key="deadline_desc" value="deadline_desc">{pick("الموعد النهائي (الأحدث)", "Deadline (Latest)")}</SelectItem>
+                <SelectItem key="name_asc" value="name_asc">{pick("الاسم (أ-ي)", "Name (A-Z)")}</SelectItem>
+                <SelectItem key="name_desc" value="name_desc">{pick("الاسم (ي-أ)", "Name (Z-A)")}</SelectItem>
               </Select>
             </div>
 
             <div className="flex items-end">
               <Button variant="ghost" size="sm" onClick={resetFilters} className="gap-1.5 text-primary hover:text-primary hover:bg-primary/10">
                 <RotateCcw className="h-3.5 w-3.5" />
-                Reset
+                {pick("إعادة تعيين", "Reset")}
               </Button>
             </div>
           </div>
@@ -274,11 +276,16 @@ export function ScholarshipCardList({ scholarships }: { scholarships: Scholarshi
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <p className="text-sm text-muted-foreground">
-            Showing <span className="font-semibold text-foreground">{filtered.length}</span> of <span className="font-semibold text-foreground">{scholarships.length}</span> scholarships
+            {pick(
+              <span>عرض {num(filtered.length)} من {num(scholarships.length)} منحة</span>,
+              <>
+                Showing <span className="font-semibold text-foreground">{filtered.length}</span> of <span className="font-semibold text-foreground">{scholarships.length}</span> scholarships
+              </>
+            )}
           </p>
           {profileDegree && matchMyDegree && (
             <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium">
-              Matched to {profileDegree}
+              {pick(`مطابقة مع ${profileDegree}`, `Matched to ${profileDegree}`)}
             </span>
           )}
         </div>
@@ -309,10 +316,10 @@ export function ScholarshipCardList({ scholarships }: { scholarships: Scholarshi
                       onChange={() => toggle(sch.id)}
                       className="h-4 w-4 rounded border-primary/20 text-primary focus:ring-primary"
                     />
-                    <span className="text-xs text-muted-foreground">Compare</span>
+                    <span className="text-xs text-muted-foreground">{pick("قارن", "Compare")}</span>
                   </label>
                   <Badge variant={getCompetitionVariant(sch.competitionLevel)} className="text-[10px] uppercase tracking-wider">
-                    {sch.competitionLevel}
+                    {sch.competitionLevel === "low" ? pick("منخفضة", "Low") : sch.competitionLevel === "medium" ? pick("متوسطة", "Medium") : sch.competitionLevel === "high" ? pick("عالية", "High") : sch.competitionLevel}
                   </Badge>
                 </div>
               </div>
@@ -341,7 +348,7 @@ export function ScholarshipCardList({ scholarships }: { scholarships: Scholarshi
 
             <CardContent className="flex-1 space-y-3 pt-0 relative">
               <p className="text-sm text-muted-foreground line-clamp-2">
-                {sch.description ?? "No description available."}
+                {sch.description ?? pick("لا يوجد وصف متاح.", "No description available.")}
               </p>
 
               <DeadlineIndicator deadline={sch.deadline} />
@@ -363,8 +370,8 @@ export function ScholarshipCardList({ scholarships }: { scholarships: Scholarshi
             <div className="border-t border-primary/10 px-6 py-3 bg-primary/[0.02]">
               <Link href={`/scholarships/${sch.id}`}>
                 <Button variant="outline" size="sm" className="w-full gap-1.5 group/btn rounded-xl border-primary/20 hover:bg-primary hover:text-white hover:border-primary transition-all duration-300">
-                  View Details
-                  <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover/btn:translate-x-0.5" />
+                  {pick("عرض التفاصيل", "View Details")}
+                  <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover/btn:translate-x-0.5 rtl:rotate-180" />
                 </Button>
               </Link>
             </div>
@@ -378,12 +385,12 @@ export function ScholarshipCardList({ scholarships }: { scholarships: Scholarshi
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
             <Search className="h-8 w-8 text-primary" />
           </div>
-          <h2 className="text-lg font-semibold text-foreground">No scholarships found</h2>
-          <p className="text-muted-foreground text-sm mt-1">Try adjusting your filters or search terms</p>
+          <h2 className="text-lg font-semibold text-foreground">{pick("لم يتم العثور على منح", "No scholarships found")}</h2>
+          <p className="text-muted-foreground text-sm mt-1">{pick("جرّب تعديل الفلاتر أو كلمات البحث", "Try adjusting your filters or search terms")}</p>
           {hasActiveFilters && (
             <Button variant="outline" size="sm" onClick={resetFilters} className="mt-4 gap-1.5 rounded-xl border-primary/20 hover:bg-primary/5">
               <RotateCcw className="h-3.5 w-3.5" />
-              Reset Filters
+              {pick("إعادة تعيين الفلاتر", "Reset Filters")}
             </Button>
           )}
         </div>
@@ -391,13 +398,13 @@ export function ScholarshipCardList({ scholarships }: { scholarships: Scholarshi
 
       {/* Compare Button */}
       {selected.size >= 2 && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 lg:bottom-6">
           <Button
             onClick={() => router.push(`/dashboard/compare?ids=${encodeCompareIds(Array.from(selected))}`)}
             className="shadow-xl shadow-primary/20 rounded-xl px-6"
           >
             <Sparkles className="h-4 w-4 me-2" />
-            Compare Selected ({selected.size})
+            {pick(`قارن المحدد (${num(selected.size)})`, `Compare Selected (${selected.size})`)}
           </Button>
         </div>
       )}

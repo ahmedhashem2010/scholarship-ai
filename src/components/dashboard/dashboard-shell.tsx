@@ -190,7 +190,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-2">
             <Link
               href="/dashboard/profile"
-              aria-label="Profile"
+              aria-label={pick("الملف الشخصي", "Profile")}
               className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground ring-2 ring-secondary-500/70"
             >
               {displayName ? initialsOf(displayName) : "S"}
@@ -208,7 +208,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
       {/* Mobile bottom nav -------------------------------------------------- */}
       <nav
-        aria-label="Main"
+        aria-label={pick("الرئيسية", "Main")}
         className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/90 backdrop-blur-md lg:hidden"
         style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
       >

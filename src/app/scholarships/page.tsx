@@ -6,8 +6,10 @@ import { useState, useEffect } from "react";
 import { Search } from "lucide-react";
 import { ScholarshipCardList } from "@/components/scholarship-card-list";
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function ScholarshipsPage() {
+  const { pick, num } = useLanguage();
   const [scholarships, setScholarships] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -51,11 +53,14 @@ export default function ScholarshipsPage() {
           <div className="relative z-10">
             <div className="flex items-center gap-2 mb-1">
               <Search className="h-4 w-4 text-white/80" />
-              <span className="text-xs font-medium text-white/80 uppercase tracking-wider">Scholarship Database</span>
+              <span className="text-xs font-medium text-white/80 uppercase tracking-wider">{pick("قاعدة بيانات المنح", "Scholarship Database")}</span>
             </div>
-            <h1 className="text-h2 sm:text-h1 mt-2">Browse Scholarships</h1>
+            <h1 className="text-h2 sm:text-h1 mt-2">{pick("تصفّح المنح", "Browse Scholarships")}</h1>
             <p className="mt-2 text-white/80 max-w-2xl">
-              Discover {scholarships.length} fully-funded scholarships for Arab and Egyptian students
+              {pick(
+                `اكتشف ${num(scholarships.length)} منحة ممولة بالكامل للطلاب العرب والمصريين`,
+                `Discover ${scholarships.length} fully-funded scholarships for Arab and Egyptian students`
+              )}
             </p>
           </div>
         </div>

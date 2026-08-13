@@ -8,6 +8,8 @@ import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Mail, CheckCircle2 } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { BRAND } from "@/lib/brand";
 
 /** Same localStorage key LanguageContext uses — see signup/page.tsx for why this reads it directly. */
 function currentSiteLang(): "en" | "ar" {
@@ -26,6 +28,7 @@ function currentSiteLang(): "en" | "ar" {
  * the email.
  */
 function VerifyPageContent() {
+  const { pick, num } = useLanguage();
   const searchParams = useSearchParams();
   const email = searchParams.get("email") || "";
 
@@ -45,14 +48,14 @@ function VerifyPageContent() {
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         setStatus("error");
-        setMessage(data.error || "Couldn't send a new link. Try again shortly.");
+        setMessage(data.error || pick("تعذّر إرسال رابط جديد. حاول مرة أخرى بعد قليل.", "Couldn't send a new link. Try again shortly."));
         return;
       }
       setStatus("sent");
-      setMessage("A new link is on its way. It can take a minute to arrive.");
+      setMessage(pick("الرابط الجديد في الطريق إليك. قد يستغرق وصوله دقيقة.", "A new link is on its way. It can take a minute to arrive."));
     } catch {
       setStatus("error");
-      setMessage("Network problem. Check your connection and try again.");
+      setMessage(pick("مشكلة في الاتصال بالشبكة. تحقق من اتصالك وحاول مجدداً.", "Network problem. Check your connection and try again."));
     }
   }
 
@@ -62,17 +65,17 @@ function VerifyPageContent() {
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground mb-4">
           <Mail className="h-6 w-6" />
         </div>
-        <h1 className="text-h2 mb-2">Check your inbox</h1>
+        <h1 className="text-h2 mb-2">{pick("تفقّد بريدك الوارد", "Check your inbox")}</h1>
         <p className="text-muted-foreground mb-8">
           {email ? (
             <>
-              We sent a confirmation link to{" "}
+              {pick("أرسلنا رابط التأكيد إلى ", "We sent a confirmation link to ")}
               <strong className="text-foreground" dir="ltr">
                 {email}
               </strong>
             </>
           ) : (
-            <>We sent you a confirmation link.</>
+            <>{pick("أرسلنا إليك رابط التأكيد.", "We sent you a confirmation link.")}</>
           )}
         </p>
 
@@ -81,23 +84,27 @@ function VerifyPageContent() {
             <ol className="space-y-3 text-sm text-muted-foreground">
               <li className="flex gap-3">
                 <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-medium text-foreground">
-                  1
+                  {num(1)}
                 </span>
-                Open the email from SmartScholar.
+                {pick(`افتح البريد الوارد من ${BRAND.nameAr}.`, `Open the email from ${BRAND.name}.`)}
               </li>
               <li className="flex gap-3">
                 <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-medium text-foreground">
-                  2
+                  {num(2)}
                 </span>
-                Tap the <strong className="text-foreground">confirmation button</strong> in the
-                email — you&apos;ll be signed in automatically.
+                {pick(
+                  <>اضغط <strong className="text-foreground">زر التأكيد</strong> في البريد — سيتم تسجيل دخولك تلقائياً.</>,
+                  <>Tap the <strong className="text-foreground">confirmation button</strong> in the email — you&apos;ll be signed in automatically.</>
+                )}
               </li>
               <li className="flex gap-3">
                 <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-medium text-foreground">
-                  3
+                  {num(3)}
                 </span>
-                Not there? Check spam or promotions — new senders often land
-                there first.
+                {pick(
+                  "غير موجود؟ تفقّد مجلد البريد المزعج أو العروض الترويجية — غالباً ما تصل رسائل المرسلين الجدد هناك أولاً.",
+                  "Not there? Check spam or promotions — new senders often land there first."
+                )}
               </li>
             </ol>
 
@@ -122,7 +129,7 @@ function VerifyPageContent() {
                 onClick={resend}
                 disabled={status === "sending"}
               >
-                {status === "sending" ? "Sending…" : "Send the link again"}
+                {status === "sending" ? pick("جارٍ الإرسال…", "Sending…") : pick("أعد إرسال الرابط", "Send the link again")}
               </Button>
             )}
 
@@ -130,15 +137,15 @@ function VerifyPageContent() {
               href="/auth/login"
               className="block text-center text-sm font-medium text-primary hover:text-primary-700 transition-colors"
             >
-              Back to sign in
+              {pick("العودة إلى تسجيل الدخول", "Back to sign in")}
             </Link>
           </CardContent>
         </Card>
 
         <p className="mt-6 text-xs text-muted-foreground">
-          Still stuck? Email us at{" "}
-          <a href="mailto:care@smartscholar.org" className="text-primary" dir="ltr">
-            care@smartscholar.org
+          {pick("لا تزال عالقاً؟ راسلنا على ", "Still stuck? Email us at ")}
+          <a href={`mailto:${BRAND.supportEmail}`} className="text-primary" dir="ltr">
+            {BRAND.supportEmail}
           </a>
         </p>
       </div>
@@ -147,8 +154,9 @@ function VerifyPageContent() {
 }
 
 export default function VerifyPage() {
+  const { t } = useLanguage();
   return (
-    <Suspense fallback={<div className="p-8 text-center text-muted-foreground">Loading…</div>}>
+    <Suspense fallback={<div className="p-8 text-center text-muted-foreground">{t("common.loading")}</div>}>
       <VerifyPageContent />
     </Suspense>
   );

@@ -28,6 +28,7 @@ import {
   getDeadlineUrgency,
   DOC_TYPE_LABELS,
 } from "@/lib/application-progress";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ApplicationDoc {
   id: string;
@@ -121,13 +122,18 @@ function parseRequirements(req: string | null): string[] {
 }
 
 const phases = [
-  { num: 1, label: "Research", icon: BookOpen },
-  { num: 2, label: "Documents", icon: FileText },
-  { num: 3, label: "Review", icon: CheckCircle2 },
-  { num: 4, label: "Submit", icon: Upload },
+  { num: 1, label: { ar: "البحث", en: "Research" }, icon: BookOpen },
+  { num: 2, label: { ar: "المستندات", en: "Documents" }, icon: FileText },
+  { num: 3, label: { ar: "المراجعة", en: "Review" }, icon: CheckCircle2 },
+  { num: 4, label: { ar: "التقديم", en: "Submit" }, icon: Upload },
 ];
 
 export default function ApplicationJourneyPage() {
+  const { pick, num, isRTL } = useLanguage();
+  const docLabel = (type: string) => {
+    const entry = docTypeLabels[type];
+    return entry ? pick(entry.ar, entry.en) : type;
+  };
   const params = useParams();
   const router = useRouter();
   const scholarshipId = params.scholarshipId as string;
@@ -151,7 +157,7 @@ export default function ApplicationJourneyPage() {
           setError(json.error);
         }
       } catch {
-        setError("Failed to load application");
+        setError(pick("تعذّر تحميل الطلب", "Failed to load application"));
       } finally {
         setLoading(false);
       }
@@ -205,7 +211,7 @@ export default function ApplicationJourneyPage() {
         });
         const uploadJson = await uploadRes.json();
         if (!uploadJson.success) {
-          alert(uploadJson.error ?? "Upload failed");
+          alert(uploadJson.error ?? pick("فشل الرفع", "Upload failed"));
           setUploadingDoc(null);
           return;
         }
@@ -259,7 +265,7 @@ export default function ApplicationJourneyPage() {
             <div className="h-12 w-12 animate-spin rounded-full border-4 border-border border-t-indigo-600" />
           </div>
           <p className="text-sm font-medium text-muted-foreground">
-            Loading your application...
+            {pick("جارِ تحميل طلبك...", "Loading your application...")}
           </p>
         </div>
       </div>
@@ -274,18 +280,18 @@ export default function ApplicationJourneyPage() {
             <AlertCircle size={32} className="text-red-500" />
           </div>
           <p className="mb-2 text-lg font-semibold text-foreground">
-            Something went wrong
+            {pick("حدث خطأ ما", "Something went wrong")}
           </p>
           <p className="mb-6 text-sm text-muted-foreground">
-            {error ?? "Application not found"}
+            {error ?? pick("الطلب غير موجود", "Application not found")}
           </p>
           <Button
             variant="outline"
             className="gap-2"
             onClick={() => router.push("/dashboard")}
           >
-            <ArrowLeft size={16} />
-            Back to Dashboard
+            <ArrowLeft size={16} className="rtl:rotate-180" />
+            {pick("العودة إلى لوحة التحكم", "Back to Dashboard")}
           </Button>
         </div>
       </div>
@@ -303,19 +309,21 @@ export default function ApplicationJourneyPage() {
             <AlertCircle size={32} className="text-amber-500" />
           </div>
           <p className="mb-2 text-lg font-semibold text-foreground">
-            Scholarship no longer available
+            {pick("المنحة لم تعد متاحة", "Scholarship no longer available")}
           </p>
           <p className="mb-6 text-sm text-muted-foreground">
-            This scholarship is no longer in the catalog, so its application
-            details can&apos;t be displayed.
+            {pick(
+              "أُزيلت هذه المنحة من القائمة، لذا لا يمكن عرض تفاصيل هذا الطلب.",
+              "This scholarship is no longer in the catalog, so its application details can't be displayed."
+            )}
           </p>
           <Button
             variant="outline"
             className="gap-2"
             onClick={() => router.push("/dashboard")}
           >
-            <ArrowLeft size={16} />
-            Back to Dashboard
+            <ArrowLeft size={16} className="rtl:rotate-180" />
+            {pick("العودة إلى لوحة التحكم", "Back to Dashboard")}
           </Button>
         </div>
       </div>
@@ -326,8 +334,8 @@ export default function ApplicationJourneyPage() {
   const sch = app.scholarship;
   const daysLeft = daysRemaining(sch.deadline);
   const reqList = parseRequirements(sch.requirements);
-  const nextAction = getNextAction(app.documents);
-  const deadlineUrgency = getDeadlineUrgency(sch.deadline);
+  const nextAction = getNextAction(app.documents, isRTL);
+  const deadlineUrgency = getDeadlineUrgency(sch.deadline, isRTL);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
@@ -338,8 +346,8 @@ export default function ApplicationJourneyPage() {
             href="/dashboard"
             className="mb-6 inline-flex items-center gap-1.5 text-sm text-indigo-200 transition-colors hover:text-white"
           >
-            <ArrowLeft size={16} />
-            Back to Dashboard
+            <ArrowLeft size={16} className="rtl:rotate-180" />
+            {pick("\u0627\u0644\u0639\u0648\u062F\u0629 \u0625\u0644\u0649 \u0644\u0648\u062D\u0629 \u0627\u0644\u062A\u062D\u0643\u0645", "Back to Dashboard")}
           </Link>
 
           <div className="flex flex-wrap items-start justify-between gap-4">
@@ -347,7 +355,7 @@ export default function ApplicationJourneyPage() {
               <span className="text-4xl">{getCountryFlag(sch.country)}</span>
               <div>
                 <h1 className="text-2xl font-bold tracking-tight">
-                  {sch.nameEn}
+                  {pick(sch.nameAr, sch.nameEn)}
                 </h1>
                 <p className="mt-1 text-sm text-indigo-200">
                   {sch.country}
@@ -357,15 +365,13 @@ export default function ApplicationJourneyPage() {
                 </p>
               </div>
             </div>
-            <Badge className="border-white/20 bg-white/10 text-white backdrop-blur-sm hover:bg-white/20">
-              {app.status.replace(/_/g, " ")}
-            </Badge>
+            <StatusBadge status={app.status} size="sm" showIcon={false} className="border border-white/20 bg-white/10 text-white" />
           </div>
 
           <div className="mt-6">
             <div className="mb-2 flex items-center justify-between text-sm">
-              <span className="text-indigo-200">Overall Progress</span>
-              <span className="font-semibold text-white">{app.progress}%</span>
+              <span className="text-indigo-200">{pick("\u0627\u0644\u062A\u0642\u062F\u0651\u0645 \u0627\u0644\u0625\u062C\u0645\u0627\u0644\u064A", "Overall Progress")}</span>
+              <span className="font-semibold text-white">{num(app.progress)}%</span>
             </div>
             <ProgressBar
               value={app.progress}
@@ -419,7 +425,7 @@ export default function ApplicationJourneyPage() {
                                 : "text-muted-foreground"
                           }`}
                         >
-                          {p.label}
+                          {pick(p.label.ar, p.label.en)}
                         </span>
                       </div>
                       {i < phases.length - 1 && (
@@ -449,10 +455,12 @@ export default function ApplicationJourneyPage() {
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-100">
                   <ListChecks size={16} className="text-indigo-600" />
                 </div>
-                <CardTitle className="text-lg">Required Documents</CardTitle>
-                <Badge variant="secondary" className="ml-auto">
-                  {app.documents.filter((d) => d.status === "READY").length}/
-                  {app.documents.length} ready
+                <CardTitle className="text-lg">{pick("المستندات المطلوبة", "Required Documents")}</CardTitle>
+                <Badge variant="secondary" className="ms-auto">
+                  {pick(
+                    `${num(app.documents.filter((d) => d.status === "READY").length)}/${num(app.documents.length)} جاهز`,
+                    `${app.documents.filter((d) => d.status === "READY").length}/${app.documents.length} ready`
+                  )}
                 </Badge>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -490,8 +498,7 @@ export default function ApplicationJourneyPage() {
                           <div className="min-w-0 flex-1">
                             <div className="flex flex-wrap items-center gap-2">
                               <span className="truncate text-sm font-medium text-foreground">
-                                {docTypeLabels[doc.documentType] ??
-                                  doc.documentType}
+                                {docLabel(doc.documentType)}
                               </span>
                               <StatusBadge
                                 status={
@@ -509,7 +516,7 @@ export default function ApplicationJourneyPage() {
                                   className="max-w-[120px]"
                                 />
                                 <span className="text-xs font-medium text-muted-foreground">
-                                  AI Score: {doc.aiScore}/10
+                                  {pick(`تقييم الذكاء الاصطناعي: ${num(doc.aiScore)}/10`, `AI Score: ${doc.aiScore}/10`)}
                                 </span>
                               </div>
                             )}
@@ -535,8 +542,8 @@ export default function ApplicationJourneyPage() {
                             >
                               <Upload size={14} />
                               {uploadingDoc === doc.id
-                                ? "Uploading..."
-                                : "Upload First Draft"}
+                                ? pick("جارِ الرفع...", "Uploading...")
+                                : pick("ارفع المسودة الأولى", "Upload First Draft")}
                             </Button>
                           )}
                           {(hasReview || isDraft) && (
@@ -553,7 +560,7 @@ export default function ApplicationJourneyPage() {
                                     className="gap-1.5"
                                   >
                                     <FileText size={14} />
-                                    View
+                                    {pick("عرض", "View")}
                                   </Button>
                                 </a>
                               )}
@@ -568,8 +575,8 @@ export default function ApplicationJourneyPage() {
                               >
                                 <Upload size={14} />
                                 {uploadingDoc === doc.id
-                                  ? "Uploading..."
-                                  : "Upload New Version"}
+                                  ? pick("جارِ الرفع...", "Uploading...")
+                                  : pick("ارفع نسخة جديدة", "Upload New Version")}
                               </Button>
                             </div>
                           )}
@@ -585,8 +592,8 @@ export default function ApplicationJourneyPage() {
                               >
                                 <Upload size={14} />
                                 {uploadingDoc === doc.id
-                                  ? "Uploading..."
-                                  : "Upload Improved"}
+                                  ? pick("جارِ الرفع...", "Uploading...")
+                                  : pick("ارفع نسخة محسّنة", "Upload Improved")}
                               </Button>
                               <Button
                                 size="sm"
@@ -607,7 +614,7 @@ export default function ApplicationJourneyPage() {
                                 }}
                               >
                                 <CheckCircle2 size={14} />
-                                Mark as Final
+                                {pick("اعتماد كنسخة نهائية", "Mark as Final")}
                               </Button>
                             </div>
                           )}
@@ -625,7 +632,7 @@ export default function ApplicationJourneyPage() {
                                     className="gap-1.5"
                                   >
                                     <FileText size={14} />
-                                    View
+                                    {pick("عرض", "View")}
                                   </Button>
                                 </a>
                               )}
@@ -634,7 +641,7 @@ export default function ApplicationJourneyPage() {
                                 className="gap-1 bg-green-100 text-green-700 hover:bg-green-100"
                               >
                                 <CheckCircle2 size={14} />
-                                Ready
+                                {pick("جاهز", "Ready")}
                               </Badge>
                             </div>
                           )}
@@ -654,7 +661,7 @@ export default function ApplicationJourneyPage() {
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-base">
                   <Flag size={16} className="text-indigo-500" />
-                  Next Action
+                  {pick("الخطوة التالية", "Next Action")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -671,7 +678,7 @@ export default function ApplicationJourneyPage() {
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-base">
                   <CalendarDays size={16} className="text-indigo-500" />
-                  Deadline
+                  {pick("الموعد النهائي", "Deadline")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -698,7 +705,7 @@ export default function ApplicationJourneyPage() {
                     }`}
                   >
                     {deadlineUrgency.daysLeft !== null
-                      ? deadlineUrgency.daysLeft
+                      ? num(deadlineUrgency.daysLeft)
                       : "—"}
                   </p>
                   <p
@@ -713,12 +720,12 @@ export default function ApplicationJourneyPage() {
                     }`}
                   >
                     {deadlineUrgency.daysLeft !== null
-                      ? "days remaining"
-                      : "No deadline set"}
+                      ? pick("يوماً متبقياً", "days remaining")
+                      : pick("لا يوجد موعد نهائي محدد", "No deadline set")}
                   </p>
                   {sch.deadline && (
                     <p className="mt-2 text-xs text-muted-foreground">
-                      {new Date(sch.deadline).toLocaleDateString("en-US", {
+                      {new Date(sch.deadline).toLocaleDateString(pick("ar-EG", "en-US"), {
                         month: "long",
                         day: "numeric",
                         year: "numeric",
@@ -734,7 +741,7 @@ export default function ApplicationJourneyPage() {
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-base">
                   <Target size={16} className="text-indigo-500" />
-                  Milestones
+                  {pick("المحطات الرئيسية", "Milestones")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm">
@@ -760,11 +767,13 @@ export default function ApplicationJourneyPage() {
                           : "text-muted-foreground"
                       }`}
                     >
-                      Complete all documents
+                      {pick("إكمال جميع المستندات", "Complete all documents")}
                     </p>
                     <p className="mt-0.5 text-[11px] text-muted-foreground">
-                      {app.documents.filter((d) => d.status === "READY").length}
-                      /{app.documents.length} ready
+                      {pick(
+                        `${num(app.documents.filter((d) => d.status === "READY").length)}/${num(app.documents.length)} جاهز`,
+                        `${app.documents.filter((d) => d.status === "READY").length}/${app.documents.length} ready`
+                      )}
                     </p>
                   </div>
                 </div>
@@ -791,12 +800,12 @@ export default function ApplicationJourneyPage() {
                           : "text-muted-foreground"
                       }`}
                     >
-                      Submit application
+                      {pick("تقديم الطلب", "Submit application")}
                     </p>
                     <p className="mt-0.5 text-[11px] text-muted-foreground">
                       {daysLeft !== null
-                        ? `${daysLeft} days to submit`
-                        : "No deadline"}
+                        ? pick(`${num(daysLeft)} يوم للتقديم`, `${daysLeft} days to submit`)
+                        : pick("لا يوجد موعد نهائي", "No deadline")}
                     </p>
                   </div>
                 </div>
@@ -807,10 +816,10 @@ export default function ApplicationJourneyPage() {
                   </div>
                   <div>
                     <p className="text-xs font-medium text-muted-foreground">
-                      Prepare for interview
+                      {pick("الاستعداد للمقابلة", "Prepare for interview")}
                     </p>
                     <p className="mt-0.5 text-[11px] text-muted-foreground">
-                      After submission
+                      {pick("بعد التقديم", "After submission")}
                     </p>
                   </div>
                 </div>
@@ -822,7 +831,7 @@ export default function ApplicationJourneyPage() {
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-base">
                   <Lightbulb size={16} className="text-amber-500" />
-                  AI Recommendations
+                  {pick("توصيات الذكاء الاصطناعي", "AI Recommendations")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2.5">
@@ -834,16 +843,28 @@ export default function ApplicationJourneyPage() {
                       className="mt-0.5 shrink-0 text-indigo-500"
                     />
                     <p className="text-xs leading-relaxed text-indigo-800">
-                      Start with your{" "}
-                      <strong>
-                        {docTypeLabels[
-                          app.documents.find(
-                            (d) => d.status === "NOT_STARTED",
-                          )?.documentType ?? "PERSONAL_STATEMENT"
-                        ] ?? "Personal Statement"}
-                      </strong>
-                      &mdash; it&apos;s the most important document and needs
-                      the most time.
+                      {pick(
+                        <>
+                          ابدأ بـ{" "}
+                          <strong>
+                            {docLabel(
+                              app.documents.find((d) => d.status === "NOT_STARTED")?.documentType ??
+                                "PERSONAL_STATEMENT"
+                            )}
+                          </strong>
+                          — إنه أهم مستند ويحتاج أكبر قدر من الوقت.
+                        </>,
+                        <>
+                          Start with your{" "}
+                          <strong>
+                            {docLabel(
+                              app.documents.find((d) => d.status === "NOT_STARTED")?.documentType ??
+                                "PERSONAL_STATEMENT"
+                            )}
+                          </strong>
+                          &mdash; it&apos;s the most important document and needs the most time.
+                        </>
+                      )}
                     </p>
                   </div>
                 )}
@@ -857,14 +878,28 @@ export default function ApplicationJourneyPage() {
                       className="mt-0.5 shrink-0 text-amber-500"
                     />
                     <p className="text-xs leading-relaxed text-amber-800">
-                      Review the feedback on your{" "}
-                      <strong>
-                        {app.documents
-                          .filter((d) => d.status === "NEEDS_IMPROVEMENT")
-                          .map((d) => docTypeLabels[d.documentType])
-                          .join(", ")}
-                      </strong>{" "}
-                      and upload an improved version.
+                      {pick(
+                        <>
+                          راجع الملاحظات على{" "}
+                          <strong>
+                            {app.documents
+                              .filter((d) => d.status === "NEEDS_IMPROVEMENT")
+                              .map((d) => docLabel(d.documentType))
+                              .join("، ")}
+                          </strong>{" "}
+                          وارفع نسخة محسّنة.
+                        </>,
+                        <>
+                          Review the feedback on your{" "}
+                          <strong>
+                            {app.documents
+                              .filter((d) => d.status === "NEEDS_IMPROVEMENT")
+                              .map((d) => docLabel(d.documentType))
+                              .join(", ")}
+                          </strong>{" "}
+                          and upload an improved version.
+                        </>
+                      )}
                     </p>
                   </div>
                 )}
@@ -876,8 +911,10 @@ export default function ApplicationJourneyPage() {
                       className="mt-0.5 shrink-0 text-red-500"
                     />
                     <p className="text-xs leading-relaxed text-red-800">
-                      Only <strong>{daysLeft} days</strong> until the deadline.
-                      Prioritize this application!
+                      {pick(
+                        <>باقٍ فقط <strong>{num(daysLeft)} يوم</strong> على الموعد النهائي. أعطِ هذا الطلب الأولوية!</>,
+                        <>Only <strong>{daysLeft} days</strong> until the deadline. Prioritize this application!</>
+                      )}
                     </p>
                   </div>
                 )}
@@ -890,8 +927,10 @@ export default function ApplicationJourneyPage() {
                         className="mt-0.5 shrink-0 text-green-500"
                       />
                       <p className="text-xs leading-relaxed text-green-800">
-                        All documents are ready! You can now submit your
-                        application.
+                        {pick(
+                          "كل المستندات جاهزة! يمكنك الآن تقديم طلبك.",
+                          "All documents are ready! You can now submit your application."
+                        )}
                       </p>
                     </div>
                   )}
@@ -909,8 +948,10 @@ export default function ApplicationJourneyPage() {
                   ) &&
                   !app.documents.every((d) => d.status === "READY") && (
                     <p className="text-xs text-muted-foreground">
-                      Continue working on your documents to get personalized
-                      recommendations.
+                      {pick(
+                        "تابع العمل على مستنداتك للحصول على توصيات مخصصة.",
+                        "Continue working on your documents to get personalized recommendations."
+                      )}
                     </p>
                   )}
               </CardContent>
@@ -922,7 +963,7 @@ export default function ApplicationJourneyPage() {
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-2 text-base">
                     <BookOpen size={16} className="text-indigo-500" />
-                    Requirements
+                    {pick("المتطلبات", "Requirements")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>

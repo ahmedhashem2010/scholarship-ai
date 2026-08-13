@@ -9,12 +9,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { GraduationCap, Mail, Lock, Eye, EyeOff, User } from "lucide-react";
 import { ConversionEvents } from "@/lib/analytics";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 /**
  * Reads the site's own language preference (same localStorage key
  * LanguageContext uses) so the verification email matches the language the
- * visitor was actually using — without wiring this page's own text into the
- * bilingual system, which the page intentionally doesn't do.
+ * visitor was actually using. The page's visible text is bilingual via
+ * useLanguage(); this direct read only feeds the API's `lang` parameter.
  */
 function currentSiteLang(): "en" | "ar" {
   if (typeof window === "undefined") return "en";
@@ -22,6 +23,7 @@ function currentSiteLang(): "en" | "ar" {
 }
 
 export default function SignupPage() {
+  const { pick, num, t } = useLanguage();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -36,7 +38,7 @@ export default function SignupPage() {
     setLoading(true);
 
     if (password.length < 6) {
-      setError("Password must be at least 6 characters.");
+      setError(pick(`كلمة المرور يجب ألا تقل عن ${num(6)} أحرف.`, "Password must be at least 6 characters."));
       setLoading(false);
       return;
     }
@@ -51,7 +53,7 @@ export default function SignupPage() {
 
     if (!res.ok) {
       // `debug` is only ever present outside production — see the signup route.
-      setError(data.debug ? `${data.error}\n\n[dev] ${data.debug}` : data.error || "Something went wrong");
+      setError(data.debug ? `${data.error}\n\n[dev] ${data.debug}` : data.error || t("common.error"));
       setLoading(false);
       return;
     }
@@ -70,19 +72,21 @@ export default function SignupPage() {
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground mb-4">
             <GraduationCap className="h-6 w-6" />
           </div>
-          <h1 className="text-h2">Create your account</h1>
-          <p className="text-muted-foreground mt-2">Start your scholarship journey today</p>
+          <h1 className="text-h2">{pick("أنشئ حسابك", "Create your account")}</h1>
+          <p className="text-muted-foreground mt-2">
+            {pick("ابدأ رحلتك مع المنح الدراسية اليوم", "Start your scholarship journey today")}
+          </p>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Sign Up</CardTitle>
+            <CardTitle className="text-base">{pick("إنشاء حساب", "Sign Up")}</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-foreground mb-1.5">
-                  Full Name
+                  {pick("الاسم الكامل", "Full Name")}
                 </label>
                 <div className="relative">
                   <User className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -93,14 +97,14 @@ export default function SignupPage() {
                     onChange={(e) => setName(e.target.value)}
                     required
                     className="w-full rounded-lg border border-input bg-background ps-9 pe-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
-                    placeholder="Ahmed Hassan"
+                    placeholder={pick("أحمد حسن", "Ahmed Hassan")}
                   />
                 </div>
               </div>
 
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-foreground mb-1.5">
-                  Email
+                  {pick("البريد الإلكتروني", "Email")}
                 </label>
                 <div className="relative">
                   <Mail className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -118,7 +122,7 @@ export default function SignupPage() {
 
               <div>
                 <label htmlFor="password" className="block text-sm font-medium text-foreground mb-1.5">
-                  Password
+                  {pick("كلمة المرور", "Password")}
                 </label>
                 <div className="relative">
                   <Lock className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -130,7 +134,7 @@ export default function SignupPage() {
                     required
                     minLength={6}
                     className="w-full rounded-lg border border-input bg-background ps-9 pe-9 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
-                    placeholder="Min. 6 characters"
+                    placeholder={pick(`${num(6)} أحرف على الأقل`, "Min. 6 characters")}
                   />
                   <button
                     type="button"
@@ -150,18 +154,18 @@ export default function SignupPage() {
               )}
 
               <Button type="submit" disabled={loading} className="w-full">
-                {loading ? "Creating account..." : "Create Account"}
+                {loading ? pick("جارٍ إنشاء الحساب…", "Creating account...") : pick("إنشاء حساب", "Create Account")}
               </Button>
 
               <p className="text-center text-xs text-muted-foreground">
-                We&apos;ll email you a link to confirm your address.
+                {pick("سنرسل لك رابطاً عبر البريد الإلكتروني لتأكيد عنوانك.", "We'll email you a link to confirm your address.")}
               </p>
             </form>
 
             <p className="mt-4 text-center text-sm text-muted-foreground">
-              Already have an account?{" "}
+              {pick("لديك حساب بالفعل؟", "Already have an account?")}{" "}
               <Link href="/auth/login" className="font-medium text-primary hover:text-primary-700 transition-colors">
-                Sign in
+                {pick("سجّل الدخول", "Sign in")}
               </Link>
             </p>
           </CardContent>

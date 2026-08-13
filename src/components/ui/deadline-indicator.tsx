@@ -3,6 +3,7 @@
 import { Chip } from "@heroui/react";
 import { CalendarDays, AlertTriangle, Timer, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface DeadlineIndicatorProps {
   deadline: Date | string | null;
@@ -12,11 +13,12 @@ interface DeadlineIndicatorProps {
 }
 
 export function DeadlineIndicator({ deadline, className, showDate = true, size = "md" }: DeadlineIndicatorProps) {
+  const { pick, num, isRTL } = useLanguage();
   if (!deadline) {
     return (
       <span className={cn("inline-flex items-center gap-1.5 text-default-500", size === "sm" ? "text-xs" : "text-sm", className)}>
         <CalendarDays className={size === "sm" ? "h-3 w-3" : "h-3.5 w-3.5"} />
-        <span>No deadline</span>
+        <span>{pick("لا يوجد موعد نهائي", "No deadline")}</span>
       </span>
     );
   }
@@ -38,26 +40,26 @@ export function DeadlineIndicator({ deadline, className, showDate = true, size =
   if (isPast) {
     color = "default";
     Icon = XCircle;
-    label = `Closed ${Math.abs(days)} day${Math.abs(days) !== 1 ? "s" : ""} ago`;
+    label = pick(`أغلق منذ ${num(Math.abs(days))} يوم`, `Closed ${Math.abs(days)} day${Math.abs(days) !== 1 ? "s" : ""} ago`);
   } else if (isToday) {
     color = "danger";
     Icon = AlertTriangle;
-    label = "Due today!";
+    label = pick("ينتهي اليوم!", "Due today!");
   } else if (isUrgent) {
     color = "danger";
     Icon = AlertTriangle;
-    label = `${days} day${days !== 1 ? "s" : ""} left`;
+    label = pick(`${num(days)} يوم متبقٍ`, `${days} day${days !== 1 ? "s" : ""} left`);
   } else if (isSoon) {
     color = "warning";
     Icon = Timer;
-    label = `${days} day${days !== 1 ? "s" : ""} left`;
+    label = pick(`${num(days)} يوم متبقٍ`, `${days} day${days !== 1 ? "s" : ""} left`);
   } else {
     color = "success";
     Icon = CalendarDays;
-    label = `${days} day${days !== 1 ? "s" : ""} left`;
+    label = pick(`${num(days)} يوم متبقٍ`, `${days} day${days !== 1 ? "s" : ""} left`);
   }
 
-  const dateStr = d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+  const dateStr = d.toLocaleDateString(isRTL ? "ar-EG" : "en-US", { year: "numeric", month: "short", day: "numeric" });
 
   if (size === "sm") {
     return (

@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 import { calculateAverageScore } from "@/lib/ai-review";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   FileText,
   Upload,
@@ -38,14 +39,14 @@ interface Document {
   uploadedAt: string;
 }
 
-const TYPE_LABELS: Record<string, string> = {
-  PERSONAL_STATEMENT: "Personal Statement",
-  CV: "CV / Resume",
-  MOTIVATION_LETTER: "Motivation Letter",
-  RESEARCH_PROPOSAL: "Research Proposal",
-  RECOMMENDATION_LETTER: "Recommendation Letter",
-  TRANSCRIPT: "Transcripts",
-  OTHER: "Other",
+const TYPE_LABELS: Record<string, { ar: string; en: string }> = {
+  PERSONAL_STATEMENT: { ar: "خطاب الدوافع", en: "Personal Statement" },
+  CV: { ar: "السيرة الذاتية", en: "CV / Resume" },
+  MOTIVATION_LETTER: { ar: "خطاب التحفيز", en: "Motivation Letter" },
+  RESEARCH_PROPOSAL: { ar: "المقترح البحثي", en: "Research Proposal" },
+  RECOMMENDATION_LETTER: { ar: "خطاب التوصية", en: "Recommendation Letter" },
+  TRANSCRIPT: { ar: "كشف الدرجات", en: "Transcripts" },
+  OTHER: { ar: "مستند آخر", en: "Other" },
 };
 
 const TYPE_ICONS: Record<string, string> = {
@@ -64,8 +65,8 @@ function formatSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString("en-US", {
+function formatDate(dateStr: string, isRTL: boolean): string {
+  return new Date(dateStr).toLocaleDateString(isRTL ? "ar-EG" : "en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -73,6 +74,7 @@ function formatDate(dateStr: string): string {
 }
 
 export default function DocumentsPage() {
+  const { pick, num, isRTL } = useLanguage();
   const [documents, setDocuments] = useState<Document[]>([]);
   const [reviews, setReviews] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
@@ -125,11 +127,11 @@ export default function DocumentsPage() {
         setError(json.error);
       }
     } catch {
-      setError("Failed to load documents");
+      setError(pick("تعذّر تحميل المستندات", "Failed to load documents"));
     } finally {
       setLoading(false);
     }
-  }, [router]);
+  }, [router, pick]);
 
   useEffect(() => {
     fetchDocuments();
@@ -137,18 +139,18 @@ export default function DocumentsPage() {
   }, [fetchDocuments, fetchQuota]);
 
   async function handleDelete(id: string) {
-    if (!confirm("Delete this document?")) return;
+    if (!confirm(pick("حذف هذا المستند؟", "Delete this document?"))) return;
     try {
       const res = await fetch(`/api/documents/${id}`, { method: "DELETE" });
       const json = await res.json();
       if (json.success) {
         setDocuments((prev) => prev.filter((d) => d.id !== id));
-        addToast("success", "Document deleted successfully");
+        addToast("success", pick("تم حذف المستند بنجاح", "Document deleted successfully"));
       } else {
-        addToast("error", json.error ?? "Delete failed");
+        addToast("error", json.error ?? pick("فشل الحذف", "Delete failed"));
       }
     } catch {
-      addToast("error", "Delete failed. Please try again.");
+      addToast("error", pick("فشل الحذف. حاول مرة أخرى.", "Delete failed. Please try again."));
     }
   }
 
@@ -161,8 +163,8 @@ export default function DocumentsPage() {
       if (!ct.includes("application/json")) {
         const text = await res.text().catch(() => "");
         console.error("Non-JSON response from review POST:", text.slice(0, 200));
-        setError("AI review failed. Server returned an unexpected response.");
-        addToast("error", "AI review failed. Server error.");
+        setError(pick("فشلت مراجعة الذكاء الاصطناعي. استجابة غير متوقعة من الخادم.", "AI review failed. Server returned an unexpected response."));
+        addToast("error", pick("فشلت مراجعة الذكاء الاصطناعي. خطأ في الخادم.", "AI review failed. Server error."));
         setReviewingId(null);
         fetchQuota();
         return;
@@ -170,18 +172,18 @@ export default function DocumentsPage() {
       const json = await res.json();
       if (json.success && json.data) {
         setReviews((prev) => ({ ...prev, [docId]: json.data }));
-        addToast("success", `AI review completed. Score: ${json.data.score}/10`);
+        addToast("success", pick(`اكتملت مراجعة الذكاء الاصطناعي. الدرجة: ${num(json.data.score)}/10`, `AI review completed. Score: ${json.data.score}/10`));
         router.push(`/dashboard/reviews/${docId}`);
       } else if (json.limitReached) {
-        setError(json.message ?? json.error ?? "You've reached your daily review limit");
-        addToast("error", json.message ?? json.error ?? "You've reached your daily review limit");
+        setError(json.message ?? json.error ?? pick("لقد وصلت إلى الحد اليومي للمراجعات المجانية", "You've reached your daily review limit"));
+        addToast("error", json.message ?? json.error ?? pick("لقد وصلت إلى الحد اليومي للمراجعات المجانية", "You've reached your daily review limit"));
       } else {
-        setError(json.message ?? json.error ?? "AI review failed");
-        addToast("error", json.message ?? json.error ?? "AI review failed");
+        setError(json.message ?? json.error ?? pick("فشلت مراجعة الذكاء الاصطناعي", "AI review failed"));
+        addToast("error", json.message ?? json.error ?? pick("فشلت مراجعة الذكاء الاصطناعي", "AI review failed"));
       }
     } catch {
-      setError("AI review failed. Please try again.");
-      addToast("error", "AI review failed. Please try again.");
+      setError(pick("فشلت مراجعة الذكاء الاصطناعي. حاول مرة أخرى.", "AI review failed. Please try again."));
+      addToast("error", pick("فشلت مراجعة الذكاء الاصطناعي. حاول مرة أخرى.", "AI review failed. Please try again."));
     } finally {
       setReviewingId(null);
       fetchQuota();
@@ -190,7 +192,7 @@ export default function DocumentsPage() {
 
   const handleUploadComplete = () => {
     setShowUpload(false);
-    addToast("success", "Document uploaded successfully");
+    addToast("success", pick("تم رفع المستند بنجاح", "Document uploaded successfully"));
     fetchDocuments();
   };
 
@@ -205,9 +207,9 @@ export default function DocumentsPage() {
             <FileText className="h-5 w-5" />
           </div>
           <div>
-            <h1 className="text-h3 font-bold">My Documents</h1>
+            <h1 className="text-h3 font-bold">{pick("مستنداتي", "My Documents")}</h1>
             <p className="text-sm text-muted-foreground mt-0.5">
-              Upload and manage your scholarship documents
+              {pick("ارفع مستنداتك وادِرها بسهولة", "Upload and manage your scholarship documents")}
             </p>
           </div>
         </div>
@@ -219,14 +221,14 @@ export default function DocumentsPage() {
           )}
           <Link href="/dashboard">
             <Button variant="ghost" size="sm">
-              <ArrowRight className="h-3.5 w-3.5 rotate-180" />
-              Dashboard
+              <ArrowRight className="h-3.5 w-3.5 rotate-180 rtl:rotate-0" />
+              {pick("لوحتي", "Dashboard")}
             </Button>
           </Link>
           {!showUpload && (
             <Button onClick={() => setShowUpload(true)} className="gap-1.5 shadow-sm">
               <Upload className="h-4 w-4" />
-              Upload Document
+              {pick("ارفع مستنداً", "Upload Document")}
             </Button>
           )}
         </div>
@@ -238,13 +240,13 @@ export default function DocumentsPage() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Upload className="h-4 w-4 text-primary" />
-              <h2 className="font-semibold text-sm">New Upload</h2>
+              <h2 className="font-semibold text-sm">{pick("رفع جديد", "New Upload")}</h2>
             </div>
             <button
               onClick={() => setShowUpload(false)}
               className="text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
-              Cancel
+              {pick("إلغاء", "Cancel")}
             </button>
           </div>
           <UploadDropzone onUploadComplete={handleUploadComplete} />
@@ -267,14 +269,17 @@ export default function DocumentsPage() {
               <FileText className="h-7 w-7 text-muted-foreground" />
             </div>
             <h2 className="text-lg font-semibold text-foreground mb-2">
-              No documents yet
+              {pick("لم ترفع أي مستند", "No documents yet")}
             </h2>
             <p className="text-sm text-muted-foreground mb-6">
-              Upload your first scholarship document to get AI-powered feedback and improve your chances.
+              {pick(
+                "ارفع مستندك الأول لتحصل على تقييم بالذكاء الاصطناعي وتحسّن فرصك.",
+                "Upload your first scholarship document to get AI-powered feedback and improve your chances."
+              )}
             </p>
             <Button onClick={() => setShowUpload(true)} className="gap-1.5">
               <Upload className="h-4 w-4" />
-              Upload Your First Document
+              {pick("ارفع مستندك الأول", "Upload Your First Document")}
             </Button>
           </div>
         </div>
@@ -310,12 +315,15 @@ export default function DocumentsPage() {
                       </div>
                       <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground flex-wrap">
                         <Badge variant="outline" className="text-[11px]">
-                          {TYPE_LABELS[doc.documentType] ?? doc.documentType}
+                          {(() => {
+                            const label = TYPE_LABELS[doc.documentType];
+                            return label ? pick(label.ar, label.en) : doc.documentType;
+                          })()}
                         </Badge>
                         <span className="text-muted-foreground">&middot;</span>
                         <span>{formatSize(doc.fileSize)}</span>
                         <span className="text-muted-foreground">&middot;</span>
-                        <span>{formatDate(doc.uploadedAt)}</span>
+                        <span>{formatDate(doc.uploadedAt, isRTL)}</span>
                       </div>
                       {review && (
                         <div className="mt-2 flex items-center gap-3">
@@ -323,13 +331,13 @@ export default function DocumentsPage() {
                             <Star className="h-3.5 w-3.5 shrink-0 text-amber-400" />
                             <ProgressBar value={scoreValue * 10} size="sm" color={scoreColor} className="flex-1" />
                             <span className="text-xs font-semibold tabular-nums shrink-0">
-                              {scoreValue}/10
+                              {num(scoreValue)}/10
                             </span>
                           </div>
                           {doc.improvementScore !== null && doc.improvementScore > 0 && (
                             <Badge variant="green" className="gap-1 text-[11px]">
                               <Sparkles className="h-3 w-3" />
-                              +{doc.improvementScore} since last
+                              {pick(`+${num(doc.improvementScore)} عن النسخة السابقة`, `+${doc.improvementScore} since last`)}
                             </Badge>
                           )}
                         </div>
@@ -351,7 +359,7 @@ export default function DocumentsPage() {
                       <Link href={`/dashboard/reviews/${doc.id}`}>
                         <Button size="sm" variant="outline" className="gap-1.5">
                           <Sparkles className="h-3.5 w-3.5 text-amber-400" />
-                          Review
+                          {pick("المراجعة", "Review")}
                         </Button>
                       </Link>
                     ) : (
@@ -363,7 +371,9 @@ export default function DocumentsPage() {
                         className="gap-1.5"
                       >
                         <Sparkles className="h-3.5 w-3.5" />
-                        {reviewingId === doc.id ? "Reviewing..." : "AI Review"}
+                        {reviewingId === doc.id
+                          ? pick("جارٍ المراجعة…", "Reviewing...")
+                          : pick("مراجعة بالذكاء الاصطناعي", "AI Review")}
                       </Button>
                     )}
                     <Button

@@ -9,15 +9,15 @@ export const DOC_PRIORITY: Record<string, number> = {
   OTHER: 6,
 };
 
-export const DOC_TYPE_LABELS: Record<string, string> = {
-  RESEARCH_PROPOSAL: "Research Proposal",
-  CV: "CV / Resume",
-  PERSONAL_STATEMENT: "Personal Statement",
-  RECOMMENDATION_LETTER: "Recommendation Letter",
-  TRANSCRIPT: "Transcripts & Certificates",
-  MOTIVATION_LETTER: "Motivation Letter",
-  MEDICAL_CERTIFICATE: "Medical Certificate",
-  OTHER: "Other Document",
+export const DOC_TYPE_LABELS: Record<string, { ar: string; en: string }> = {
+  RESEARCH_PROPOSAL: { ar: "المقترح البحثي", en: "Research Proposal" },
+  CV: { ar: "السيرة الذاتية", en: "CV / Resume" },
+  PERSONAL_STATEMENT: { ar: "خطاب الدوافع", en: "Personal Statement" },
+  RECOMMENDATION_LETTER: { ar: "خطاب التوصية", en: "Recommendation Letter" },
+  TRANSCRIPT: { ar: "كشف الدرجات والشهادات", en: "Transcripts & Certificates" },
+  MOTIVATION_LETTER: { ar: "خطاب التحفيز", en: "Motivation Letter" },
+  MEDICAL_CERTIFICATE: { ar: "شهادة طبية", en: "Medical Certificate" },
+  OTHER: { ar: "مستند آخر", en: "Other Document" },
 };
 
 export function calculateProgress(
@@ -29,7 +29,8 @@ export function calculateProgress(
 }
 
 export function getNextAction(
-  documents: { status: string; documentType: string; aiScore?: number | null }[]
+  documents: { status: string; documentType: string; aiScore?: number | null }[],
+  isRTL = false
 ): string {
   const pending = documents
     .filter((d) => d.status !== "READY")
@@ -40,35 +41,44 @@ export function getNextAction(
     });
 
   if (pending.length === 0) {
-    return "All documents ready! Review and submit your application.";
+    return isRTL
+      ? "كل المستندات جاهزة! راجع طلبك وقدّمه."
+      : "All documents ready! Review and submit your application.";
   }
 
   const next = pending[0]!;
-  const label = DOC_TYPE_LABELS[next.documentType] ?? next.documentType.toLowerCase();
+  const labelEntry = DOC_TYPE_LABELS[next.documentType];
+  const label = labelEntry ? (isRTL ? labelEntry.ar : labelEntry.en) : next.documentType.toLowerCase();
 
   if (next.status === "NOT_STARTED") {
-    return `Start working on your ${label}`;
+    return isRTL ? `ابدأ العمل على ${label}` : `Start working on your ${label}`;
   }
   if (next.status === "NEEDS_IMPROVEMENT") {
-    return `Improve your ${label} (current score: ${next.aiScore ?? "?"}/10)`;
+    return isRTL
+      ? `حسّن ${label} (الدرجة الحالية: ${next.aiScore ?? "؟"}/10)`
+      : `Improve your ${label} (current score: ${next.aiScore ?? "?"}/10)`;
   }
   if (next.status === "IN_REVIEW") {
-    return `Review AI feedback for your ${label}`;
+    return isRTL ? `راجع ملاحظات الذكاء الاصطناعي على ${label}` : `Review AI feedback for your ${label}`;
   }
-  return `Continue working on your ${label}`;
+  return isRTL ? `تابع العمل على ${label}` : `Continue working on your ${label}`;
 }
 
-export function getDeadlineUrgency(deadline: string | null): {
+export function getDeadlineUrgency(
+  deadline: string | null,
+  isRTL = false
+): {
   label: string;
   color: "red" | "yellow" | "green" | "gray";
   daysLeft: number | null;
 } {
-  if (!deadline) return { label: "No deadline", color: "gray", daysLeft: null };
+  if (!deadline) return { label: isRTL ? "لا يوجد موعد نهائي" : "No deadline", color: "gray", daysLeft: null };
   const diff = new Date(deadline).getTime() - Date.now();
   const daysLeft = Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
-  if (daysLeft < 15) return { label: `${daysLeft} days left`, color: "red", daysLeft };
-  if (daysLeft <= 30) return { label: `${daysLeft} days left`, color: "yellow", daysLeft };
-  return { label: `${daysLeft} days left`, color: "green", daysLeft };
+  const label = isRTL ? `${daysLeft} يوم متبقٍ` : `${daysLeft} days left`;
+  if (daysLeft < 15) return { label, color: "red", daysLeft };
+  if (daysLeft <= 30) return { label, color: "yellow", daysLeft };
+  return { label, color: "green", daysLeft };
 }
 
 export function autoUpdateDocStatus(status: string, aiScore: number | null): string {

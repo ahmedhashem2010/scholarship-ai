@@ -21,6 +21,7 @@ import {
   ChevronUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/contexts/LanguageContext";
 import type { MatchResult } from "@/lib/scholarship-matcher";
 
 function getCountryFlag(country: string): string {
@@ -41,15 +42,15 @@ function parseBenefitValue(benefits: string | null, key: string): string | null 
   } catch { return null; }
 }
 
-function getTotalValue(benefits: string | null): string {
-  if (!benefits) return "Varies";
+function getTotalValue(benefits: string | null): "varies" | "full_tuition_stipend" | "tuition_covered" | "full_scholarship" {
+  if (!benefits) return "varies";
   try {
     const parsed = JSON.parse(benefits);
     const text = JSON.stringify(parsed).toLowerCase();
-    if (text.includes("full tuition")) return "Full Tuition + Stipend";
-    if (text.includes("tuition")) return "Tuition Covered";
-    return "Full Scholarship";
-  } catch { return "Full Scholarship"; }
+    if (text.includes("full tuition")) return "full_tuition_stipend";
+    if (text.includes("tuition")) return "tuition_covered";
+    return "full_scholarship";
+  } catch { return "full_scholarship"; }
 }
 
 /**
@@ -107,6 +108,7 @@ export function ScholarshipCard({
   className,
 }: ScholarshipCardProps) {
   const sch = match.scholarship;
+  const { pick, num } = useLanguage();
   const rankEmojis = ["🥇", "🥈", "🥉"];
   const [showAllReasons, setShowAllReasons] = useState(false);
   const visibleReasons =
@@ -120,14 +122,17 @@ export function ScholarshipCard({
               <span className="text-xl">{rankEmojis[index] ?? `#${index + 1}`}</span>
               <div className="flex items-center gap-1">
                 <FitScore score={match.fitScore} size="sm" />
-                <HelpTooltip text="Fit Score measures how well this scholarship matches your profile based on education, major, country eligibility, age, and English level." side="top" />
+                <HelpTooltip text={pick(
+                  "تقيس نسبة التطابق مدى توافق هذه المنحة مع ملفك بناءً على التعليم والتخصص وبلد الأهلية والعمر ومستوى الإنجليزية.",
+                  "Fit Score measures how well this scholarship matches your profile based on education, major, country eligibility, age, and English level."
+                )} side="top" />
               </div>
             </div>
             <Badge variant={match.fitScore >= 80 ? "green" : match.fitScore >= 60 ? "blue" : "yellow"}>
-              {match.fitScore}% fit
+              {pick(`${num(match.fitScore)}% توافق`, `${match.fitScore}% fit`)}
             </Badge>
         </div>
-        <CardTitle className="text-base mt-2 leading-snug">{sch.nameEn}</CardTitle>
+        <CardTitle className="text-base mt-2 leading-snug">{pick(sch.nameAr, sch.nameEn)}</CardTitle>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
           <span className="flex items-center gap-1">
             <span>{getCountryFlag(sch.country)}</span>
@@ -150,7 +155,7 @@ export function ScholarshipCard({
         <div className="space-y-2">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
             <Award className="h-3 w-3" />
-            Why this fits you
+            {pick("لماذا تناسبك", "Why this fits you")}
           </p>
           <ul className="space-y-1.5">
             {visibleReasons.map((r, i) => (
@@ -168,13 +173,13 @@ export function ScholarshipCard({
             >
               {showAllReasons ? (
                 <>
-                  Show fewer
-                  <ChevronUp className="h-3 w-3" />
+                  {pick("عرض أقل", "Show fewer")}
+                  <ChevronUp className="h-3 w-3 rtl:rotate-180" />
                 </>
               ) : (
                 <>
-                  Show all reasons ({match.reasons.length})
-                  <ChevronDown className="h-3 w-3" />
+                  {pick(`عرض كل الأسباب (${num(match.reasons.length)})`, `Show all reasons (${match.reasons.length})`)}
+                  <ChevronDown className="h-3 w-3 rtl:rotate-180" />
                 </>
               )}
             </button>
@@ -187,15 +192,26 @@ export function ScholarshipCard({
               <span key={i} className="text-[11px] bg-muted text-muted-foreground rounded-md px-2 py-0.5">{b}</span>
             ))}
           </div>
-          <span className="text-sm font-semibold text-foreground">{getTotalValue(sch.benefits)}</span>
+          <span className="text-sm font-semibold text-foreground">
+            {getTotalValue(sch.benefits) === "varies"
+              ? pick("متغير", "Varies")
+              : getTotalValue(sch.benefits) === "full_tuition_stipend"
+                ? pick("رسوم كاملة + منحة شهرية", "Full Tuition + Stipend")
+                : getTotalValue(sch.benefits) === "tuition_covered"
+                  ? pick("الرسوم مغطاة", "Tuition Covered")
+                  : pick("منحة كاملة", "Full Scholarship")}
+          </span>
         </div>
 
         <div className="flex items-center justify-between">
           <DeadlineIndicator deadline={sch.deadline} showDate={false} />
           <span className="text-xs text-muted-foreground flex items-center gap-1">
             <TrendingUp className="h-3 w-3" />
-            ~{match.successProbability}% success
-            <HelpTooltip text="Estimated chance of acceptance based on your fit score and the scholarship's competition level. Higher fit + lower competition = better odds." side="top" />
+            {pick(`~${num(match.successProbability)}% فرصة القبول`, `~${match.successProbability}% success`)}
+            <HelpTooltip text={pick(
+              "تقدير لفرصة القبول بناءً على نسبة التطابق ومستوى المنافسة على المنحة. تطابق أعلى + منافسة أقل = فرصة أفضل.",
+              "Estimated chance of acceptance based on your fit score and the scholarship's competition level. Higher fit + lower competition = better odds."
+            )} side="top" />
           </span>
         </div>
       </CardContent>
@@ -209,19 +225,19 @@ export function ScholarshipCard({
               onChange={() => onToggleCompare(sch.id)}
               className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
             />
-            <span className="text-[11px] text-muted-foreground">Compare</span>
+            <span className="text-[11px] text-muted-foreground">{pick("قارن", "Compare")}</span>
           </label>
         )}
         {match.isEligible && (
           <Link href={`/dashboard/applications/${sch.id}`} className="flex-1">
             <Button size="sm" className="w-full gap-1.5 text-xs group/btn">
-              Start Application
-              <ArrowRight className="h-3 w-3 transition-transform group-hover/btn:translate-x-0.5" />
+              {pick("ابدأ التقديم", "Start Application")}
+              <ArrowRight className="h-3 w-3 transition-transform group-hover/btn:translate-x-0.5 rtl:rotate-180" />
             </Button>
           </Link>
         )}
         <Link href={`/scholarships/${sch.id}`}>
-          <Button variant="outline" size="sm" className="text-xs">Details</Button>
+          <Button variant="outline" size="sm" className="text-xs">{pick("التفاصيل", "Details")}</Button>
         </Link>
       </div>
     </Card>

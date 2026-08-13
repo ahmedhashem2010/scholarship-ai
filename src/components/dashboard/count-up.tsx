@@ -11,6 +11,8 @@ interface CountUpProps {
   className?: string
   /** Kept out of the DOM when true — used to reserve exact text width. */
   tabular?: boolean
+  /** Intl locale for digit formatting — pass "ar-EG" to render Arabic-Indic numerals. */
+  locale?: string
 }
 
 /**
@@ -24,6 +26,7 @@ export function CountUp({
   duration = 1100,
   className,
   tabular = true,
+  locale = "en-US",
 }: CountUpProps) {
   const [display, setDisplay] = useState(value)
   const [mounted, setMounted] = useState(false)
@@ -55,7 +58,7 @@ export function CountUp({
     return () => cancelAnimationFrame(frame)
   }, [value, duration])
 
-  const formatted = display.toLocaleString("en-US", {
+  const formatted = display.toLocaleString(locale, {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
   })
@@ -65,7 +68,7 @@ export function CountUp({
       className={className}
       style={tabular ? { fontVariantNumeric: "tabular-nums" } : undefined}
     >
-      {mounted ? formatted : value.toLocaleString("en-US", {
+      {mounted ? formatted : value.toLocaleString(locale, {
         minimumFractionDigits: decimals,
         maximumFractionDigits: decimals,
       })}

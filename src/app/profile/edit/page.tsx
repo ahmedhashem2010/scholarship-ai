@@ -6,56 +6,85 @@ import { useState, useEffect, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Check, Save } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const countries = [
-  "Egypt", "Saudi Arabia", "United Arab Emirates", "Qatar", "Kuwait",
-  "Oman", "Bahrain", "Jordan", "Lebanon", "Morocco", "Algeria", "Tunisia",
-  "Palestine", "Syria", "Iraq", "Yemen", "Sudan", "Libya",
+  { value: "Egypt", ar: "مصر", en: "Egypt" },
+  { value: "Saudi Arabia", ar: "السعودية", en: "Saudi Arabia" },
+  { value: "United Arab Emirates", ar: "الإمارات العربية المتحدة", en: "United Arab Emirates" },
+  { value: "Qatar", ar: "قطر", en: "Qatar" },
+  { value: "Kuwait", ar: "الكويت", en: "Kuwait" },
+  { value: "Oman", ar: "عُمان", en: "Oman" },
+  { value: "Bahrain", ar: "البحرين", en: "Bahrain" },
+  { value: "Jordan", ar: "الأردن", en: "Jordan" },
+  { value: "Lebanon", ar: "لبنان", en: "Lebanon" },
+  { value: "Morocco", ar: "المغرب", en: "Morocco" },
+  { value: "Algeria", ar: "الجزائر", en: "Algeria" },
+  { value: "Tunisia", ar: "تونس", en: "Tunisia" },
+  { value: "Palestine", ar: "فلسطين", en: "Palestine" },
+  { value: "Syria", ar: "سوريا", en: "Syria" },
+  { value: "Iraq", ar: "العراق", en: "Iraq" },
+  { value: "Yemen", ar: "اليمن", en: "Yemen" },
+  { value: "Sudan", ar: "السودان", en: "Sudan" },
+  { value: "Libya", ar: "ليبيا", en: "Libya" },
 ];
 
 const educationLevels = [
-  { value: "high-school", label: "High School" },
-  { value: "bachelor", label: "Bachelor's Degree" },
-  { value: "master", label: "Master's Degree" },
-  { value: "phd", label: "PhD / Doctorate" },
+  { value: "high-school", ar: "الثانوية العامة", en: "High School" },
+  { value: "bachelor", ar: "درجة البكالوريوس", en: "Bachelor's Degree" },
+  { value: "master", ar: "درجة الماجستير", en: "Master's Degree" },
+  { value: "phd", ar: "الدكتوراه", en: "PhD / Doctorate" },
 ];
 
 const majors = [
-  "Computer Science", "Engineering", "Medicine", "Business",
-  "Law", "Economics", "Biology", "Physics", "Mathematics",
-  "Chemistry", "Architecture", "Education", "Arts", "Political Science",
-  "Environmental Science", "Other",
+  { value: "Computer Science", ar: "علوم الحاسوب", en: "Computer Science" },
+  { value: "Engineering", ar: "الهندسة", en: "Engineering" },
+  { value: "Medicine", ar: "الطب", en: "Medicine" },
+  { value: "Business", ar: "إدارة الأعمال", en: "Business" },
+  { value: "Law", ar: "القانون", en: "Law" },
+  { value: "Economics", ar: "الاقتصاد", en: "Economics" },
+  { value: "Biology", ar: "علم الأحياء", en: "Biology" },
+  { value: "Physics", ar: "الفيزياء", en: "Physics" },
+  { value: "Mathematics", ar: "الرياضيات", en: "Mathematics" },
+  { value: "Chemistry", ar: "الكيمياء", en: "Chemistry" },
+  { value: "Architecture", ar: "العمارة", en: "Architecture" },
+  { value: "Education", ar: "التربية", en: "Education" },
+  { value: "Arts", ar: "الفنون", en: "Arts" },
+  { value: "Political Science", ar: "العلوم السياسية", en: "Political Science" },
+  { value: "Environmental Science", ar: "العلوم البيئية", en: "Environmental Science" },
+  { value: "Other", ar: "أخرى", en: "Other" },
 ];
 
 const targetDegrees = [
-  { value: "bachelor", label: "Bachelor's" },
-  { value: "master", label: "Master's" },
-  { value: "phd", label: "PhD" },
-  { value: "exchange", label: "Exchange Program" },
-  { value: "summer-school", label: "Summer School" },
+  { value: "bachelor", ar: "بكالوريوس", en: "Bachelor's" },
+  { value: "master", ar: "ماجستير", en: "Master's" },
+  { value: "phd", ar: "دكتوراه", en: "PhD" },
+  { value: "exchange", ar: "برنامج تبادل", en: "Exchange Program" },
+  { value: "summer-school", ar: "مدرسة صيفية", en: "Summer School" },
 ];
 
 const englishLevels = [
-  { value: "beginner", label: "Beginner" },
-  { value: "intermediate", label: "Intermediate" },
-  { value: "advanced", label: "Advanced" },
-  { value: "fluent", label: "Fluent" },
-  { value: "native", label: "Native" },
-  { value: "TOEFL", label: "TOEFL" },
-  { value: "IELTS", label: "IELTS" },
+  { value: "beginner", ar: "مبتدئ", en: "Beginner" },
+  { value: "intermediate", ar: "متوسط", en: "Intermediate" },
+  { value: "advanced", ar: "متقدم", en: "Advanced" },
+  { value: "fluent", ar: "طليق", en: "Fluent" },
+  { value: "native", ar: "اللغة الأم", en: "Native" },
+  { value: "TOEFL", ar: "TOEFL", en: "TOEFL" },
+  { value: "IELTS", ar: "IELTS", en: "IELTS" },
 ];
 
 const budgetOptions = [
-  { value: "NONE", label: "No funding available" },
-  { value: "LIMITED", label: "Limited (partial coverage needed)" },
-  { value: "MODERATE", label: "Moderate (can cover some costs)" },
-  { value: "FULL", label: "Full (can self-fund)" },
+  { value: "NONE", ar: "لا يتوفر تمويل", en: "No funding available" },
+  { value: "LIMITED", ar: "محدود (أحتاج تمويلاً جزئياً)", en: "Limited (partial coverage needed)" },
+  { value: "MODERATE", ar: "متوسط (أستطيع تغطية بعض التكاليف)", en: "Moderate (can cover some costs)" },
+  { value: "FULL", ar: "كامل (أستطيع تمويل نفسي)", en: "Full (can self-fund)" },
 ];
 
 export default function EditProfilePage() {
   const router = useRouter();
+  const { t, pick } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -100,7 +129,7 @@ export default function EditProfilePage() {
           });
         }
       })
-      .catch(() => setError("Failed to load profile"))
+      .catch(() => setError(pick("فشل تحميل الملف الشخصي", "Failed to load profile")))
       .finally(() => setLoading(false));
   }, []);
 
@@ -141,10 +170,10 @@ export default function EditProfilePage() {
         setSuccess(true);
         setTimeout(() => router.push("/dashboard"), 1500);
       } else {
-        setError(json.error ?? "Failed to save");
+        setError(json.error ?? pick("فشل الحفظ", "Failed to save"));
       }
     } catch {
-      setError("Something went wrong");
+      setError(pick("حدث خطأ ما", "Something went wrong"));
     } finally {
       setSaving(false);
     }
@@ -153,7 +182,7 @@ export default function EditProfilePage() {
   if (loading) {
     return (
       <div className="page-container py-16 text-center">
-        <div className="text-muted-foreground animate-pulse">Loading profile...</div>
+        <div className="text-muted-foreground animate-pulse">{pick("جارِ تحميل الملف الشخصي…", "Loading profile...")}</div>
       </div>
     );
   }
@@ -163,26 +192,26 @@ export default function EditProfilePage() {
       <div className="flex items-center gap-3 mb-6">
         <Link href="/dashboard">
           <Button variant="ghost" size="sm">
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
           </Button>
         </Link>
-        <h1 className="text-h2">Edit Profile</h1>
+        <h1 className="text-h2">{pick("تعديل الملف الشخصي", "Edit Profile")}</h1>
       </div>
 
       <form onSubmit={handleSubmit}>
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Personal Information</CardTitle>
+            <CardTitle className="text-base">{pick("المعلومات الشخصية", "Personal Information")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1.5">Full Name</label>
+                <label className="block text-sm font-medium text-foreground mb-1.5">{t("onb.fullName")}</label>
                 <input value={form.displayName} onChange={(e) => update("displayName", e.target.value)} required
                   className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1.5">Date of Birth</label>
+                <label className="block text-sm font-medium text-foreground mb-1.5">{t("onb.dob")}</label>
                 <input type="date" value={form.dateOfBirth} onChange={(e) => update("dateOfBirth", e.target.value)} required
                   max={new Date().toISOString().split("T")[0]}
                   className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring" />
@@ -190,44 +219,44 @@ export default function EditProfilePage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">Country</label>
+              <label className="block text-sm font-medium text-foreground mb-1.5">{pick("البلد", "Country")}</label>
               <select value={form.country} onChange={(e) => update("country", e.target.value)} required
                 className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring">
-                <option value="">Select...</option>
-                {countries.map((c) => <option key={c} value={c}>{c}</option>)}
+                <option value="">{pick("اختر…", "Select...")}</option>
+                {countries.map((c) => <option key={c.value} value={c.value}>{pick(c.ar, c.en)}</option>)}
               </select>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1.5">Education Level</label>
+                <label className="block text-sm font-medium text-foreground mb-1.5">{pick("المستوى التعليمي", "Education Level")}</label>
                 <select value={form.educationLevel} onChange={(e) => update("educationLevel", e.target.value)} required
                   className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring">
-                  <option value="">Select...</option>
-                  {educationLevels.map((el) => <option key={el.value} value={el.value}>{el.label}</option>)}
+                  <option value="">{pick("اختر…", "Select...")}</option>
+                  {educationLevels.map((el) => <option key={el.value} value={el.value}>{pick(el.ar, el.en)}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1.5">Field of Study</label>
+                <label className="block text-sm font-medium text-foreground mb-1.5">{pick("مجال الدراسة", "Field of Study")}</label>
                 <select value={form.major} onChange={(e) => update("major", e.target.value)}
                   className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring">
-                  <option value="">Select...</option>
-                  {majors.map((m) => <option key={m} value={m}>{m}</option>)}
+                  <option value="">{pick("اختر…", "Select...")}</option>
+                  {majors.map((m) => <option key={m.value} value={m.value}>{pick(m.ar, m.en)}</option>)}
                 </select>
               </div>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1.5">Target Degree</label>
+                <label className="block text-sm font-medium text-foreground mb-1.5">{pick("الدرجة المستهدفة", "Target Degree")}</label>
                 <select value={form.targetDegree} onChange={(e) => update("targetDegree", e.target.value)} required
                   className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring">
-                  <option value="">Select...</option>
-                  {targetDegrees.map((td) => <option key={td.value} value={td.value}>{td.label}</option>)}
+                  <option value="">{pick("اختر…", "Select...")}</option>
+                  {targetDegrees.map((td) => <option key={td.value} value={td.value}>{pick(td.ar, td.en)}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1.5">GPA (optional)</label>
+                <label className="block text-sm font-medium text-foreground mb-1.5">{pick("المعدل التراكمي (اختياري)", "GPA (optional)")}</label>
                 <input type="number" step="0.01" min="0" max="4" value={form.gpa} onChange={(e) => update("gpa", e.target.value)}
                   className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
                   placeholder="3.5" />
@@ -236,17 +265,17 @@ export default function EditProfilePage() {
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1.5">English Level</label>
+                <label className="block text-sm font-medium text-foreground mb-1.5">{pick("مستوى الإنجليزية", "English Level")}</label>
                 <select value={form.englishLevel} onChange={(e) => update("englishLevel", e.target.value)} required
                   className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring">
-                  <option value="">Select...</option>
-                  {englishLevels.map((el) => <option key={el.value} value={el.value}>{el.label}</option>)}
+                  <option value="">{pick("اختر…", "Select...")}</option>
+                  {englishLevels.map((el) => <option key={el.value} value={el.value}>{pick(el.ar, el.en)}</option>)}
                 </select>
               </div>
               {(form.englishLevel === "TOEFL" || form.englishLevel === "IELTS") && (
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-1.5">
-                    {form.englishLevel === "TOEFL" ? "TOEFL Score (0-120)" : "IELTS Score (0-9)"}
+                    {pick(form.englishLevel === "TOEFL" ? "درجة TOEFL (0-120)" : "درجة IELTS (0-9)", form.englishLevel === "TOEFL" ? "TOEFL Score (0-120)" : "IELTS Score (0-9)")}
                   </label>
                   <input type="number" min={0} max={form.englishLevel === "TOEFL" ? 120 : 9} step={form.englishLevel === "IELTS" ? "0.5" : "1"}
                     value={form.englishScore} onChange={(e) => update("englishScore", e.target.value)}
@@ -261,13 +290,13 @@ export default function EditProfilePage() {
                 <input type="checkbox" checked={form.hasWorkExperience} onChange={(e) => update("hasWorkExperience", e.target.checked)}
                   className="mt-1 h-4 w-4 rounded border-border text-primary focus:ring-primary" />
                 <div>
-                  <span className="text-sm font-medium text-foreground">Work Experience</span>
-                  <p className="text-xs text-muted-foreground">Include internships and part-time jobs</p>
+                  <span className="text-sm font-medium text-foreground">{pick("الخبرة العملية", "Work Experience")}</span>
+                  <p className="text-xs text-muted-foreground">{pick("بما في ذلك التدريب والوظائف بدوام جزئي", "Include internships and part-time jobs")}</p>
                 </div>
               </label>
               {form.hasWorkExperience && (
                 <div className="ms-7 mb-3">
-                  <label className="block text-sm font-medium text-foreground mb-1.5">Years</label>
+                  <label className="block text-sm font-medium text-foreground mb-1.5">{pick("السنوات", "Years")}</label>
                   <input type="number" min={0} max={50} value={form.workYears} onChange={(e) => update("workYears", e.target.value)}
                     className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring max-w-[120px]" />
                 </div>
@@ -276,18 +305,18 @@ export default function EditProfilePage() {
                 <input type="checkbox" checked={form.hasResearch} onChange={(e) => update("hasResearch", e.target.checked)}
                   className="mt-1 h-4 w-4 rounded border-border text-primary focus:ring-primary" />
                 <div>
-                  <span className="text-sm font-medium text-foreground">Research Experience</span>
-                  <p className="text-xs text-muted-foreground">Publications, research projects, or thesis work</p>
+                  <span className="text-sm font-medium text-foreground">{pick("الخبرة البحثية", "Research Experience")}</span>
+                  <p className="text-xs text-muted-foreground">{pick("منشورات، مشاريع بحثية، أو رسائل جامعية", "Publications, research projects, or thesis work")}</p>
                 </div>
               </label>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">Budget / Funding</label>
+              <label className="block text-sm font-medium text-foreground mb-1.5">{pick("الميزانية / التمويل", "Budget / Funding")}</label>
               <select value={form.budget} onChange={(e) => update("budget", e.target.value)}
                 className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring">
-                <option value="">Select...</option>
-                {budgetOptions.map((b) => <option key={b.value} value={b.value}>{b.label}</option>)}
+                <option value="">{pick("اختر…", "Select...")}</option>
+                {budgetOptions.map((b) => <option key={b.value} value={b.value}>{pick(b.ar, b.en)}</option>)}
               </select>
             </div>
 
@@ -297,17 +326,17 @@ export default function EditProfilePage() {
             {success && (
               <div className="rounded-xl border border-success-200 bg-success-50 p-3 text-sm text-success-700 flex items-center gap-2">
                 <Check className="h-4 w-4" />
-                Profile saved! Redirecting...
+                {pick("تم حفظ الملف الشخصي! جارِ التحويل…", "Profile saved! Redirecting...")}
               </div>
             )}
 
-            <div className="flex gap-3 pt-2">
+            <div className="flex flex-wrap gap-3 pt-2">
               <Button type="submit" disabled={saving} className="gap-1.5">
                 <Save className="h-4 w-4" />
-                {saving ? "Saving..." : "Save Changes"}
+                {saving ? pick("جارِ الحفظ…", "Saving...") : pick("حفظ التغييرات", "Save Changes")}
               </Button>
               <Link href="/dashboard">
-                <Button type="button" variant="outline">Cancel</Button>
+                <Button type="button" variant="outline">{pick("إلغاء", "Cancel")}</Button>
               </Link>
             </div>
           </CardContent>

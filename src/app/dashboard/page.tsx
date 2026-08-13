@@ -27,6 +27,7 @@ import { CountUp } from "@/components/dashboard/count-up";
 import { ThreeDObject } from "@/components/landing/three-d";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Match {
   id: string;
@@ -56,22 +57,23 @@ interface Application {
   documents: { documentType: string; status: string }[];
 }
 
-function greeting(): string {
+function greeting(isRTL: boolean): string {
   const h = new Date().getHours();
-  if (h < 12) return "Good morning";
-  if (h < 17) return "Good afternoon";
-  return "Good evening";
+  if (h < 12) return isRTL ? "صباح الخير" : "Good morning";
+  if (h < 17) return isRTL ? "مساء الخير" : "Good afternoon";
+  return isRTL ? "مساء الخير" : "Good evening";
 }
 
-function timeAgo(ts: number): string {
+function timeAgo(ts: number, isRTL: boolean, num: (n: number | string) => string): string {
   const diff = Date.now() - ts;
   const m = Math.floor(diff / 60_000);
-  if (m < 1) return "just now";
-  if (m < 60) return `${m}m ago`;
+  if (m < 1) return isRTL ? "الآن" : "just now";
+  if (m < 60) return isRTL ? `قبل ${num(m)} دقيقة` : `${m}m ago`;
   const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h ago`;
+  if (h < 24) return isRTL ? `قبل ${num(h)} ساعة` : `${h}h ago`;
   const d = Math.floor(h / 24);
-  return d <= 1 ? "yesterday" : `${d}d ago`;
+  if (d <= 1) return isRTL ? "أمس" : "yesterday";
+  return isRTL ? `قبل ${num(d)} يوم` : `${d}d ago`;
 }
 
 function fitColor(score: number): string {
@@ -97,6 +99,7 @@ function SectionHeader({
   href?: string;
   hrefLabel?: string;
 }) {
+  const { pick } = useLanguage();
   return (
     <div className="flex items-end justify-between gap-4">
       <div>
@@ -112,7 +115,7 @@ function SectionHeader({
           href={href}
           className="group inline-flex items-center gap-1 text-sm font-medium text-primary-700 transition-colors hover:text-primary-900 dark:text-primary-300 dark:hover:text-primary-200"
         >
-          {hrefLabel ?? "View all"}
+          {hrefLabel ?? pick("عرض الكل", "View all")}
           <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5" />
         </Link>
       )}
@@ -135,6 +138,7 @@ function StatCard({
   decimals?: number;
   loading?: boolean;
 }) {
+  const { isRTL } = useLanguage();
   return (
     <div
       className="dash-scale-in rounded-2xl border border-border bg-card p-4 shadow-[0_14px_36px_-18px_rgb(22_44_76_/_0.35)] sm:p-5"
@@ -153,7 +157,7 @@ function StatCard({
       ) : (
         <>
           <p className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-            <CountUp value={value} decimals={decimals} />
+            <CountUp value={value} decimals={decimals} locale={isRTL ? "ar-EG" : "en-US"} />
           </p>
           <p className="mt-1 text-sm font-medium text-foreground">{label}</p>
           <p className="text-xs text-muted-foreground">{caption}</p>
@@ -216,6 +220,7 @@ function JourneyHero({
   nextDeadline: Match | null;
   loading: boolean;
 }) {
+  const { pick, num } = useLanguage();
   const floating: {
     icon: React.ElementType;
     value: string;
@@ -226,32 +231,42 @@ function JourneyHero({
   }[] = [
     {
       icon: Target,
-      value: bestFit !== null ? `${Math.round(bestFit)}% match` : "No matches yet",
-      label: "Your top pick",
+      value:
+        bestFit !== null
+          ? `${num(Math.round(bestFit))}% ${pick("تطابق", "match")}`
+          : pick("لا توجد نتائج بعد", "No matches yet"),
+      label: pick("أفضل خيار لك", "Your top pick"),
       tone: "gold",
       className: "-top-7 -start-4",
       tilt: -3,
     },
     {
       icon: Clock,
-      value: nextDeadline ? `${nextDeadline.daysLeft}d left` : "No deadlines",
-      label: nextDeadline ? "Next deadline" : "Saved search",
+      value: nextDeadline
+        ? pick(`${num(nextDeadline.daysLeft!)} يوم متبقي`, `${nextDeadline.daysLeft}d left`)
+        : pick("لا مواعيد قادمة", "No deadlines"),
+      label: nextDeadline
+        ? pick("الموعد الأقرب", "Next deadline")
+        : pick("بحث محفوظ", "Saved search"),
       tone: "white",
       className: "-top-8 -end-4",
       tilt: 3,
     },
     {
       icon: FileCheck,
-      value: `${docsReady}/${docsTotal} ready`,
-      label: "Documents",
+      value: `${num(docsReady)}/${num(docsTotal)} ${pick("جاهز", "ready")}`,
+      label: pick("المستندات", "Documents"),
       tone: "white",
       className: "bottom-14 -start-6",
       tilt: -2,
     },
     {
       icon: Sparkles,
-      value: matchCount > 0 ? `${matchCount} matches` : "Get matched",
-      label: "AI curated for you",
+      value:
+        matchCount > 0
+          ? `${num(matchCount)} ${pick("منحة متطابقة", "matches")}`
+          : pick("احصل على تطابق", "Get matched"),
+      label: pick("منسّقة لك بالذكاء الاصطناعي", "AI curated for you"),
       tone: "white",
       className: "-bottom-8 -end-5",
       tilt: 2,
@@ -287,19 +302,31 @@ function JourneyHero({
           <div>
             <p className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-secondary-300">
               <Sparkles className="h-3.5 w-3.5" />
-              Your scholarship journey
+              {pick("رحلتك مع المنح", "Your scholarship journey")}
             </p>
             <h1 className="mt-4 max-w-xl text-2xl font-bold leading-tight text-white sm:text-[2rem] sm:leading-[1.2]">
               {loading
-                ? "Finding the right scholarships for you…"
-                : `Turn your dream into an application, ${firstName || "student"}.`}
+                ? pick("نبحث عن المنح المناسبة لك…", "Finding the right scholarships for you…")
+                : pick(
+                    `حوّل حلمك إلى طلب منحة، ${firstName || "طالب"}.`,
+                    `Turn your dream into an application, ${firstName || "student"}.`
+                  )}
             </h1>
             <p className="mt-3 max-w-md text-sm leading-relaxed text-white/75">
               {loading
-                ? "We're matching your profile against hundreds of verified scholarships."
+                ? pick(
+                    "نطابق ملفك مع مئات المنح الموثقة.",
+                    "We're matching your profile against hundreds of verified scholarships."
+                  )
                 : matchCount > 0
-                  ? `We matched ${matchCount} scholarships to your profile. Your next move is one click away.`
-                  : "Complete your profile and we'll match hundreds of verified scholarships to you."}
+                  ? pick(
+                      `طابقنا ${num(matchCount)} منحة مع ملفك. خطوتك التالية بضغطة واحدة.`,
+                      `We matched ${matchCount} scholarships to your profile. Your next move is one click away.`
+                    )
+                  : pick(
+                      "أكمل ملفك الشخصي وسنطابق لك مئات المنح الموثقة.",
+                      "Complete your profile and we'll match hundreds of verified scholarships to you."
+                    )}
             </p>
 
             <div className="mt-6 flex flex-wrap items-center gap-3">
@@ -307,7 +334,7 @@ function JourneyHero({
                 href="/scholarships/matches"
                 className="inline-flex items-center gap-2 rounded-xl bg-secondary-500 px-5 py-3 text-sm font-semibold text-[#162C4C] shadow-[0_12px_28px_-10px_rgb(198_161_75_/_0.65)] transition hover:bg-secondary-400"
               >
-                Explore my matches
+                {pick("استكشف تطابقاتي", "Explore my matches")}
                 <ArrowUpRight className="h-4 w-4" />
               </Link>
             </div>
@@ -316,11 +343,14 @@ function JourneyHero({
                 floating cards. */}
             <div className="mt-7 grid max-w-lg grid-cols-3 gap-3 border-t border-white/15 pt-5">
               {[
-                { label: "Matches", value: loading ? "…" : String(matchCount) },
-                { label: "Docs ready", value: loading ? "…" : `${docsReady}/${docsTotal}` },
+                { label: pick("التطابقات", "Matches"), value: loading ? "…" : num(matchCount) },
                 {
-                  label: "Best fit",
-                  value: loading ? "…" : bestFit !== null ? `${Math.round(bestFit)}%` : "—",
+                  label: pick("مستندات جاهزة", "Docs ready"),
+                  value: loading ? "…" : `${num(docsReady)}/${num(docsTotal)}`,
+                },
+                {
+                  label: pick("أفضل تطابق", "Best fit"),
+                  value: loading ? "…" : bestFit !== null ? `${num(Math.round(bestFit))}%` : "—",
                 },
               ].map((s) => (
                 <div key={s.label}>
@@ -359,10 +389,12 @@ function JourneyHero({
                 ) : (
                   <>
                     <p className="text-4xl font-bold tabular-nums text-white">
-                      {bestFit !== null ? Math.round(bestFit) : "—"}
+                      {bestFit !== null ? num(Math.round(bestFit)) : "—"}
                       <span className="text-xl text-white/60">%</span>
                     </p>
-                    <p className="mt-1 text-xs font-medium text-secondary-300">top match fit</p>
+                    <p className="mt-1 text-xs font-medium text-secondary-300">
+                      {pick("أفضل تطابق", "top match fit")}
+                    </p>
                   </>
                 )}
               </div>
@@ -383,6 +415,7 @@ function JourneyHero({
 }
 
 function RecommendedCard({ match, index }: { match: Match; index: number }) {
+  const { pick, num } = useLanguage();
   const pct = Math.round(match.fitScore);
   return (
     <Link
@@ -394,13 +427,14 @@ function RecommendedCard({ match, index }: { match: Match; index: number }) {
         <GraduationCap className="h-5 w-5" />
       </span>
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold text-foreground">{match.nameEn}</p>
+        <p className="truncate text-sm font-semibold text-foreground">{pick(match.nameAr, match.nameEn)}</p>
         <p className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground">
           <MapPin className="h-3 w-3" />
           {match.country}
           {match.daysLeft !== null && (
             <span className="inline-flex items-center gap-1 text-secondary-700 dark:text-secondary-400">
-              · <Clock className="h-3 w-3" /> {match.daysLeft}d left
+              · <Clock className="h-3 w-3" />{" "}
+              {pick(`${num(match.daysLeft)} يوم متبقي`, `${match.daysLeft}d left`)}
             </span>
           )}
         </p>
@@ -417,14 +451,17 @@ function RecommendedCard({ match, index }: { match: Match; index: number }) {
         </div>
       </div>
       <div className="shrink-0 text-end">
-        <p className={cn("text-2xl font-bold tabular-nums", fitColor(pct))}>{pct}%</p>
-        <p className="text-[11px] font-medium text-muted-foreground">fit score</p>
+        <p className={cn("text-2xl font-bold tabular-nums", fitColor(pct))}>{num(pct)}%</p>
+        <p className="text-[11px] font-medium text-muted-foreground">
+          {pick("نسبة التطابق", "fit score")}
+        </p>
       </div>
     </Link>
   );
 }
 
 function DeadlineRow({ match }: { match: Match }) {
+  const { pick, num } = useLanguage();
   return (
     <Link
       href={`/scholarships/${match.id}`}
@@ -440,8 +477,8 @@ function DeadlineRow({ match }: { match: Match }) {
       >
         {match.daysLeft !== null ? (
           <>
-            <span className="text-base font-bold leading-none tabular-nums">{match.daysLeft}</span>
-            <span className="text-[9px] font-semibold uppercase leading-none">days</span>
+            <span className="text-base font-bold leading-none tabular-nums">{num(match.daysLeft)}</span>
+            <span className="text-[9px] font-semibold uppercase leading-none">{pick("يوم", "days")}</span>
           </>
         ) : (
           <Clock className="h-5 w-5" />
@@ -449,7 +486,7 @@ function DeadlineRow({ match }: { match: Match }) {
       </span>
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium text-foreground group-hover:text-primary-700">
-          {match.nameEn}
+          {pick(match.nameAr, match.nameEn)}
         </p>
         <p className="text-xs text-muted-foreground">{match.country}</p>
       </div>
@@ -459,6 +496,7 @@ function DeadlineRow({ match }: { match: Match }) {
 }
 
 function AppProgressRow({ app }: { app: Application }) {
+  const { pick, num } = useLanguage();
   const pct = Math.min(Math.max(app.progress || 0, 0), 100);
 
   // Orphaned application (its scholarship was deleted in the MVP freeze).
@@ -468,12 +506,12 @@ function AppProgressRow({ app }: { app: Application }) {
       <div className="rounded-xl border border-dashed border-border bg-muted/30 p-4">
         <div className="flex items-center justify-between gap-3">
           <p className="truncate text-sm font-semibold text-muted-foreground">
-            Scholarship no longer available
+            {pick("المنحة لم تعد متاحة", "Scholarship no longer available")}
           </p>
           <StatusBadge status={app.status} />
         </div>
         <p className="mt-2 text-xs text-muted-foreground">
-          This scholarship was removed from the catalog.
+          {pick("أُزيلت هذه المنحة من قائمة المنح.", "This scholarship was removed from the catalog.")}
         </p>
       </div>
     );
@@ -485,7 +523,9 @@ function AppProgressRow({ app }: { app: Application }) {
       className="group rounded-xl border border-border bg-card p-4 transition hover:border-secondary-500/40"
     >
       <div className="flex items-center justify-between gap-3">
-        <p className="truncate text-sm font-semibold text-foreground">{app.scholarship.nameEn}</p>
+        <p className="truncate text-sm font-semibold text-foreground">
+          {pick(app.scholarship.nameAr, app.scholarship.nameEn)}
+        </p>
         <StatusBadge status={app.status} />
       </div>
       <div className="mt-3 h-2 overflow-hidden rounded-full bg-muted">
@@ -497,9 +537,9 @@ function AppProgressRow({ app }: { app: Application }) {
         />
       </div>
       <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
-        <span>{pct}% complete</span>
+        <span>{pick(`${num(pct)}% مكتمل`, `${pct}% complete`)}</span>
         <span className="inline-flex items-center gap-1 text-secondary-700 dark:text-secondary-400">
-          Continue <ArrowUpRight className="h-3.5 w-3.5" />
+          {pick("متابعة", "Continue")} <ArrowUpRight className="h-3.5 w-3.5" />
         </span>
       </div>
     </Link>
@@ -517,6 +557,7 @@ function AchievementTile({
   hint: string;
   locked: boolean;
 }) {
+  const { pick } = useLanguage();
   return (
     <div
       className={cn(
@@ -536,7 +577,9 @@ function AchievementTile({
       </span>
       <div className="min-w-0">
         <p className="truncate text-sm font-semibold text-foreground">{label}</p>
-        <p className="truncate text-xs text-muted-foreground">{locked ? hint : `${hint} · unlocked`}</p>
+        <p className="truncate text-xs text-muted-foreground">
+          {locked ? hint : `${hint} · ${pick("مفتوح", "unlocked")}`}
+        </p>
       </div>
     </div>
   );
@@ -546,6 +589,7 @@ function AchievementTile({
 
 export default function DashboardPage() {
   const router = useRouter();
+  const { pick, num, isRTL } = useLanguage();
   const { profile, isLoading: profileLoading, hasProfile } = useProfile();
 
   const [matches, setMatches] = useState<Match[]>([]);
@@ -588,7 +632,7 @@ export default function DashboardPage() {
           setDocs(
             (docJson.data ?? []).map((d: any) => ({
               id: d.id,
-              name: d.fileName || d.documentType || "Document",
+              name: d.fileName || d.documentType || pick("مستند", "Document"),
               score: d.reviews?.[0]?.score ?? null,
               createdAt: d.createdAt ?? "",
             }))
@@ -657,42 +701,42 @@ export default function DashboardPage() {
     () => [
       {
         icon: FileCheck,
-        label: "Profile ready",
-        hint: "Tell us about your goals",
+        label: pick("ملف جاهز", "Profile ready"),
+        hint: pick("أخبرنا عن أهدافك", "Tell us about your goals"),
         unlocked: !!(profile?.displayName && profile?.country),
       },
       {
         icon: Target,
-        label: "Matched",
-        hint: "Find your first matches",
+        label: pick("تم التطابق", "Matched"),
+        hint: pick("اعثر على أول منحك", "Find your first matches"),
         unlocked: matches.length > 0,
       },
       {
         icon: Sparkles,
-        label: "First AI review",
-        hint: "Get a document scored",
+        label: pick("أول مراجعة ذكاء اصطناعي", "First AI review"),
+        hint: pick("احصل على تقييم لمستند", "Get a document scored"),
         unlocked: docs.some((d) => d.score !== null),
       },
       {
         icon: Rocket,
-        label: "On track",
-        hint: "Reach 50% on an application",
+        label: pick("على المسار", "On track"),
+        hint: pick("أكمل ٥٠٪ من طلب", "Reach 50% on an application"),
         unlocked: apps.some((a) => a.progress >= 50),
       },
       {
         icon: Medal,
-        label: "Deadline hunter",
-        hint: "Track an upcoming deadline",
+        label: pick("صائد المواعيد", "Deadline hunter"),
+        hint: pick("تابع موعداً قادماً", "Track an upcoming deadline"),
         unlocked: upcoming.length > 0,
       },
       {
         icon: Star,
-        label: "8+ scorer",
-        hint: "Score 8/10 on a review",
+        label: pick("تقييم ٨+", "8+ scorer"),
+        hint: pick("احصل على ٨/١٠ في مراجعة", "Score 8/10 on a review"),
         unlocked: docs.some((d) => (d.score ?? 0) >= 8),
       },
     ],
-    [profile, matches, docs, apps, upcoming]
+    [profile, matches, docs, apps, upcoming, pick, isRTL]
   );
 
   const activities = useMemo(() => {
@@ -701,7 +745,10 @@ export default function DashboardPage() {
       events.push({
         id: `app-${app.id}`,
         icon: FileText,
-        title: `Started application for ${app.scholarship?.nameEn ?? "a removed scholarship"}`,
+        title: pick(
+          `بدأت طلباً لـ ${app.scholarship?.nameAr ?? "منحة أُزيلت"}`,
+          `Started application for ${app.scholarship?.nameEn ?? "a removed scholarship"}`
+        ),
         time: new Date(app.updatedAt).getTime(),
       });
     }
@@ -709,14 +756,17 @@ export default function DashboardPage() {
       events.push({
         id: `doc-${doc.id}`,
         icon: FileCheck,
-        title: `Uploaded ${doc.name}`,
+        title: pick(`رفعت ${doc.name}`, `Uploaded ${doc.name}`),
         time: doc.createdAt ? new Date(doc.createdAt).getTime() : Date.now(),
       });
       if (doc.score !== null) {
         events.push({
           id: `rev-${doc.id}`,
           icon: Sparkles,
-          title: `AI review scored ${doc.score.toFixed(1)}/10`,
+          title: pick(
+            `مراجعة الذكاء الاصطناعي: ${num(doc.score.toFixed(1))}/10`,
+            `AI review scored ${doc.score.toFixed(1)}/10`
+          ),
           time: doc.createdAt ? new Date(doc.createdAt).getTime() : Date.now(),
         });
       }
@@ -725,12 +775,15 @@ export default function DashboardPage() {
       events.push({
         id: "match-ready",
         icon: Target,
-        title: `${matches.length} personalized matches ready`,
+        title: pick(
+          `${num(matches.length)} منحة مخصصة جاهزة`,
+          `${matches.length} personalized matches ready`
+        ),
         time: Date.now(),
       });
     }
     return events.sort((a, b) => b.time - a.time).slice(0, 5);
-  }, [apps, docs, matches]);
+  }, [apps, docs, matches, pick, num, isRTL]);
 
   return (
     <div className="space-y-12">
@@ -740,21 +793,27 @@ export default function DashboardPage() {
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-secondary-700 dark:text-secondary-400">
               <CalendarDays className="me-1 inline h-3.5 w-3.5" />
-              {new Date().toLocaleDateString("en-GB", {
+              {new Date().toLocaleDateString(isRTL ? "ar-EG" : "en-GB", {
                 weekday: "long",
                 day: "numeric",
                 month: "long",
               })}
             </p>
             <h1 className="mt-1.5 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-              {greeting()}, {profileLoading ? "…" : firstName || "student"}.
+              {greeting(isRTL)}, {profileLoading ? "…" : firstName || pick("طالب", "student")}.
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
               {sectionsLoading
-                ? "Loading your personalized summary…"
+                ? pick("جارٍ تحميل ملخصك الشخصي…", "Loading your personalized summary…")
                 : upcoming.length > 0
-                  ? `You have ${upcoming.length} deadline${upcoming.length === 1 ? "" : "s"} ahead and ${matches.length} curated matches.`
-                  : `You have ${matches.length} curated matches ready.`}
+                  ? pick(
+                      `أمامك ${num(upcoming.length)} موعد نهائي و${num(matches.length)} منحة منسّقة.`,
+                      `You have ${upcoming.length} deadline${upcoming.length === 1 ? "" : "s"} ahead and ${matches.length} curated matches.`
+                    )
+                  : pick(
+                      `لديك ${num(matches.length)} منحة منسّقة جاهزة.`,
+                      `You have ${matches.length} curated matches ready.`
+                    )}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -763,7 +822,7 @@ export default function DashboardPage() {
               className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground transition hover:border-secondary-500/40"
             >
               <FileText className="h-4 w-4 text-secondary-700 dark:text-secondary-400" />
-              Upload document
+              {pick("ارفع مستنداً", "Upload document")}
             </Link>
           </div>
         </div>
@@ -784,30 +843,37 @@ export default function DashboardPage() {
       <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard
           icon={Target}
-          label="Curated matches"
-          caption="matched to your profile"
+          label={pick("منح منسّقة", "Curated matches")}
+          caption={pick("مطابقة لملفك", "matched to your profile")}
           value={matches.length}
           loading={sectionsLoading}
         />
         <StatCard
           icon={FileCheck}
-          label="Documents"
-          caption={`${docs.length} uploaded · ${docsReady} reviewed`}
+          label={pick("المستندات", "Documents")}
+          caption={pick(
+            `${num(docs.length)} مرفوع · ${num(docsReady)} مراجع`,
+            `${docs.length} uploaded · ${docsReady} reviewed`
+          )}
           value={docs.length}
           loading={sectionsLoading}
         />
         <StatCard
           icon={Sparkles}
-          label="Avg AI review"
-          caption="latest document scores"
+          label={pick("متوسط تقييم الذكاء الاصطناعي", "Avg AI review")}
+          caption={pick("أحدث درجات المستندات", "latest document scores")}
           value={avgScore}
           decimals={1}
           loading={sectionsLoading}
         />
         <StatCard
           icon={Clock}
-          label="Deadlines ahead"
-          caption={upcoming[0] ? `soonest in ${upcoming[0].daysLeft} days` : "nothing urgent"}
+          label={pick("المواعيد القادمة", "Deadlines ahead")}
+          caption={
+            upcoming[0]
+              ? pick(`الأقرب خلال ${num(upcoming[0].daysLeft!)} يوم`, `soonest in ${upcoming[0].daysLeft} days`)
+              : pick("لا شيء عاجل", "nothing urgent")
+          }
           value={upcoming.length}
           loading={sectionsLoading}
         />
@@ -819,23 +885,31 @@ export default function DashboardPage() {
         <div className="space-y-8 lg:col-span-2">
           {/* Recommended */}
           <section>
-            <SectionHeader eyebrow="Recommended" title="Your best matches" href="/scholarships/matches" />
+            <SectionHeader
+              eyebrow={pick("موصى بها", "Recommended")}
+              title={pick("أفضل المنح لك", "Your best matches")}
+              href="/scholarships/matches"
+            />
             <div className="mt-4 space-y-3">
               {sectionsLoading ? (
                 [0, 1, 2].map((i) => <SkeletonBlock key={i} className="h-[86px]" />)
               ) : matches.length === 0 ? (
                 <div className="dash-scale-in rounded-2xl border-2 border-dashed border-border bg-card/50 p-8 text-center">
                   <Target className="mx-auto h-8 w-8 text-secondary-500" />
-                  <p className="mt-3 text-sm font-semibold text-foreground">No matches yet</p>
+                  <p className="mt-3 text-sm font-semibold text-foreground">
+                    {pick("لا توجد نتائج بعد", "No matches yet")}
+                  </p>
                   <p className="mx-auto mt-1 max-w-sm text-sm text-muted-foreground">
-                    Complete your profile and we will score hundreds of scholarships against it in
-                    seconds.
+                    {pick(
+                      "أكمل ملفك الشخصي وسنقيم مئات المنح مقابله خلال ثوانٍ.",
+                      "Complete your profile and we will score hundreds of scholarships against it in seconds."
+                    )}
                   </p>
                   <Link
                     href="/dashboard/profile"
                     className="mt-4 inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary-700"
                   >
-                    Complete my profile
+                    {pick("أكمل ملفي", "Complete my profile")}
                   </Link>
                 </div>
               ) : (
@@ -847,10 +921,10 @@ export default function DashboardPage() {
           {/* Application progress */}
           <section>
             <SectionHeader
-              eyebrow="Progress"
-              title="My applications"
+              eyebrow={pick("التقدم", "Progress")}
+              title={pick("طلباتي", "My applications")}
               href="/dashboard/applications"
-              hrefLabel="All applications"
+              hrefLabel={pick("كل الطلبات", "All applications")}
             />
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {sectionsLoading ? (
@@ -859,17 +933,19 @@ export default function DashboardPage() {
                 <div className="dash-scale-in col-span-full rounded-2xl border-2 border-dashed border-border bg-card/50 p-8 text-center">
                   <Trophy className="mx-auto h-8 w-8 text-secondary-500" />
                   <p className="mt-3 text-sm font-semibold text-foreground">
-                    No applications started yet
+                    {pick("لا توجد طلبات بدأت بعد", "No applications started yet")}
                   </p>
                   <p className="mx-auto mt-1 max-w-sm text-sm text-muted-foreground">
-                    Pick a match and start your first application — we will track your documents and
-                    keep you on schedule.
+                    {pick(
+                      "اختر منحة مطابقة وابدأ طلبك الأول — سنتتبع مستنداتك ونبقيك على الموعد.",
+                      "Pick a match and start your first application — we will track your documents and keep you on schedule."
+                    )}
                   </p>
                   <Link
                     href="/scholarships"
                     className="mt-4 inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary-700"
                   >
-                    Browse scholarships
+                    {pick("تصفّح المنح", "Browse scholarships")}
                   </Link>
                 </div>
               ) : (
@@ -883,16 +959,21 @@ export default function DashboardPage() {
         <div className="space-y-8">
           {/* Deadlines */}
           <section>
-            <SectionHeader eyebrow="Soonest first" title="Upcoming deadlines" />
+            <SectionHeader
+              eyebrow={pick("الأقرب أولاً", "Soonest first")}
+              title={pick("أقرب المواعيد", "Upcoming deadlines")}
+            />
             <div className="mt-4 space-y-2.5">
               {sectionsLoading ? (
                 [0, 1, 2].map((i) => <SkeletonBlock key={i} className="h-[68px]" />)
               ) : upcoming.length === 0 ? (
                 <div className="rounded-2xl border-2 border-dashed border-border bg-card/50 p-6 text-center">
                   <Clock className="mx-auto h-7 w-7 text-muted-foreground" />
-                  <p className="mt-2 text-sm font-medium text-foreground">No deadlines ahead</p>
+                  <p className="mt-2 text-sm font-medium text-foreground">
+                    {pick("لا توجد مواعيد قادمة", "No deadlines ahead")}
+                  </p>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    Deadlines from your matches will appear here.
+                    {pick("ستظهر مواعيد منحك المطابقة هنا.", "Deadlines from your matches will appear here.")}
                   </p>
                 </div>
               ) : (
@@ -904,7 +985,10 @@ export default function DashboardPage() {
           {/* AI Coach */}
           {/* Achievements */}
           <section>
-            <SectionHeader eyebrow="Badges" title="Achievements" />
+            <SectionHeader
+              eyebrow={pick("الشارات", "Badges")}
+              title={pick("الإنجازات", "Achievements")}
+            />
             <div className="mt-4 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
               {achievements.map((a) => (
                 <AchievementTile key={a.label} icon={a.icon} label={a.label} hint={a.hint} locked={!a.unlocked} />
@@ -914,7 +998,10 @@ export default function DashboardPage() {
 
           {/* Recent activity */}
           <section>
-            <SectionHeader eyebrow="Latest" title="Recent activity" />
+            <SectionHeader
+              eyebrow={pick("الأحدث", "Latest")}
+              title={pick("النشاط الأخير", "Recent activity")}
+            />
             <div className="mt-4 rounded-2xl border border-border bg-card p-4">
               {sectionsLoading ? (
                 <div className="space-y-4">
@@ -930,7 +1017,10 @@ export default function DashboardPage() {
                 </div>
               ) : activities.length === 0 ? (
                 <p className="py-2 text-center text-sm text-muted-foreground">
-                  Your activity will show up here as you explore.
+                  {pick(
+                    "سيظهر نشاطك هنا أثناء استكشافك.",
+                    "Your activity will show up here as you explore."
+                  )}
                 </p>
               ) : (
                 <ol className="relative space-y-5 before:absolute before:inset-y-1 before:start-[17px] before:w-px before:bg-border">
@@ -943,7 +1033,7 @@ export default function DashboardPage() {
                         </span>
                         <div className="min-w-0 pt-1">
                           <p className="truncate text-sm font-medium text-foreground">{a.title}</p>
-                          <p className="text-xs text-muted-foreground">{timeAgo(a.time)}</p>
+                          <p className="text-xs text-muted-foreground">{timeAgo(a.time, isRTL, num)}</p>
                         </div>
                       </li>
                     );
@@ -960,17 +1050,21 @@ export default function DashboardPage() {
         <section className="dash-journey dash-scale-in relative overflow-hidden rounded-3xl p-8 text-center">
           <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-secondary-400/70 to-transparent" />
           <Sparkles className="mx-auto h-8 w-8 text-secondary-300" />
-          <h2 className="mt-3 text-xl font-bold text-white">Your scholarship starts here</h2>
+          <h2 className="mt-3 text-xl font-bold text-white">
+            {pick("منحتك تبدأ من هنا", "Your scholarship starts here")}
+          </h2>
           <p className="mx-auto mt-2 max-w-md text-sm text-white/70">
-            Set up your profile to unlock curated matches, document reviews and a step-by-step
-            roadmap.
+            {pick(
+              "أكمل ملفك لفتح المنح المطابقة ومراجعات المستندات وخطة زمنية خطوة بخطوة.",
+              "Set up your profile to unlock curated matches, document reviews and a step-by-step roadmap."
+            )}
           </p>
           <Link
             href="/dashboard/profile"
             className="mt-5 inline-flex items-center gap-2 rounded-xl bg-secondary-500 px-5 py-3 text-sm font-semibold text-[#162C4C] transition hover:bg-secondary-400"
           >
             <CheckCircle2 className="h-4 w-4" />
-            Complete my profile
+            {pick("أكمل ملفي", "Complete my profile")}
           </Link>
         </section>
       )}

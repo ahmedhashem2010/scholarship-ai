@@ -7,6 +7,7 @@ import Link from "next/link";
 import { FolderKanban, MapPin, ArrowUpRight, Trophy } from "lucide-react";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface AppDocument {
   documentType: string;
@@ -32,6 +33,7 @@ function SkeletonRow() {
 }
 
 export default function ApplicationsPage() {
+  const { pick, num } = useLanguage();
   const [apps, setApps] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -62,17 +64,17 @@ export default function ApplicationsPage() {
     <div className="space-y-8">
       <header className="dash-in">
         <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-secondary-700 dark:text-secondary-400">
-          Applications
+          {pick("الطلبات", "Applications")}
         </p>
         <h1 className="mt-1.5 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-          My applications
+          {pick("طلباتي", "My applications")}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           {loading
-            ? "Loading your applications…"
+            ? pick("جارٍ تحميل طلباتك…", "Loading your applications…")
             : apps.length === 0
-              ? "Start your first application from any match."
-              : `${apps.length} active application${apps.length === 1 ? "" : "s"} · ${totalReady}/${totalDocs} documents ready`}
+              ? pick("ابدأ أول طلب لك من أي منحة متطابقة.", "Start your first application from any match.")
+              : pick(`${num(apps.length)} طلب نشط · ${num(totalReady)}/${num(totalDocs)} مستند جاهز`, `${apps.length} active application${apps.length === 1 ? "" : "s"} · ${totalReady}/${totalDocs} documents ready`)}
         </p>
       </header>
 
@@ -85,16 +87,18 @@ export default function ApplicationsPage() {
       ) : apps.length === 0 ? (
         <div className="dash-scale-in rounded-3xl border-2 border-dashed border-border bg-card/50 p-12 text-center">
           <Trophy className="mx-auto h-10 w-10 text-secondary-500" />
-          <h2 className="mt-4 text-lg font-bold text-foreground">No applications yet</h2>
+          <h2 className="mt-4 text-lg font-bold text-foreground">{pick("لا توجد طلبات بعد", "No applications yet")}</h2>
           <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-            Pick one of your matched scholarships and start tracking documents, deadlines and
-            progress in one place.
+            {pick(
+              "اختر إحدى المنح المطابقة وابدأ بتتبّع المستندات والمواعيد وتقدمك في مكان واحد.",
+              "Pick one of your matched scholarships and start tracking documents, deadlines and progress in one place."
+            )}
           </p>
           <Link
             href="/scholarships"
             className="mt-6 inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary-700"
           >
-            Browse scholarships
+            {pick("تصفّح المنح", "Browse scholarships")}
           </Link>
         </div>
       ) : (
@@ -119,11 +123,13 @@ export default function ApplicationsPage() {
                       </span>
                       <div className="min-w-0">
                         <p className="truncate text-sm font-semibold text-muted-foreground">
-                          Scholarship no longer available
+                          {pick("المنحة لم تعد متاحة", "Scholarship no longer available")}
                         </p>
                         <p className="mt-0.5 text-xs text-muted-foreground">
-                          This scholarship was removed from the catalog, so this application can&apos;t
-                          be opened.
+                          {pick(
+                            "أُزيلت هذه المنحة من القائمة، لذا لا يمكن فتح هذا الطلب.",
+                            "This scholarship was removed from the catalog, so this application can't be opened."
+                          )}
                         </p>
                       </div>
                     </div>
@@ -146,7 +152,7 @@ export default function ApplicationsPage() {
                     </span>
                     <div className="min-w-0">
                       <p className="truncate text-sm font-semibold text-foreground group-hover:text-primary-700">
-                        {app.scholarship.nameEn}
+                        {pick(app.scholarship.nameAr, app.scholarship.nameEn)}
                       </p>
                       <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
                         <MapPin className="h-3 w-3" />
@@ -159,10 +165,10 @@ export default function ApplicationsPage() {
 
                 <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
                   <span>
-                    {ready}/{app.documents.length} documents ready
+                    {pick(`${num(ready)}/${num(app.documents.length)} مستند جاهز`, `${ready}/${app.documents.length} documents ready`)}
                   </span>
                   <span className="inline-flex items-center gap-1 text-secondary-700 dark:text-secondary-400">
-                    Open <ArrowUpRight className="h-3.5 w-3.5" />
+                    {pick("فتح", "Open")} <ArrowUpRight className="h-3.5 w-3.5 rtl:-scale-x-100" />
                   </span>
                 </div>
                 <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
@@ -173,7 +179,7 @@ export default function ApplicationsPage() {
                     style={{ width: `${pct}%` }}
                   />
                 </div>
-                <p className="mt-1.5 text-xs font-medium text-foreground">{pct}% complete</p>
+                <p className="mt-1.5 text-xs font-medium text-foreground">{pick(`${num(pct)}% مكتمل`, `${pct}% complete`)}</p>
               </Link>
             );
           })}
@@ -181,7 +187,10 @@ export default function ApplicationsPage() {
       )}
 
       <p className="text-xs text-muted-foreground">
-        Status updates automatically as you upload and review your documents.
+        {pick(
+          "تتحدّث الحالة تلقائياً عند رفع مستنداتك ومراجعتها.",
+          "Status updates automatically as you upload and review your documents."
+        )}
       </p>
     </div>
   );

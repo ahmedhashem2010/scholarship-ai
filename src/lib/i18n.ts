@@ -162,6 +162,11 @@ export const t: Dict = {
     ar: "وإن لم تجد إجابتك، اكتب لنا وسنرد خلال يوم عمل واحد.",
     en: "Can't find your answer? Email us and we'll reply within one business day.",
   },
+  "faq.still": {
+    ar: "لم تجد إجابتك بعد؟ راسلنا وسنرد عليك.",
+    en: "Still can't find your answer? Email us and we'll reply.",
+  },
+  "why.vs": { ar: "مقارنة", en: "VS" },
 
   // --- Landing: final CTA -----------------------------------------------------
   "cta.title": { ar: "منحتك تبدأ بملف شخصي", en: "Your scholarship starts with a profile" },

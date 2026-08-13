@@ -49,12 +49,12 @@ export default function MatchesPage() {
         }
         const json = await res.json();
         if (!res.ok || !json.success) {
-          if (!cancelled) setError(json.error ?? "Couldn't load your matches.");
+          if (!cancelled) setError(json.error ?? pick("تعذّر تحميل منحك المطابقة.", "Couldn't load your matches."));
           return;
         }
         if (!cancelled) setResults(json.data ?? []);
       } catch {
-        if (!cancelled) setError("Couldn't load your matches. Please try again.");
+        if (!cancelled) setError(pick("تعذّر تحميل منحك المطابقة. حاول مرة أخرى.", "Couldn't load your matches. Please try again."));
       }
     })();
     return () => {

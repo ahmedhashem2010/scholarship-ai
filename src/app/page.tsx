@@ -411,7 +411,7 @@ export default function Home() {
                 className="absolute start-1/2 top-1/2 z-10 hidden -translate-x-1/2 -translate-y-1/2 lg:flex rtl:translate-x-1/2"
               >
                 <span className="flex h-11 w-11 items-center justify-center rounded-full bg-secondary-500 text-sm font-extrabold text-secondary-foreground shadow-lg ring-4 ring-background">
-                  VS
+                  {t("why.vs")}
                 </span>
               </div>
 

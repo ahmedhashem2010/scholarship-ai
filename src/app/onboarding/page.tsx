@@ -7,56 +7,85 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, Check, GraduationCap, User, Globe, Briefcase } from "lucide-react";
 import { ConversionEvents } from "@/lib/analytics";
 import { useProfile } from "@/lib/profile-context";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
 import { EnglishStep, type EnglishAnswers } from "@/components/onboarding/english-step";
 
 const steps = [
-  { title: "About You", icon: User },
-  { title: "Education", icon: GraduationCap },
-  { title: "Experience", icon: Briefcase },
-  { title: "Preferences", icon: Globe },
-  { title: "Review", icon: Check },
+  { titleAr: "عنك", titleEn: "About You", icon: User },
+  { titleAr: "دراستك", titleEn: "Education", icon: GraduationCap },
+  { titleAr: "خبرتك", titleEn: "Experience", icon: Briefcase },
+  { titleAr: "التفضيلات", titleEn: "Preferences", icon: Globe },
+  { titleAr: "مراجعة", titleEn: "Review", icon: Check },
 ];
 
 const countries = [
-  "Egypt", "Saudi Arabia", "United Arab Emirates", "Qatar", "Kuwait",
-  "Oman", "Bahrain", "Jordan", "Lebanon", "Morocco", "Algeria", "Tunisia",
-  "Palestine", "Syria", "Iraq", "Yemen", "Sudan", "Libya",
+  { value: "Egypt", ar: "مصر", en: "Egypt" },
+  { value: "Saudi Arabia", ar: "السعودية", en: "Saudi Arabia" },
+  { value: "United Arab Emirates", ar: "الإمارات العربية المتحدة", en: "United Arab Emirates" },
+  { value: "Qatar", ar: "قطر", en: "Qatar" },
+  { value: "Kuwait", ar: "الكويت", en: "Kuwait" },
+  { value: "Oman", ar: "عُمان", en: "Oman" },
+  { value: "Bahrain", ar: "البحرين", en: "Bahrain" },
+  { value: "Jordan", ar: "الأردن", en: "Jordan" },
+  { value: "Lebanon", ar: "لبنان", en: "Lebanon" },
+  { value: "Morocco", ar: "المغرب", en: "Morocco" },
+  { value: "Algeria", ar: "الجزائر", en: "Algeria" },
+  { value: "Tunisia", ar: "تونس", en: "Tunisia" },
+  { value: "Palestine", ar: "فلسطين", en: "Palestine" },
+  { value: "Syria", ar: "سوريا", en: "Syria" },
+  { value: "Iraq", ar: "العراق", en: "Iraq" },
+  { value: "Yemen", ar: "اليمن", en: "Yemen" },
+  { value: "Sudan", ar: "السودان", en: "Sudan" },
+  { value: "Libya", ar: "ليبيا", en: "Libya" },
 ];
 
 const educationLevels = [
-  { value: "high-school", label: "High School" },
-  { value: "bachelor", label: "Bachelor's Degree" },
-  { value: "master", label: "Master's Degree" },
-  { value: "phd", label: "PhD / Doctorate" },
+  { value: "high-school", ar: "الثانوية العامة", en: "High School" },
+  { value: "bachelor", ar: "درجة البكالوريوس", en: "Bachelor's Degree" },
+  { value: "master", ar: "درجة الماجستير", en: "Master's Degree" },
+  { value: "phd", ar: "الدكتوراه", en: "PhD / Doctorate" },
 ];
 
 const majors = [
-  "Computer Science", "Engineering", "Medicine", "Business",
-  "Law", "Economics", "Biology", "Physics", "Mathematics",
-  "Chemistry", "Architecture", "Education", "Arts", "Political Science",
-  "Environmental Science", "Other",
+  { value: "Computer Science", ar: "علوم الحاسوب", en: "Computer Science" },
+  { value: "Engineering", ar: "الهندسة", en: "Engineering" },
+  { value: "Medicine", ar: "الطب", en: "Medicine" },
+  { value: "Business", ar: "إدارة الأعمال", en: "Business" },
+  { value: "Law", ar: "القانون", en: "Law" },
+  { value: "Economics", ar: "الاقتصاد", en: "Economics" },
+  { value: "Biology", ar: "علم الأحياء", en: "Biology" },
+  { value: "Physics", ar: "الفيزياء", en: "Physics" },
+  { value: "Mathematics", ar: "الرياضيات", en: "Mathematics" },
+  { value: "Chemistry", ar: "الكيمياء", en: "Chemistry" },
+  { value: "Architecture", ar: "العمارة", en: "Architecture" },
+  { value: "Education", ar: "التربية", en: "Education" },
+  { value: "Arts", ar: "الفنون", en: "Arts" },
+  { value: "Political Science", ar: "العلوم السياسية", en: "Political Science" },
+  { value: "Environmental Science", ar: "العلوم البيئية", en: "Environmental Science" },
+  { value: "Other", ar: "أخرى", en: "Other" },
 ];
 
 const targetDegrees = [
-  { value: "bachelor", label: "Bachelor's" },
-  { value: "master", label: "Master's" },
-  { value: "phd", label: "PhD" },
-  { value: "exchange", label: "Exchange Program" },
-  { value: "summer-school", label: "Summer School" },
+  { value: "bachelor", ar: "بكالوريوس", en: "Bachelor's" },
+  { value: "master", ar: "ماجستير", en: "Master's" },
+  { value: "phd", ar: "دكتوراه", en: "PhD" },
+  { value: "exchange", ar: "برنامج تبادل", en: "Exchange Program" },
+  { value: "summer-school", ar: "مدرسة صيفية", en: "Summer School" },
 ];
 
 const budgetOptions = [
-  { value: "NONE", label: "No funding available" },
-  { value: "LIMITED", label: "Limited (partial coverage needed)" },
-  { value: "MODERATE", label: "Moderate (can cover some costs)" },
-  { value: "FULL", label: "Full (can self-fund)" },
+  { value: "NONE", ar: "لا يتوفر تمويل", en: "No funding available" },
+  { value: "LIMITED", ar: "محدود (أحتاج تمويلاً جزئياً)", en: "Limited (partial coverage needed)" },
+  { value: "MODERATE", ar: "متوسط (أستطيع تغطية بعض التكاليف)", en: "Moderate (can cover some costs)" },
+  { value: "FULL", ar: "كامل (أستطيع تمويل نفسي)", en: "Full (can self-fund)" },
 ];
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const { t, pick, num } = useLanguage();
   const { refresh: refreshProfile } = useProfile();
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -126,8 +155,9 @@ export default function OnboardingPage() {
     if (step > 0) setStep(step - 1);
   }
 
-  function getLabel(value: string, options: { value: string; label: string }[]): string {
-    return options.find((o) => o.value === value)?.label ?? value;
+  function optionLabel(value: string, options: { value: string; ar: string; en: string }[]): string {
+    const o = options.find((x) => x.value === value);
+    return o ? pick(o.ar, o.en) : value;
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -169,10 +199,10 @@ export default function OnboardingPage() {
         router.push("/dashboard");
         router.refresh();
       } else {
-        setError(json.details ? Object.values(json.details).flat().join(". ") : (json.error ?? "Failed to save profile"));
+        setError(json.details ? Object.values(json.details).flat().join(". ") : (json.error ?? pick("فشل حفظ الملف الشخصي", "Failed to save profile")));
       }
     } catch {
-      setError("Something went wrong. Please try again.");
+      setError(pick("حدث خطأ ما. يرجى المحاولة مرة أخرى.", "Something went wrong. Please try again."));
     } finally {
       setLoading(false);
     }
@@ -181,7 +211,7 @@ export default function OnboardingPage() {
   if (checking) {
     return (
       <div className="flex min-h-[calc(100vh-3.5rem)] items-center justify-center">
-        <div className="text-muted-foreground animate-pulse">Loading...</div>
+        <div className="text-muted-foreground animate-pulse">{pick("جارِ التحميل…", "Loading...")}</div>
       </div>
     );
   }
@@ -193,17 +223,17 @@ export default function OnboardingPage() {
           <div className="mx-auto flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground mb-3 sm:mb-4">
             <GraduationCap className="h-5 w-5 sm:h-6 sm:w-6" />
           </div>
-          <h1 className="text-xl sm:text-h2">Set Up Your Profile</h1>
-          <p className="mt-1 sm:mt-2 text-sm sm:text-base text-muted-foreground">Help us find the perfect scholarships for you</p>
+          <h1 className="text-xl sm:text-h2">{pick("أنشئ ملفك الشخصي", "Set Up Your Profile")}</h1>
+          <p className="mt-1 sm:mt-2 text-sm sm:text-base text-muted-foreground">{pick("ساعدنا في العثور على المنح المثالية لك", "Help us find the perfect scholarships for you")}</p>
         </div>
 
         {/* Step Indicator — Mobile */}
         <div className="md:hidden text-center mb-6">
           <p className="text-sm text-muted-foreground">
-            Step {step + 1} of {steps.length}
+            {pick(`الخطوة ${num(step + 1)} من ${num(steps.length)}`, `Step ${step + 1} of ${steps.length}`)}
           </p>
           <h2 className="text-xl font-semibold mt-1">
-            {steps[step]?.title ?? ""}
+            {steps[step] ? pick(steps[step].titleAr, steps[step].titleEn) : ""}
           </h2>
           <div className="w-full bg-muted rounded-full h-2 mt-4">
             <div
@@ -219,7 +249,7 @@ export default function OnboardingPage() {
         <div className="hidden md:block mb-10">
           <div className="flex items-center justify-between">
             {steps.map((s, i) => (
-              <div key={s.title} className="flex items-center">
+              <div key={s.titleEn} className="flex items-center">
                 <div className="flex flex-col items-center">
                   <div
                     className={`flex h-10 w-10 items-center justify-center rounded-full border-2 text-sm font-semibold transition-all duration-300 ${
@@ -233,7 +263,7 @@ export default function OnboardingPage() {
                     {i < step ? <Check className="h-4 w-4" /> : <s.icon className="h-4 w-4" />}
                   </div>
                   <span className={`mt-1.5 text-xs font-medium ${i <= step ? "text-primary" : "text-muted-foreground"}`}>
-                    {s.title}
+                    {pick(s.titleAr, s.titleEn)}
                   </span>
                 </div>
                 {i < steps.length - 1 && (
@@ -247,21 +277,21 @@ export default function OnboardingPage() {
         <Card>
           <CardContent className="p-4 sm:p-6">
             <div className="hidden sm:block">
-              <h2 className="text-base font-semibold mb-4">{steps[step]?.title ?? ""}</h2>
+              <h2 className="text-base font-semibold mb-4">{steps[step] ? pick(steps[step].titleAr, steps[step].titleEn) : ""}</h2>
             </div>
             {step === 0 && (
               <div className="space-y-3 sm:space-y-4 animate-fade-in">
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-1.5">Full Name</label>
+                  <label className="block text-sm font-medium text-foreground mb-1.5">{t("onb.fullName")}</label>
                   <input
                     value={form.displayName}
                     onChange={(e) => update("displayName", e.target.value)}
                     className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
-                    placeholder="Ahmed Hassan"
+                    placeholder={pick("أحمد حسن", "Ahmed Hassan")}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-1.5">Date of Birth</label>
+                  <label className="block text-sm font-medium text-foreground mb-1.5">{t("onb.dob")}</label>
                   <input
                     type="date"
                     value={form.dateOfBirth}
@@ -271,15 +301,15 @@ export default function OnboardingPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-1.5">Country</label>
+                  <label className="block text-sm font-medium text-foreground mb-1.5">{t("onb.country")}</label>
                   <select
                     value={form.country}
                     onChange={(e) => update("country", e.target.value)}
                     className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
                   >
-                    <option value="">Select your country...</option>
+                    <option value="">{pick("اختر بلدك…", "Select your country...")}</option>
                     {countries.map((c) => (
-                      <option key={c} value={c}>{c}</option>
+                      <option key={c.value} value={c.value}>{pick(c.ar, c.en)}</option>
                     ))}
                   </select>
                 </div>
@@ -289,7 +319,7 @@ export default function OnboardingPage() {
             {step === 1 && (
               <div className="space-y-4 animate-fade-in">
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-1.5">Current Education Level</label>
+                  <label className="block text-sm font-medium text-foreground mb-1.5">{pick("المستوى التعليمي الحالي", "Current Education Level")}</label>
                   <div className="grid gap-2 sm:grid-cols-2">
                     {educationLevels.map((el) => (
                       <button
@@ -302,26 +332,26 @@ export default function OnboardingPage() {
                             : "border-border text-muted-foreground hover:border-border"
                         }`}
                       >
-                        {el.label}
+                        {pick(el.ar, el.en)}
                       </button>
                     ))}
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-1.5">Field of Study / Major</label>
+                  <label className="block text-sm font-medium text-foreground mb-1.5">{pick("مجال الدراسة / التخصص", "Field of Study / Major")}</label>
                   <select
                     value={form.major}
                     onChange={(e) => update("major", e.target.value)}
                     className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
                   >
-                    <option value="">Select your major...</option>
+                    <option value="">{pick("اختر تخصصك…", "Select your major...")}</option>
                     {majors.map((m) => (
-                      <option key={m} value={m}>{m}</option>
+                      <option key={m.value} value={m.value}>{pick(m.ar, m.en)}</option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-1.5">Target Degree</label>
+                  <label className="block text-sm font-medium text-foreground mb-1.5">{pick("الدرجة المستهدفة", "Target Degree")}</label>
                   <div className="grid gap-2 sm:grid-cols-3">
                     {targetDegrees.map((td) => (
                       <button
@@ -334,13 +364,13 @@ export default function OnboardingPage() {
                             : "border-border text-muted-foreground hover:border-border"
                         }`}
                       >
-                        {td.label}
+                        {pick(td.ar, td.en)}
                       </button>
                     ))}
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-1.5">GPA (optional)</label>
+                  <label className="block text-sm font-medium text-foreground mb-1.5">{pick("المعدل التراكمي (اختياري)", "GPA (optional)")}</label>
                   <input
                     type="number"
                     step="0.01"
@@ -366,14 +396,14 @@ export default function OnboardingPage() {
                       className="mt-1 h-4 w-4 rounded border-border text-primary focus:ring-primary"
                     />
                     <div>
-                      <span className="text-sm font-medium text-foreground">I have work experience</span>
-                      <p className="text-xs text-muted-foreground mt-0.5">Include internships and part-time jobs</p>
+                      <span className="text-sm font-medium text-foreground">{pick("لدي خبرة عمل", "I have work experience")}</span>
+                      <p className="text-xs text-muted-foreground mt-0.5">{pick("بما في ذلك التدريب والوظائف بدوام جزئي", "Include internships and part-time jobs")}</p>
                     </div>
                   </label>
                 </div>
                 {form.hasWorkExperience && (
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-1.5">Years of Experience</label>
+                    <label className="block text-sm font-medium text-foreground mb-1.5">{pick("سنوات الخبرة", "Years of Experience")}</label>
                     <input
                       type="number"
                       min={0}
@@ -394,8 +424,8 @@ export default function OnboardingPage() {
                       className="mt-1 h-4 w-4 rounded border-border text-primary focus:ring-primary"
                     />
                     <div>
-                      <span className="text-sm font-medium text-foreground">I have research experience</span>
-                      <p className="text-xs text-muted-foreground mt-0.5">Publications, research projects, or thesis work</p>
+                      <span className="text-sm font-medium text-foreground">{pick("لدي خبرة بحثية", "I have research experience")}</span>
+                      <p className="text-xs text-muted-foreground mt-0.5">{pick("منشورات، مشاريع بحثية، أو رسائل جامعية", "Publications, research projects, or thesis work")}</p>
                     </div>
                   </label>
                 </div>
@@ -419,7 +449,7 @@ export default function OnboardingPage() {
                 />
 
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-1.5">Budget / Funding</label>
+                  <label className="block text-sm font-medium text-foreground mb-1.5">{pick("الميزانية / التمويل", "Budget / Funding")}</label>
                   <div className="grid gap-2 sm:grid-cols-2">
                     {budgetOptions.map((b) => (
                       <button
@@ -432,7 +462,7 @@ export default function OnboardingPage() {
                             : "border-border text-muted-foreground hover:border-border"
                         }`}
                       >
-                        {b.label}
+                        {pick(b.ar, b.en)}
                       </button>
                     ))}
                   </div>
@@ -442,31 +472,31 @@ export default function OnboardingPage() {
 
             {step === 4 && (
               <div className="space-y-4 animate-fade-in">
-                <h2 className="text-lg font-semibold text-foreground">Review Your Profile</h2>
-                <p className="text-sm text-muted-foreground">Make sure everything looks right before saving</p>
+                <h2 className="text-lg font-semibold text-foreground">{pick("راجع ملفك الشخصي", "Review Your Profile")}</h2>
+                <p className="text-sm text-muted-foreground">{pick("تأكد من أن كل شيء يبدو صحيحاً قبل الحفظ", "Make sure everything looks right before saving")}</p>
                 <div className="space-y-3">
                   {[
-                    { label: "Name", value: form.displayName },
-                    { label: "Date of Birth", value: form.dateOfBirth },
-                    { label: "Country", value: form.country },
-                    { label: "Education Level", value: getLabel(form.educationLevel, educationLevels) },
-                    { label: "Major", value: form.major || "Not specified" },
-                    { label: "Target Degree", value: getLabel(form.targetDegree, targetDegrees) },
-                    { label: "GPA", value: form.gpa || "Not specified" },
+                    { label: pick("الاسم", "Name"), value: form.displayName },
+                    { label: pick("تاريخ الميلاد", "Date of Birth"), value: form.dateOfBirth },
+                    { label: pick("البلد", "Country"), value: optionLabel(form.country, countries) },
+                    { label: pick("المستوى التعليمي", "Education Level"), value: optionLabel(form.educationLevel, educationLevels) },
+                    { label: pick("التخصص", "Major"), value: form.major ? optionLabel(form.major, majors) : pick("غير محدد", "Not specified") },
+                    { label: pick("الدرجة المستهدفة", "Target Degree"), value: optionLabel(form.targetDegree, targetDegrees) },
+                    { label: pick("المعدل التراكمي", "GPA"), value: form.gpa || pick("غير محدد", "Not specified") },
                     {
-                      label: "English",
+                      label: pick("الإنجليزية", "English"),
                       value:
                         form.hasEnglishTest === "YES"
-                          ? `${form.englishTestType} ${form.englishScore || "?"}`
+                          ? pick(`${form.englishTestType} ${form.englishScore || "؟"}`, `${form.englishTestType} ${form.englishScore || "?"}`)
                           : form.hasEnglishTest === "WILLING"
-                            ? `Will take a test (${form.testTimeframe || "?"})`
+                            ? pick(`سأخوض اختباراً (${form.testTimeframe || "؟"})`, `Will take a test (${form.testTimeframe || "?"})`)
                             : form.hasEnglishTest === "PREFER_WITHOUT"
-                              ? "Prefers no English test"
+                              ? pick("يفضّل منحاً لا تشترط اختبار إنجليزية", "Prefers no English test")
                               : "—",
                     },
-                    { label: "Work Experience", value: form.hasWorkExperience ? `${form.workYears || "?"} years` : "None" },
-                    { label: "Research Experience", value: form.hasResearch ? "Yes" : "No" },
-                    { label: "Budget", value: getLabel(form.budget, budgetOptions) || "Not specified" },
+                    { label: pick("الخبرة العملية", "Work Experience"), value: form.hasWorkExperience ? pick(`${num(form.workYears || "؟")} سنة`, `${form.workYears || "?"} years`) : pick("لا يوجد", "None") },
+                    { label: pick("الخبرة البحثية", "Research Experience"), value: form.hasResearch ? pick("نعم", "Yes") : pick("لا", "No") },
+                    { label: pick("الميزانية", "Budget"), value: form.budget ? optionLabel(form.budget, budgetOptions) : pick("غير محدد", "Not specified") },
                   ].map((item) => (
                     <div key={item.label} className="flex justify-between border-b border-border pb-2">
                       <span className="text-sm text-muted-foreground">{item.label}</span>
@@ -483,7 +513,7 @@ export default function OnboardingPage() {
               </div>
             )}
 
-            <div className="mt-8 flex items-center justify-between">
+            <div className="mt-8 flex flex-wrap items-center justify-between gap-2">
               <Button
                 type="button"
                 variant="ghost"
@@ -491,7 +521,7 @@ export default function OnboardingPage() {
                 disabled={step === 0}
                 className="gap-1.5"
               >
-                <ArrowLeft className="h-4 w-4" /> Back
+                <ArrowLeft className="h-4 w-4 rtl:rotate-180" /> {t("onb.back")}
               </Button>
 
               {step < steps.length - 1 ? (
@@ -501,7 +531,7 @@ export default function OnboardingPage() {
                   disabled={!canProceed()}
                   className="gap-1.5"
                 >
-                  Next <ArrowRight className="h-4 w-4" />
+                  {t("onb.next")} <ArrowRight className="h-4 w-4 rtl:rotate-180" />
                 </Button>
               ) : (
                 <Button
@@ -510,7 +540,7 @@ export default function OnboardingPage() {
                   disabled={loading}
                   className="gap-1.5"
                 >
-                  {loading ? "Saving..." : "Complete Setup"}
+                  {loading ? pick("جارِ الحفظ…", "Saving...") : pick("إكمال الإعداد", "Complete Setup")}
                   <Check className="h-4 w-4" />
                 </Button>
               )}
