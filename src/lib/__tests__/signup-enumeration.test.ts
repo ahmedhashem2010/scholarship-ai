@@ -6,9 +6,19 @@ const { createClient } = vi.hoisted(() => ({ createClient: vi.fn() }));
 const { sendEmail } = vi.hoisted(() => ({
   sendEmail: vi.fn().mockResolvedValue({ sent: true }),
 }));
+const { consumeRateLimitBucket, clientIp } = vi.hoisted(() => ({
+  consumeRateLimitBucket: vi.fn().mockResolvedValue(true),
+  clientIp: vi.fn().mockReturnValue("203.0.113.7"),
+}));
 
 vi.mock("@supabase/supabase-js", () => ({ createClient }));
 vi.mock("@/lib/email", () => ({ sendEmail }));
+vi.mock("@/lib/rate-limit", () => ({
+  consumeRateLimitBucket,
+  clientIp,
+  SIGNUP_IP_LIMIT: 5,
+  SIGNUP_EMAIL_LIMIT: 3,
+}));
 
 import { POST } from "@/app/api/auth/signup/route";
 

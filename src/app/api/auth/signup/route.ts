@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { sendEmail } from "@/lib/email";
 import { confirmSignupHtml } from "@/lib/email-templates";
+import {
+  clientIp,
+  consumeRateLimitBucket,
+  SIGNUP_EMAIL_LIMIT,
+  SIGNUP_IP_LIMIT,
+} from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -48,6 +54,38 @@ export async function POST(req: NextRequest) {
 
   const cleanEmail = email.trim().toLowerCase();
   const cleanName = typeof name === "string" ? name.trim().slice(0, 80) : "";
+
+  // Server-side rate limiting (Postgres-backed, shared across instances) so an
+  // attacker can't trivially burn the Zoho send quota. Both dimensions are
+  // enforced: per-IP catches a single bot, per-email catches the same address
+  // being pounded from anywhere. A fresh address probed once is never limited,
+  // and a 429 is keyed to attempt count, not existence — so it leaks nothing
+  // about whether an address is registered.
+  const ip = clientIp(req);
+  const ipAllowed = await consumeRateLimitBucket({
+    scope: "signup",
+    dimension: "ip",
+    value: ip,
+    limit: SIGNUP_IP_LIMIT,
+  });
+  if (!ipAllowed) {
+    return NextResponse.json(
+      { error: "Too many sign-up attempts from your network. Please try again later." },
+      { status: 429 }
+    );
+  }
+  const emailAllowed = await consumeRateLimitBucket({
+    scope: "signup",
+    dimension: "email",
+    value: cleanEmail,
+    limit: SIGNUP_EMAIL_LIMIT,
+  });
+  if (!emailAllowed) {
+    return NextResponse.json(
+      { error: "Too many sign-up attempts for this address. Please try again later." },
+      { status: 429 }
+    );
+  }
 
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

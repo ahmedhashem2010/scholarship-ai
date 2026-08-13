@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient, type GenerateLinkParams } from "@supabase/supabase-js";
 import { sendEmail } from "@/lib/email";
 import { confirmSignupHtml } from "@/lib/email-templates";
+import {
+  clientIp,
+  consumeRateLimitBucket,
+  RESEND_EMAIL_LIMIT,
+  RESEND_IP_LIMIT,
+} from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -20,9 +26,10 @@ export const runtime = "nodejs";
  */
 
 /**
- * Crude in-memory throttle. Per-instance and lost on cold start, which is
- * fine: it exists to stop someone hammering the button and burning the daily
- * Zoho send quota, not as real abuse protection. Do not treat it as security.
+ * Button-debounce throttle: per-instance, lost on cold start. It exists purely
+ * to stop a user hammering the button and getting three duplicate emails in as
+ * many seconds — NOT a security boundary. Real abuse protection is the
+ * Postgres-backed rate limiter in src/lib/rate-limit.ts, enforced below.
  */
 const lastSent = new Map<string, number>();
 const COOLDOWN_MS = 60_000;
@@ -48,6 +55,36 @@ export async function POST(req: NextRequest) {
   }
 
   const cleanEmail = email.trim().toLowerCase();
+
+  // Real abuse protection. The in-memory `lastSent` cooldown below is only a
+  // button-debounce for UX — this Postgres-backed limiter is the boundary. It
+  // is keyed to attempts, not to whether the address exists, so a 429 here
+  // leaks nothing (fresh random addresses get throttled identically).
+  const ip = clientIp(req);
+  const ipAllowed = await consumeRateLimitBucket({
+    scope: "resend",
+    dimension: "ip",
+    value: ip,
+    limit: RESEND_IP_LIMIT,
+  });
+  if (!ipAllowed) {
+    return NextResponse.json(
+      { error: "Too many verification emails requested from your network. Please try again later." },
+      { status: 429 }
+    );
+  }
+  const emailAllowed = await consumeRateLimitBucket({
+    scope: "resend",
+    dimension: "email",
+    value: cleanEmail,
+    limit: RESEND_EMAIL_LIMIT,
+  });
+  if (!emailAllowed) {
+    return NextResponse.json(
+      { error: "Too many verification emails requested for this address. Please try again later." },
+      { status: 429 }
+    );
+  }
 
   const previous = lastSent.get(cleanEmail);
   if (previous && Date.now() - previous < COOLDOWN_MS) {

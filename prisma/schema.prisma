@@ -230,3 +230,22 @@ model RoadmapMilestone {
   @@index([userId, isDone])
   @@index([dueDate, isDone, reminderSentAt])
 }
+
+/// Fixed-window server-side rate-limit bucket.
+///
+/// Backs src/lib/rate-limit.ts for signup and verification-email resend. The
+/// key embeds the scope (e.g. "signup:ip"), a hash of the value (IP or email)
+/// and the UTC window start, so each window is its own row and reserving a slot
+/// is a single atomic upsert on the primary key — no lost updates under
+/// concurrency, and unlike the old in-memory map it is shared across every
+/// Vercel instance. `windowStart` mirrors the timestamp embedded in the key so
+/// expired windows can be swept by the limiter's opportunistic cleanup.
+model RateLimitBucket {
+  key         String   @id
+  windowStart DateTime
+  count       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([windowStart])
+}
