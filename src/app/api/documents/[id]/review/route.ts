@@ -15,7 +15,7 @@ import type { ReviewScore } from "@/lib/ai-review";
 import { extractTextFromFile } from "@/lib/text-extract";
 import { getVersionChain } from "@/lib/document-versions";
 import { DAILY_REVIEW_LIMIT, currentDayKey } from "@/lib/review-quota";
-import { documentFileUrl } from "@/lib/document-access";
+import { documentFileUrl, findDocumentWithOwnership } from "@/lib/document-access";
 
 
 /**
@@ -102,18 +102,16 @@ export async function POST(
     debugLog("[POST] Authenticated as user:", user.id);
 
     debugLog("[POST] Step 3/12: Finding document by id...");
-    const document = await prisma.document.findUnique({
-      where: { id },
-      include: { parentDocument: true },
-    });
-    if (!document) {
+    const ownership = await findDocumentWithOwnership(id, user.id, { parentDocument: true });
+    if (ownership.status === "missing") {
       debugLog("[POST] Document not found:", id);
       return NextResponse.json({ success: false, error: "Document not found" }, { status: 404 });
     }
-    if (document.userId !== user.id) {
+    if (ownership.status === "forbidden") {
       debugLog("[POST] Forbidden: user", user.id, "does not own document", id);
       return forbidden();
     }
+    const document = ownership.document;
     debugLog("[POST] Document found:", document.id, "type:", document.documentType, "fileUrl:", document.fileUrl?.slice(0, 80) ?? "none");
 
     debugLog("[POST] Step 4/12: Checking today's review quota...");
@@ -378,22 +376,20 @@ export async function GET(
     debugLog("[GET] Authenticated as user:", user.id);
 
     debugLog("[GET] Step 3/6: Finding document...");
-    const document = await prisma.document.findUnique({
-      where: { id },
-      include: {
-        parentDocument: {
-          include: { reviews: { orderBy: { createdAt: "desc" }, take: 1 } },
-        },
+    const ownership = await findDocumentWithOwnership(id, user.id, {
+      parentDocument: {
+        include: { reviews: { orderBy: { createdAt: "desc" }, take: 1 } },
       },
     });
-    if (!document) {
+    if (ownership.status === "missing") {
       debugLog("[GET] Document not found:", id);
       return NextResponse.json({ success: false, error: "Document not found" }, { status: 404 });
     }
-    if (document.userId !== user.id) {
+    if (ownership.status === "forbidden") {
       debugLog("[GET] Forbidden: user", user.id, "does not own document", id);
       return forbidden();
     }
+    const document = ownership.document;
     debugLog("[GET] Document found:", document.id, "version:", document.version);
 
     debugLog("[GET] Step 4/6: Finding latest review...");

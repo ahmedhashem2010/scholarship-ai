@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getAuthenticatedUser } from "@/lib/api-auth";
 import { unauthorized, forbidden } from "@/lib/api-utils";
 import { deleteFile } from "@/lib/supabase/storage";
-import { documentFileUrl } from "@/lib/document-access";
+import { documentFileUrl, findDocumentWithOwnership } from "@/lib/document-access";
 
 export async function GET(
   request: NextRequest,
@@ -18,13 +18,12 @@ export async function GET(
     const user = await getAuthenticatedUser(request);
     if (!user) return unauthorized();
 
-    const document = await prisma.document.findUnique({ where: { id } });
-    if (!document) {
+    const result = await findDocumentWithOwnership(id, user.id);
+    if (result.status === "missing") {
       return NextResponse.json({ success: false, error: "Document not found" }, { status: 404 });
     }
-    if (document.userId !== user.id) {
-      return forbidden();
-    }
+    if (result.status === "forbidden") return forbidden();
+    const document = result.document;
 
     return NextResponse.json({
       success: true,
@@ -61,13 +60,12 @@ export async function DELETE(
     const user = await getAuthenticatedUser(request);
     if (!user) return unauthorized();
 
-    const document = await prisma.document.findUnique({ where: { id } });
-    if (!document) {
+    const result = await findDocumentWithOwnership(id, user.id);
+    if (result.status === "missing") {
       return NextResponse.json({ success: false, error: "Document not found" }, { status: 404 });
     }
-    if (document.userId !== user.id) {
-      return forbidden();
-    }
+    if (result.status === "forbidden") return forbidden();
+    const document = result.document;
 
     await deleteFile(document.fileUrl);
 

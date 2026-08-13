@@ -4,7 +4,7 @@ import { uploadFile, ensureUserRecord } from "@/lib/supabase/storage";
 import { getAuthenticatedUser } from "@/lib/api-auth";
 import { unauthorized, forbidden } from "@/lib/api-utils";
 import { createNewVersion } from "@/lib/document-versions";
-import { documentFileUrl } from "@/lib/document-access";
+import { documentFileUrl, findDocumentWithOwnership } from "@/lib/document-access";
 
 export async function GET(request: NextRequest) {
   try {
@@ -76,11 +76,11 @@ export async function POST(request: NextRequest) {
     // the version chain would link an attacker-controlled file to a victim's
     // document row (privilege escalation via the versioned doc's userId).
     if (parentDocumentId) {
-      const parent = await prisma.document.findUnique({ where: { id: parentDocumentId } });
-      if (!parent) {
+      const parent = await findDocumentWithOwnership(parentDocumentId, user.id);
+      if (parent.status === "missing") {
         return NextResponse.json({ success: false, error: "Parent document not found" }, { status: 404 });
       }
-      if (parent.userId !== user.id) {
+      if (parent.status === "forbidden") {
         return forbidden();
       }
 
