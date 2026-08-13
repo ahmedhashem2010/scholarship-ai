@@ -426,7 +426,7 @@ function RecommendedCard({ match, index }: { match: Match; index: number }) {
       <span className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-secondary-500/12 text-secondary-700 dark:text-secondary-400 sm:flex">
         <GraduationCap className="h-5 w-5" />
       </span>
-      <div className="min-w-0 flex-1">
+      <div className="min-w-0 flex-1 overflow-hidden">
         <p className="truncate text-sm font-semibold text-foreground">{pick(match.nameAr, match.nameEn)}</p>
         <p className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground">
           <MapPin className="h-3 w-3" />

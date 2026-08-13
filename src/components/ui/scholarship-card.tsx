@@ -115,7 +115,7 @@ export function ScholarshipCard({
     showAllReasons ? match.reasons : match.reasons.slice(0, DEFAULT_REASON_COUNT);
 
   return (
-    <Card className={cn("flex flex-col card-hover group", isSelected && "ring-2 ring-primary", className)}>
+    <Card className={cn("flex min-w-0 flex-col card-hover group", isSelected && "ring-2 ring-primary", className)}>
       <CardHeader>
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-2">
@@ -132,7 +132,7 @@ export function ScholarshipCard({
               {pick(`${num(match.fitScore)}% توافق`, `${match.fitScore}% fit`)}
             </Badge>
         </div>
-        <CardTitle className="text-base mt-2 leading-snug">{pick(sch.nameAr, sch.nameEn)}</CardTitle>
+        <CardTitle className="text-base mt-2 leading-snug break-words">{pick(sch.nameAr, sch.nameEn)}</CardTitle>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
           <span className="flex items-center gap-1">
             <span>{getCountryFlag(sch.country)}</span>

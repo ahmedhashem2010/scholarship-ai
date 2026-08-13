@@ -296,7 +296,7 @@ export function ScholarshipCardList({ scholarships }: { scholarships: Scholarshi
         {filtered.map((sch, i) => (
           <Card
             key={sch.id}
-            className="group relative overflow-hidden border border-primary/10 bg-gradient-to-br from-card to-primary/[0.02] hover:-translate-y-1.5 hover:shadow-xl hover:shadow-primary/10 hover:border-primary/20 transition-all duration-300"
+            className="group relative min-w-0 overflow-hidden border border-primary/10 bg-gradient-to-br from-card to-primary/[0.02] hover:-translate-y-1.5 hover:shadow-xl hover:shadow-primary/10 hover:border-primary/20 transition-all duration-300"
             style={{ animationDelay: `${i * 0.05}s` }}
           >
             {/* Competition Level Bar */}
@@ -324,7 +324,7 @@ export function ScholarshipCardList({ scholarships }: { scholarships: Scholarshi
                 </div>
               </div>
 
-              <CardTitle className={`text-base font-bold leading-snug ${selected.has(sch.id) ? "text-primary" : ""}`}>
+              <CardTitle className={`text-base font-bold leading-snug break-words ${selected.has(sch.id) ? "text-primary" : ""}`}>
                 {sch.nameEn}
               </CardTitle>
 
