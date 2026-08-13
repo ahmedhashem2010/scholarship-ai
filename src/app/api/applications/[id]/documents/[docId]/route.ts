@@ -38,7 +38,20 @@ export async function PATCH(
     }
 
     if (status) data.status = status;
-    if (uploadedDocumentId) data.uploadedDocumentId = uploadedDocumentId;
+    if (uploadedDocumentId) {
+      // A user may only link their own document to their application. Without
+      // this check an attacker could attach a victim's document row to their
+      // own application (data integrity) or, conversely, force their own file
+      // to appear inside a victim's application.
+      const doc = await prisma.document.findUnique({ where: { id: uploadedDocumentId } });
+      if (!doc) {
+        return NextResponse.json({ success: false, error: "Document not found" }, { status: 404 });
+      }
+      if (doc.userId !== user.id) {
+        return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
+      }
+      data.uploadedDocumentId = uploadedDocumentId;
+    }
     if (feedback) data.feedback = feedback;
 
     const updated = await prisma.applicationDocument.update({
@@ -46,14 +59,17 @@ export async function PATCH(
       data,
     });
 
-    // Recalculate application progress based on all documents
+    // Recalculate application progress based on all documents. Always target
+    // the application the document actually belongs to (appDoc.applicationId),
+    // never the id from the URL — a caller-supplied params.id could point at a
+    // different user's application and mutate its progress cross-account.
     const allDocs = await prisma.applicationDocument.findMany({
-      where: { applicationId: params.id },
+      where: { applicationId: appDoc.applicationId },
     });
     const newProgress = calculateProgress(allDocs);
 
     await prisma.application.update({
-      where: { id: params.id },
+      where: { id: appDoc.applicationId },
       data: { progress: newProgress },
     });
 

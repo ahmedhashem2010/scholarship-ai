@@ -6,7 +6,8 @@ const { createApiClient } = vi.hoisted(() => ({ createApiClient: vi.fn() }));
 const { createClient: storageCreateClient } = vi.hoisted(() => ({ createClient: vi.fn() }));
 const { prisma } = vi.hoisted(() => ({
   prisma: {
-    document: { count: vi.fn(), findMany: vi.fn(), findUnique: vi.fn() },
+    document: { count: vi.fn(), findMany: vi.fn(), findUnique: vi.fn(), create: vi.fn() },
+    user: { upsert: vi.fn() },
   },
 }));
 
@@ -17,6 +18,7 @@ vi.mock("@supabase/supabase-js", () => ({ createClient: storageCreateClient }));
 import { GET as GETDocuments } from "@/app/api/documents/route";
 import { GET as GETDocument } from "@/app/api/documents/[id]/route";
 import { GET as GETFile } from "@/app/api/documents/[id]/file/route";
+import { POST as POSTDocument } from "@/app/api/documents/route";
 
 const LEGACY_URL =
   "https://test.supabase.co/storage/v1/object/public/documents/user-1/cv.pdf";
@@ -139,5 +141,62 @@ describe("GET /api/documents/[id]/file — ownership enforced on every request",
     });
     expect(res.status).toBe(200);
     expect(await res.text()).toBe("pdf bytes");
+  });
+});
+
+describe("POST /api/documents — parentDocumentId ownership enforced for versions", () => {
+  function makeUploadRequest(parentDocumentId: string | null) {
+    const form = new FormData();
+    form.set("file", new File(["cv content"], "cv.pdf", { type: "application/pdf" }));
+    form.set("documentType", "CV");
+    if (parentDocumentId) form.set("parentDocumentId", parentDocumentId);
+    return new NextRequest("http://localhost/api/documents", { method: "POST", body: form });
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    prisma.user.upsert.mockResolvedValue({});
+  });
+
+  it("returns 403 when the parent document belongs to another user", async () => {
+    mockSession("user-2", "attacker@example.com");
+    prisma.document.findUnique.mockResolvedValue(makeRow({ userId: "user-1" }));
+
+    const res = await POSTDocument(makeUploadRequest("doc-1"));
+    expect(res.status).toBe(403);
+
+    // The upload must never run for a foreign parent.
+    expect(prisma.document.create).not.toHaveBeenCalled();
+  });
+
+  it("returns 404 when the parent document does not exist", async () => {
+    mockSession("user-1");
+    prisma.document.findUnique.mockResolvedValue(null);
+
+    const res = await POSTDocument(makeUploadRequest("doc-missing"));
+    expect(res.status).toBe(404);
+    expect(prisma.document.create).not.toHaveBeenCalled();
+  });
+
+  it("allows versioning your own document and records the caller as owner", async () => {
+    process.env.SUPABASE_SERVICE_ROLE_KEY = "test-key";
+    mockSession("user-1");
+    prisma.document.findUnique.mockResolvedValue(makeRow({ userId: "user-1" }));
+    prisma.document.create.mockResolvedValue(makeRow({ userId: "user-1", version: 2, parentDocumentId: "doc-1" }));
+    storageCreateClient.mockReturnValue({
+      storage: {
+        listBuckets: vi.fn().mockResolvedValue({ data: [{ name: "documents", public: false }], error: null }),
+        from: () => ({ upload: vi.fn().mockResolvedValue({ error: null }) }),
+      },
+    });
+
+    const res = await POSTDocument(makeUploadRequest("doc-1"));
+    expect(res.status).toBe(201);
+
+    const json = await res.json();
+    expect(json.data.userId).toBe("user-1");
+    expect(json.data.version).toBe(2);
+    expect(json.data.parentDocumentId).toBe("doc-1");
+    delete process.env.SUPABASE_SERVICE_ROLE_KEY;
   });
 });

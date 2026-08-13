@@ -77,8 +77,20 @@ export async function POST(request: NextRequest) {
 
     await ensureUserRecord(user.id, user.email ?? undefined);
 
-    // If this is a new version of an existing document, use the versioning system
+    // If this is a new version of an existing document, use the versioning system.
+    // The parent must belong to the caller — otherwise an attacker could upload
+    // their own bytes and have them recorded under a victim's document id, then
+    // the version chain would link an attacker-controlled file to a victim's
+    // document row (privilege escalation via the versioned doc's userId).
     if (parentDocumentId) {
+      const parent = await prisma.document.findUnique({ where: { id: parentDocumentId } });
+      if (!parent) {
+        return NextResponse.json({ success: false, error: "Parent document not found" }, { status: 404 });
+      }
+      if (parent.userId !== user.id) {
+        return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
+      }
+
       const fileUrl = await uploadFile(user.id, file);
       const document = await createNewVersion(parentDocumentId, fileUrl, {
         fileName: file.name,
