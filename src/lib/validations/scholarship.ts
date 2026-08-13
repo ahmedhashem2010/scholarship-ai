@@ -36,6 +36,8 @@ export const scholarshipQuerySchema = z.object({
   country: z.string().optional(),
   degree: z.string().optional(),
   search: z.string().optional(),
+  // Comma-separated list of scholarship IDs (used by the compare flow).
+  ids: z.string().optional(),
   sort: z.nativeEnum(SORT_OPTIONS).optional(),
   page: z
     .string()

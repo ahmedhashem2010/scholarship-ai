@@ -29,6 +29,11 @@ import { FitScore } from "@/components/ui/fit-score";
 import { DeadlineIndicator } from "@/components/ui/deadline-indicator";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { StatusBadge } from "@/components/ui/status-badge";
+import {
+  COMPARE_MAX_SELECTIONS,
+  encodeCompareIds,
+  parseCompareIds,
+} from "@/lib/compare-ids";
 
 interface Scholarship {
   id: string; nameEn: string; nameAr: string; country: string;
@@ -100,7 +105,7 @@ function getCompetitionColor(level: string): "red" | "yellow" | "green" {
 
 function ComparePageContent() {
   const searchParams = useSearchParams();
-  const ids = searchParams.get("ids")?.split(",").filter(Boolean) ?? [];
+  const ids = parseCompareIds(searchParams.get("ids"));
 
   const [scholarships, setScholarships] = useState<Scholarship[]>([]);
   const [matches, setMatches] = useState<MatchResult[]>([]);
@@ -111,7 +116,7 @@ function ComparePageContent() {
     async function load() {
       try {
         const [schRes, matchRes, appRes] = await Promise.all([
-          fetch("/api/scholarships"),
+          fetch(`/api/scholarships?ids=${encodeCompareIds(ids)}`),
           fetch("/api/scholarships/match"),
           fetch("/api/applications"),
         ]);
@@ -883,7 +888,7 @@ function ComparePageContent() {
       <div className="flex items-center justify-between gap-4 rounded-xl border border-border bg-muted p-4">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <CheckCircle2 className="h-4 w-4 text-primary" />
-          <span>Compare up to 6 scholarships at once</span>
+          <span>Compare up to {COMPARE_MAX_SELECTIONS} scholarships at once</span>
         </div>
         <Link href="/dashboard">
           <Button variant="outline" size="sm">

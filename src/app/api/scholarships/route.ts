@@ -4,6 +4,7 @@ import { scholarshipCreateSchema, scholarshipQuerySchema } from "@/lib/validatio
 import { successResponse, handleApiError } from "@/lib/api-utils";
 import { createApiClient } from "@/lib/supabase/api-auth";
 import { withVisibility } from "@/lib/scholarship-filters";
+import { parseCompareIds } from "@/lib/compare-ids";
 import type { Prisma } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
@@ -28,6 +29,16 @@ export async function GET(request: NextRequest) {
         { nameEn: { contains: query.search, mode: "insensitive" } },
         { university: { contains: query.search, mode: "insensitive" } },
       ];
+    }
+
+    if (query.ids) {
+      // Compare flow: fetch exactly the requested scholarships instead of
+      // forcing the client to page through the whole catalogue. Capped so a
+      // hand-crafted request can't build a huge `IN` clause.
+      const ids = parseCompareIds(query.ids).slice(0, 20);
+      if (ids.length > 0) {
+        filters.id = { in: ids };
+      }
     }
 
     // Visibility rules are merged in rather than set directly, so a caller

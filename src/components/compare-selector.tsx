@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { COMPARE_MAX_SELECTIONS, encodeCompareIds } from "@/lib/compare-ids";
 
 interface CompareCard {
   id: string;
@@ -18,7 +19,7 @@ export function CompareSelector({ cards }: { cards: CompareCard[] }) {
   function toggle(id: string) {
     const next = new Set(selected);
     if (next.has(id)) next.delete(id);
-    else if (next.size < 4) next.add(id);
+    else if (next.size < COMPARE_MAX_SELECTIONS) next.add(id);
     setSelected(next);
   }
 
@@ -44,7 +45,7 @@ export function CompareSelector({ cards }: { cards: CompareCard[] }) {
       {selected.size >= 2 && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
           <Button
-            onClick={() => router.push(`/dashboard/compare?ids=${Array.from(selected).join(",")}`)}
+            onClick={() => router.push(`/dashboard/compare?ids=${encodeCompareIds(Array.from(selected))}`)}
             className="shadow-lg"
           >
             Compare Selected ({selected.size})

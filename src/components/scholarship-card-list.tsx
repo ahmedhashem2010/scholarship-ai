@@ -26,6 +26,7 @@ import {
   Calendar,
 } from "lucide-react";
 import { useProfile } from "@/lib/profile-context";
+import { COMPARE_MAX_SELECTIONS, encodeCompareIds } from "@/lib/compare-ids";
 
 interface ScholarshipCardData {
   id: string;
@@ -151,7 +152,7 @@ export function ScholarshipCardList({ scholarships }: { scholarships: Scholarshi
   function toggle(id: string) {
     const next = new Set(selected);
     if (next.has(id)) next.delete(id);
-    else if (next.size < 4) next.add(id);
+    else if (next.size < COMPARE_MAX_SELECTIONS) next.add(id);
     setSelected(next);
   }
 
@@ -392,7 +393,7 @@ export function ScholarshipCardList({ scholarships }: { scholarships: Scholarshi
       {selected.size >= 2 && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
           <Button
-            onClick={() => router.push(`/dashboard/compare?ids=${Array.from(selected).join(",")}`)}
+            onClick={() => router.push(`/dashboard/compare?ids=${encodeCompareIds(Array.from(selected))}`)}
             className="shadow-xl shadow-primary/20 rounded-xl px-6"
           >
             <Sparkles className="h-4 w-4 me-2" />
