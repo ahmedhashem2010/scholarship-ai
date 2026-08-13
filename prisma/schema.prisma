@@ -168,6 +168,9 @@ model Review {
   grammarIssues   String
   overallFeedback String
   modelUsed       String   @default("gemini-2.0-flash")
+  signatureRequired Boolean?
+  signatureStatus   String?
+  signatureNote     String?
   createdAt       DateTime @default(now())
   document        Document @relation(fields: [documentId], references: [id])
   user            User     @relation(fields: [userId], references: [id])

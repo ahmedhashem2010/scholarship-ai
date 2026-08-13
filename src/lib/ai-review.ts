@@ -59,6 +59,46 @@ export class AiWafBlockError extends Error {
   }
 }
 
+/**
+ * Verdict on whether a document appears to need a signature and whether the
+ * text shows evidence of one. Produced by the review service and normalized
+ * there; SmartScholar treats it as optional because deployed versions that
+ * predate the field omit it (absence means "no verdict", never a failure).
+ */
+export interface SignatureCheck {
+  /** Whether this document appears to be the kind that needs a signature at all. */
+  required: boolean;
+  /** SIGNED/NOT_SIGNED only meaningful when `required` is true. */
+  status: "SIGNED" | "NOT_SIGNED" | "UNCERTAIN" | "NOT_APPLICABLE";
+  note: string;
+}
+
+const SIGNATURE_STATUSES = new Set<SignatureCheck["status"]>([
+  "SIGNED",
+  "NOT_SIGNED",
+  "UNCERTAIN",
+  "NOT_APPLICABLE",
+]);
+
+/**
+ * Defensive parse of the review service's `signatureCheck` field. Returns the
+ * object only when well-formed; null when the service omitted the field or
+ * sent something malformed — the review still succeeds, there's just no
+ * signature verdict to persist or show.
+ */
+export function normalizeSignatureCheck(value: unknown): SignatureCheck | null {
+  if (!value || typeof value !== "object") return null;
+  const v = value as { required?: unknown; status?: unknown; note?: unknown };
+  if (typeof v.status !== "string" || !SIGNATURE_STATUSES.has(v.status as SignatureCheck["status"])) {
+    return null;
+  }
+  return {
+    required: typeof v.required === "boolean" ? v.required : v.status !== "NOT_APPLICABLE",
+    status: v.status as SignatureCheck["status"],
+    note: typeof v.note === "string" ? v.note : "",
+  };
+}
+
 export interface ReviewScore {
   overallQuality: {
     score: number;
@@ -78,6 +118,7 @@ export interface ReviewScore {
   topImprovements: string[];
   quickWins: string[];
   overallAssessment: string;
+  signatureCheck?: SignatureCheck;
 }
 
 export function calculateAverageScore(review: ReviewScore): number {

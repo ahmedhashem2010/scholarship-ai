@@ -5,6 +5,7 @@ import { createApiClient } from "@/lib/supabase/api-auth";
 import {
   reviewDocument,
   calculateAverageScore,
+  normalizeSignatureCheck,
   AiConfigError,
   AiCapacityError,
   AGENTROUTER_MODEL,
@@ -279,6 +280,8 @@ export async function POST(
       competitiveness: coaching.competitiveness,
     };
 
+    const signatureCheck = normalizeSignatureCheck(coaching.signatureCheck);
+
     // The daily slot is already reserved, so this is a plain insert. If the
     // write fails, release the slot so the user can retry without losing a
     // free review.
@@ -296,6 +299,9 @@ export async function POST(
           suggestions: JSON.stringify(coaching.topImprovements ?? []),
           grammarIssues: JSON.stringify(coaching.quickWins ?? []),
           overallFeedback: coaching.overallAssessment ?? "Review completed.",
+          signatureRequired: signatureCheck?.required ?? null,
+          signatureStatus: signatureCheck?.status ?? null,
+          signatureNote: signatureCheck?.note ?? null,
         },
       });
       debugLog("[POST] Review saved, id:", review.id);
@@ -336,6 +342,7 @@ export async function POST(
       topImprovements: safeArray(review.suggestions),
       quickWins: safeArray(review.grammarIssues),
       overallAssessment: review.overallFeedback,
+      signatureCheck,
       modelUsed: review.modelUsed || AGENTROUTER_MODEL,
       createdAt: review.createdAt,
     };
@@ -428,6 +435,13 @@ export async function GET(
         topImprovements: safeArray(review.suggestions),
         quickWins: safeArray(review.grammarIssues),
         overallAssessment: review.overallFeedback,
+        signatureCheck: review.signatureStatus
+          ? {
+              required: review.signatureRequired ?? review.signatureStatus !== "NOT_APPLICABLE",
+              status: review.signatureStatus,
+              note: review.signatureNote ?? "",
+            }
+          : null,
         modelUsed: review.modelUsed,
         createdAt: review.createdAt,
       } : null,

@@ -6,8 +6,8 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import {
-  ArrowUpRight, Award, CheckCircle2, ExternalLink, FileText, Lightbulb,
-  Sparkles, TrendingUp, Upload, Zap, AlertCircle,
+  ArrowUpRight, Award, CheckCircle2, ExternalLink, FileText, HelpCircle,
+  Lightbulb, PenLine, Sparkles, TrendingUp, Upload, Zap, AlertCircle,
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ConfettiTrigger } from "@/components/scholarship/confetti-trigger";
@@ -32,12 +32,19 @@ interface ScoreBlock {
   competitiveness: { score: number; uniqueStrengths: string; differentiation: string };
 }
 
+interface SignatureCheckData {
+  required: boolean;
+  status: "SIGNED" | "NOT_SIGNED" | "UNCERTAIN" | "NOT_APPLICABLE";
+  note: string;
+}
+
 interface ReviewData extends ScoreBlock {
   id: string;
   score: number;
   topImprovements: string[];
   quickWins: string[];
   overallAssessment: string;
+  signatureCheck: SignatureCheckData | null;
   createdAt: string;
 }
 
@@ -239,6 +246,11 @@ export default function ReviewResultsPage() {
                 />
               </div>
             </div>
+
+            {/* Signature check ---------------------------------------- */}
+            {review.signatureCheck && review.signatureCheck.status !== "NOT_APPLICABLE" && (
+              <SignaturePanel check={review.signatureCheck} />
+            )}
 
             {/* Strengths / weaknesses --------------------------------- */}
             <div className="grid gap-4 sm:grid-cols-2">
@@ -491,6 +503,74 @@ function Panel({ tone, title, body }: { tone: "good" | "warn"; title: string; bo
     <div className={`rounded-xl border p-4 ${colour}`}>
       <h3 className="text-sm font-semibold text-foreground">{title}</h3>
       <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{body}</p>
+    </div>
+  );
+}
+
+/**
+ * Signature verdict from the review service. `NOT_APPLICABLE` is the common
+ * case (CVs, personal statements) and renders nothing; the other three
+ * statuses carry a message worth showing the student.
+ */
+function SignaturePanel({ check }: { check: SignatureCheckData }) {
+  const { pick } = useLanguage();
+
+  const copy: Record<
+    Exclude<SignatureCheckData["status"], "NOT_APPLICABLE">,
+    { tone: "good" | "warn" | "muted"; title: string; body: string }
+  > = {
+    SIGNED: {
+      tone: "good",
+      title: pick("تم العثور على توقيع", "Signature detected"),
+      body: pick(
+        "يبدو أن هذا المستند يتضمّن توقيعاً، لذا يمكنك تقديمه كما هو.",
+        "This document appears to include a signature, so it's ready to submit as-is."
+      ),
+    },
+    NOT_SIGNED: {
+      tone: "warn",
+      title: pick("يحتاج إلى توقيع", "Needs your signature"),
+      body: pick(
+        "هذا النوع من المستندات يُوقَّع عادةً، ولم نعثر على توقيع في النص. أضف توقيعك ثم ارفع نسخة جديدة.",
+        "This kind of document is normally signed, but we couldn't find a signature in the text. Add yours, then upload a new version."
+      ),
+    },
+    UNCERTAIN: {
+      tone: "muted",
+      title: pick("تعذّر التأكد من التوقيع", "Couldn't confirm the signature"),
+      body: pick(
+        "لم نتمكن من الجزم مما إذا كان هذا المستند يتطلب توقيعاً. راجع شروط المنحة قبل التقديم.",
+        "We couldn't tell whether this document needs a signature. Check the scholarship's requirements before you submit."
+      ),
+    },
+  };
+
+  const cfg = copy[check.status as Exclude<SignatureCheckData["status"], "NOT_APPLICABLE">];
+  const icon =
+    cfg.tone === "good" ? (
+      <CheckCircle2 className="h-4 w-4 text-[rgb(var(--success))]" />
+    ) : cfg.tone === "warn" ? (
+      <PenLine className="h-4 w-4 text-[rgb(var(--accent-warm))]" />
+    ) : (
+      <HelpCircle className="h-4 w-4 text-muted-foreground" />
+    );
+  const border =
+    cfg.tone === "good"
+      ? "border-[rgb(var(--success))]/25 bg-[rgb(var(--success))]/10"
+      : cfg.tone === "warn"
+        ? "border-[rgb(var(--accent-warm))]/25 bg-[rgb(var(--accent-warm))]/10"
+        : "border-border bg-card";
+
+  return (
+    <div className={`rounded-xl border p-4 ${border}`}>
+      <div className="flex items-center gap-2">
+        {icon}
+        <h3 className="text-sm font-semibold text-foreground">{cfg.title}</h3>
+      </div>
+      <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{cfg.body}</p>
+      {check.note && (
+        <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground/80">{check.note}</p>
+      )}
     </div>
   );
 }

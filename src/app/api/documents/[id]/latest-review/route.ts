@@ -22,6 +22,9 @@ export async function GET(
         overallFeedback: true,
         strengths: true,
         suggestions: true,
+        signatureRequired: true,
+        signatureStatus: true,
+        signatureNote: true,
         createdAt: true,
       },
     });
