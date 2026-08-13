@@ -128,7 +128,7 @@ export default function RootLayout({
           Skip to main content
         </a>
         <HeroUIProvider>
-          <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
             <LanguageProvider>
               <ProfileProvider>
                 <div className="min-h-screen bg-background">
