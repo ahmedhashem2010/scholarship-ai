@@ -419,7 +419,7 @@ function RecommendedCard({ match, index }: { match: Match; index: number }) {
   return (
     <Link
       href={`/scholarships/${match.id}`}
-      className="dash-scale-in group flex items-center gap-3 rounded-2xl border border-border bg-card p-3 shadow-[0_14px_34px_-18px_rgb(22_44_76_/_0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_20px_44px_-18px_rgb(22_44_76_/_0.42)] sm:gap-4 sm:p-4"
+      className="dash-scale-in group flex w-full min-w-0 max-w-full items-center gap-3 overflow-hidden rounded-2xl border border-border bg-card p-3 shadow-[0_14px_34px_-18px_rgb(22_44_76_/_0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_20px_44px_-18px_rgb(22_44_76_/_0.42)] sm:gap-4 sm:p-4"
       style={{ "--dash-delay": `${index * 90}ms` } as React.CSSProperties}
     >
       <span className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-secondary-500/12 text-secondary-700 dark:text-secondary-400 sm:flex">
@@ -427,9 +427,9 @@ function RecommendedCard({ match, index }: { match: Match; index: number }) {
       </span>
       <div className="min-w-0 flex-1 overflow-hidden">
         <p className="truncate text-sm font-semibold text-foreground">{pick(match.nameAr, match.nameEn)}</p>
-        <p className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground">
-          <MapPin className="h-3 w-3" />
-          {match.country}
+        <p className="mt-0.5 flex min-w-0 max-w-full items-center gap-1.5 overflow-hidden text-xs text-muted-foreground">
+          <MapPin className="h-3 w-3 shrink-0" />
+          <span className="min-w-0 truncate">{match.country}</span>
           {match.daysLeft !== null && (
             <span className="inline-flex items-center gap-1 text-secondary-700 dark:text-secondary-400">
               · <Clock className="h-3 w-3" />{" "}
@@ -449,7 +449,7 @@ function RecommendedCard({ match, index }: { match: Match; index: number }) {
           />
         </div>
       </div>
-<div className="min-w-[60px] shrink-0 text-end">
+      <div className="min-w-[60px] max-w-[72px] shrink-0 overflow-hidden text-end">
         <p className={cn("text-xl font-bold tabular-nums sm:text-2xl", fitColor(pct))}>{num(pct)}%</p>
         <p className="text-[10px] font-medium leading-tight text-muted-foreground sm:text-[11px]">
           {pick("نسبة التطابق", "fit score")}
@@ -785,7 +785,7 @@ export default function DashboardPage() {
   }, [apps, docs, matches, pick, num, isRTL]);
 
   return (
-    <div className="space-y-12">
+    <div className="min-w-0 space-y-12">
       {/* Welcome --------------------------------------------------------- */}
       <section className="dash-in">
         <div className="flex flex-wrap items-end justify-between gap-4">
@@ -879,9 +879,9 @@ export default function DashboardPage() {
       </section>
 
       {/* Main grid --------------------------------------------------------- */}
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid min-w-0 gap-6 lg:grid-cols-3">
         {/* Left column */}
-        <div className="space-y-8 lg:col-span-2">
+        <div className="min-w-0 space-y-8 lg:col-span-2">
           {/* Recommended */}
           <section>
             <SectionHeader
@@ -889,7 +889,7 @@ export default function DashboardPage() {
               title={pick("أفضل المنح لك", "Your best matches")}
               href="/scholarships/matches"
             />
-            <div className="mt-4 space-y-3">
+            <div className="mt-4 min-w-0 max-w-full space-y-3">
               {sectionsLoading ? (
                 [0, 1, 2].map((i) => <SkeletonBlock key={i} className="h-[86px]" />)
               ) : matches.length === 0 ? (
@@ -955,7 +955,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Right column */}
-        <div className="space-y-8">
+        <div className="min-w-0 space-y-8">
           {/* Deadlines */}
           <section>
             <SectionHeader
