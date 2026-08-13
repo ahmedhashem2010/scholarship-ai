@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { localiseNumber } from "@/lib/i18n"
 
 interface CountUpProps {
   value: number
@@ -11,8 +12,24 @@ interface CountUpProps {
   className?: string
   /** Kept out of the DOM when true — used to reserve exact text width. */
   tabular?: boolean
-  /** Intl locale for digit formatting — pass "ar-EG" to render Arabic-Indic numerals. */
+  /** Pass "ar-EG" to render Arabic-Indic numerals, any other value renders Western digits. */
   locale?: string
+}
+
+/**
+ * Formats a fixed-decimal number for display. Arabic digits are produced via
+ * the same manual substitution `num()` uses everywhere else in the app,
+ * NOT `toLocaleString("ar-EG", …)` — that Intl path renders inconsistently
+ * (missing/garbled digits) across mobile browsers' ICU data, especially
+ * combined with fractional values and an animating (non-integer) input.
+ */
+function formatCount(n: number, decimals: number, locale: string): string {
+  const fixed = n.toFixed(decimals)
+  if (locale.startsWith("ar")) return localiseNumber(fixed, "ar")
+  return Number(fixed).toLocaleString(locale, {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  })
 }
 
 /**
@@ -58,20 +75,12 @@ export function CountUp({
     return () => cancelAnimationFrame(frame)
   }, [value, duration])
 
-  const formatted = display.toLocaleString(locale, {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  })
-
   return (
     <span
       className={className}
       style={tabular ? { fontVariantNumeric: "tabular-nums" } : undefined}
     >
-      {mounted ? formatted : value.toLocaleString(locale, {
-        minimumFractionDigits: decimals,
-        maximumFractionDigits: decimals,
-      })}
+      {formatCount(mounted ? display : value, decimals, locale)}
     </span>
   )
 }

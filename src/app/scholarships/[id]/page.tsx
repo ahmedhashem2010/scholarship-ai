@@ -459,14 +459,38 @@ function SourceActions({ s }: { s: Scholarship }) {
 }
 
 /** Source text arrives as newline-separated bullets. */
-function BulletList({ text, tone }: { text: string; tone?: "good" }) {
-  const items = text
+/**
+ * `benefits`/`requirements` are stored as a single-line `JSON.stringify`'d
+ * object (varying keys per scholarship — e.g. `{tuition, allowance, ...}` or
+ * `{coverage, note, language, ...}`), never as newline-delimited prose. Parse
+ * it and use each value as one bullet line instead of falling through to
+ * "not a list" and dumping the raw JSON string on the page.
+ */
+function itemsFromJsonOrText(text: string): string[] {
+  const trimmed = text.trim();
+  if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
+    try {
+      const parsed = JSON.parse(trimmed);
+      const values = Array.isArray(parsed) ? parsed : Object.values(parsed);
+      const flat = values
+        .map((v) => (typeof v === "string" ? v.trim() : typeof v === "number" ? String(v) : ""))
+        .filter(Boolean);
+      if (flat.length > 0) return flat;
+    } catch {
+      // Not actually JSON despite the leading brace — fall through to plain-text handling below.
+    }
+  }
+  return text
     .split("\n")
     .map((l) => l.replace(/^[-•*]\s*/, "").trim())
     .filter(Boolean);
+}
+
+function BulletList({ text, tone }: { text: string; tone?: "good" }) {
+  const items = itemsFromJsonOrText(text);
 
   if (items.length <= 1) {
-    return <p className="text-sm leading-relaxed text-muted-foreground">{text}</p>;
+    return <p className="text-sm leading-relaxed text-muted-foreground">{items[0] ?? text}</p>;
   }
 
   return (
