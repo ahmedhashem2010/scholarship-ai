@@ -29,3 +29,29 @@ video-assets/out/*
 !video-assets/out/smartscholar.mp4
 video-assets/__pycache__/
 **/_*.png
+
+# AI tool / skill clutter — accidentally committed, kept locally but not tracked
+.agents/
+.claude/
+.codex/
+.impeccable/
+agent-skills/
+marketingskills/
+skills-lock.json
+opencode.json
+src/ui-ux-pro-max/
+
+# Raw AI coding-session transcripts — not meant for the public repo
+session-last.md
+session-ses_*.md
+session2.md
+
+# Stray dev artifacts
+check-profiles.tmp.mjs
+test-prisma.mjs
+martscholar-backend
+matching-audit-results.json
+prisma/dev.db
+
+# Purchased font vendor bundle — redundant with public/fonts/, not for redistribution
+nitro/
